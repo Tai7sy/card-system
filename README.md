@@ -8,6 +8,7 @@ PHP >= 5.6.4
 chmod -R 666 storage/
 chmod -R 666 bootstrap/cache/
 ```
+ - Renamed the .env.example file to .env
  - Config .env file (according to yourself)
  - Import card.sql to your database
  - Optimize (Optional)
@@ -27,6 +28,11 @@ PHP >= 5.6.4
 
 ## 安装
  - 网页根目录是 `项目路径/public`, 配置网站时请注意!
+ - 复制 .env.example 到 .env
+```
+copy .env.example .env #win
+cp .env.example .env #linux
+```
  - 修改 .env 配置文件 (app名称, 数据库, 邮件等)
  - 将 card.sql 导入到数据库
  - 修改目录权限(Linux)
