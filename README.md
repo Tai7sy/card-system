@@ -13,6 +13,7 @@ chmod -R 666 bootstrap/cache/
  - Import card.sql to your database
  - Optimize (Optional)
 ```
+php artisan key:generate
 php artisan route:cache
 php artisan config:cache
 ```
@@ -42,6 +43,7 @@ chmod -R 666 bootstrap/cache/
 ```
  - 优化 (可选)
 ```
+php artisan key:generate
 php artisan route:cache
 php artisan config:cache
 ```
