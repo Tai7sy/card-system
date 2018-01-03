@@ -1,5 +1,5 @@
 ## Require
-PHP >= 5.6.4
+PHP >= 7.0.0
 
 ## Install
  - Remember the root of website is `path_to_project/public` !
@@ -25,7 +25,7 @@ php artisan config:cache
 </br>
 
 ## 要求
-PHP >= 5.6.4
+PHP >= 7.0.0
 
 ## 安装
  - 网页根目录是 `项目路径/public`, 配置网站时请注意!
