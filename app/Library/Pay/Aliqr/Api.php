@@ -35,7 +35,6 @@ class Api implements ApiInterface
         $amount = sprintf('%.2f', $amount_cent / 100); //支付宝元为单位
         $this->defineConfig($config);
 
-        var_dump($config);
         // 支付超时，线下扫码交易定义为5分钟
         $timeExpress = '5m';
 
