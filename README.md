@@ -5,8 +5,8 @@ PHP >= 7.0.0
  - Remember the root of website is `path_to_project/public` !
  - Change folder permission
 ```
-chmod -R 666 storage/
-chmod -R 666 bootstrap/cache/
+chmod -R 777 storage/
+chmod -R 777 bootstrap/cache/
 ```
  - Renamed the .env.example file to .env
  - Config .env file (according to yourself)
@@ -38,8 +38,8 @@ cp .env.example .env #linux
  - 将 card.sql 导入到数据库
  - 修改目录权限(Linux)
 ```
-chmod -R 666 storage/
-chmod -R 666 bootstrap/cache/
+chmod -R 777 storage/
+chmod -R 777 bootstrap/cache/
 ```
  - 优化 (可选)
 ```
