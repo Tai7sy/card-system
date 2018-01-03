@@ -17,7 +17,7 @@ Route::post('admin/login', 'Admin\LoginController@login')->middleware('api');
 
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function () {
-    Route::post('dashboard', 'Admin\DashBoardController@index');
+    Route::post('dashboard', 'Admin\DashboardController@index');
     Route::post('auth/change', 'Admin\LoginController@change');
 
     Route::post('group/get', 'Admin\GroupController@get');
