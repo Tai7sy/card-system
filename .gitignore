@@ -1,3 +1,4 @@
+/.gitignore
 /web
 /node_modules
 /public/hot
