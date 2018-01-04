@@ -1,6 +1,8 @@
 [Installation Tutorial](https://github.com/Tai7sy/card-system/wiki/BT%E9%9D%A2%E6%9D%BF%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B)<br>
 [BT面板安装教程](https://github.com/Tai7sy/card-system/wiki/BT%E9%9D%A2%E6%9D%BF%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B)<br><br>
 
+> Version: 1.1
+
 ## Require
 PHP >= 7.0.0
 
@@ -10,6 +12,8 @@ PHP >= 7.0.0
 ```
 chmod -R 777 storage/
 chmod -R 777 bootstrap/cache/
+chmod -R 777 app/Library/Pay/Aliqr/f2fpay/log/ #if using Aliqr
+chmod -R 777 app/Library/Pay/Wechat/logs/ #if using Wechat
 ```
  - Renamed the .env.example file to .env
  - Config .env file (according to yourself)
@@ -43,6 +47,8 @@ cp .env.example .env #linux
 ```
 chmod -R 777 storage/
 chmod -R 777 bootstrap/cache/
+chmod -R 777 app/Library/Pay/Aliqr/f2fpay/log/ #如果使用了支付宝当面付
+chmod -R 777 app/Library/Pay/Wechat/logs/ #如果使用了微信支付
 ```
  - 优化 (可选)
 ```
