@@ -303,7 +303,14 @@ class PayController extends Controller
             }
         })) {
             Log::notice('payReturn: ' . $driver . ' verify finished: success' . "\n\n");
-            return redirect('/pay/result/' . $out_trade_no);
+            if ($request->ajax()) {
+                return self::renderResult($request, [
+                    'success' => true,
+                    'data' => '/pay/result/' . $out_trade_no
+                ]);
+            } else {
+                return redirect('/pay/result/' . $out_trade_no);
+            }
         } else {
             Log::notice('payReturn: ' . $driver . ' verify finished: fail' . "\n\n");
             return $this->renderResult($request, [

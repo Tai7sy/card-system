@@ -1,7 +1,7 @@
 [Installation Tutorial](https://github.com/Tai7sy/card-system/wiki/BT%E9%9D%A2%E6%9D%BF%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B)<br>
 [BT面板安装教程](https://github.com/Tai7sy/card-system/wiki/BT%E9%9D%A2%E6%9D%BF%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B)<br><br>
 
-> Version: 1.1
+> Version: 1.2
 
 ## Require
 PHP >= 7.0.0
