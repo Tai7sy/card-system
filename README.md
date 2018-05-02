@@ -1,6 +1,6 @@
 > 商业版预览: [http://fakala.xyz/](http://fakala.xyz/)
 
-> 开源版当前版本: 1.4
+> 开源版当前版本: 1.5
 
 [BT面板安装教程](https://github.com/Tai7sy/card-system/wiki/BT%E9%9D%A2%E6%9D%BF%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B)<br><br>
 
