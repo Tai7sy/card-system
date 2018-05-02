@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Library\Pay\Wechat;
+namespace App\Library\Pay\Wechat5;
 
 use App\Library\Pay\ApiInterface;
 use Illuminate\Support\Facades\Log;
@@ -13,10 +13,49 @@ class Api implements ApiInterface
 
     public function __construct()
     {
-        $this->url_notify = SYS_URL_API . '/pay/notify/wechat';
-        $this->url_return = SYS_URL . '/pay/return/wechat';
+        $this->url_notify = SYS_URL_API . '/pay/notify/wechat5';
+        $this->url_return = SYS_URL . '/pay/return/wechat5';
     }
 
+    /**
+     * 获取真实IP地址
+     * @return array|false|string
+     */
+    public static function getIP()
+    {
+        if (isset($_SERVER)) {
+            if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
+                $IPAddress = $_SERVER["HTTP_X_FORWARDED_FOR"];
+            } else if (isset($_SERVER["HTTP_CLIENT_IP"])) {
+                $IPAddress = $_SERVER["HTTP_CLIENT_IP"];
+            } else {
+                $IPAddress = $_SERVER["REMOTE_ADDR"];
+            }
+        } else {
+            if (getenv("HTTP_X_FORWARDED_FOR")) {
+                $IPAddress = getenv("HTTP_X_FORWARDED_FOR");
+            } else if (getenv("HTTP_CLIENT_IP")) {
+                $IPAddress = getenv("HTTP_CLIENT_IP");
+            } else {
+                $IPAddress = getenv("REMOTE_ADDR");
+            }
+        }
+
+        if (strpos($IPAddress, ',') !== FALSE) {
+            $IPAddArr = explode(',', $IPAddress);
+            return $IPAddArr[0];
+        }
+        return $IPAddress;
+    }
+
+    /**
+     * @param array $config
+     * @param string $out_trade_no
+     * @param string $subject
+     * @param string $body
+     * @param int $amount_cent
+     * @throws \Exception
+     */
     function goPay($config, $out_trade_no, $subject, $body, $amount_cent)
     {
         $amount = $amount_cent;
@@ -40,10 +79,12 @@ class Api implements ApiInterface
         $input->SetTime_expire(date('YmdHis', time() + 600));
         $input->SetGoods_tag('pay');//商品标记 主要用于优惠券立减功能
         $input->SetNotify_url($this->url_notify);
-        $input->SetTrade_type('NATIVE');
+        $input->SetTrade_type('MWEB');
+        $input->SetScene_info('{"h5_info": {"type":"Wap","wap_url": "' . SYS_URL . '","wap_name": "发卡平台"}}');
         $input->SetProduct_id($out_trade_no);//商品ID  可自定义
-        $result = $notify->GetPayUrl($input);
-        if (!isset($result['code_url'])) {
+        $input->SetSpbill_create_ip(static::getIP());
+        $result = $notify->GetH5PayUrl($input);
+        if (!isset($result['mweb_url'])) {
             \Log::error($result);
 
             if (isset($result['err_code_des']))
@@ -54,7 +95,7 @@ class Api implements ApiInterface
 
             throw new \Exception('获取支付数据失败');
         }
-        header('location: /qrcode/pay/' . $out_trade_no . '/wechat/' . base64_encode($result['code_url']));
+        header('location: ' . $result["mweb_url"]);
     }
 
 
