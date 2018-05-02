@@ -1,0 +1,34 @@
+
+@import "../../../node_modules/muse-ui/less/vars.less"; // 默认基础的变量
+// 主色和强调色
+@primaryColor: @lightBlue;           // 主色
+@darkerPrimaryColor: @lightBlue700;  // 更深的主色
+@lighterPrimaryColor: @grey400;      // 浅一点的主色
+@accentColor: @pinkA200;             // 强调色
+@darkerAccentColor: @grey100;        // 更深的强调色
+@lighterAccentColor: @grey500;       // 浅一点的强调色
+
+// 文本颜色
+@textColor: @darkBlack;
+@secondaryTextColor: fade(@fullBlack, 54%);
+@alternateTextColor: @white;
+@borderColor: fade(@fullBlack, 12%);
+@disabledColor: fade(@fullBlack, 38%);
+
+// background
+@backgroundColor: @white;           // 背景色
+@statusBarBackgroundColor: @grey300; // web项目没有状态栏，所以也没有使用
+@appbarBackgroundColor: @grey100; // 并未在appbar组件中应用
+@dialogBackgroundColor: @white; // dialogs、 cards、 paper 组件背景
+
+// icon color
+@activeIconColor: fade(@fullBlack, 54%);
+@inActiveIconColor: fade(@fullBlack, 38%);
+
+
+@import "../../../node_modules/muse-ui/less/theme-vars.less";  // 默认组件变量
+@import "../../../node_modules/muse-ui/less/theme.less"; // 主题相关的样式
+
+.mu-item.selected .mu-item-left{
+  color: @primaryColor !important;
+}
