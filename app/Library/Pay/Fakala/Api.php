@@ -51,9 +51,6 @@ class Api implements ApiInterface
         $api->uid = $config['api_id'];
         $api->key = $config['api_key'];
 
-
-        //验证订单
-        $API = new \yekeAPI();
         if ($isNotify) {
             $result = $api->notify_verify();
         } else {
