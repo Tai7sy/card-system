@@ -99,10 +99,10 @@ class fakala
     {
         $params = $_GET;
         if ($params['sign'] === $this->getSign($params, $this->key)) {
-            echo 'success';
+            echo 'return success';
             return true;
         } else {
-            echo 'fail';
+            echo 'return fail';
             return false;
         }
     }

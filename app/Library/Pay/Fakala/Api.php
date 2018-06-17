@@ -62,6 +62,7 @@ class Api implements ApiInterface
             $total_fee = $_REQUEST['total_fee'];
             $fakala_no = $_REQUEST['order_no']; // API渠道订单号
             $successCallback($out_trade_no, $total_fee, $fakala_no);
+            return true;
         }
 
         return false;
