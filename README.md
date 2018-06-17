@@ -70,6 +70,7 @@ php artisan config:cache
 - 修改 .env 之后, 需要运行 `php artisan config:cache`
 
 2. 支持的支付方式?
-- 支付宝 支付宝手机版 当面付 微信扫码 微信H5 Fakala(商业测试站API, 目前可使用) Mzhipay(@Cghang提供) Yeke(已跑路)
+- 支付宝 支付宝手机版 当面付 微信扫码 微信H5 
+- 第三四五六七八...方支付接口: Fakala(商业测试站API, 目前可使用) Mzhipay(@Cghang提供) Yeke(已跑路)
 
 
