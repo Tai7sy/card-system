@@ -17,8 +17,8 @@ class fakala
         ksort($params);
         $signStr = '';
         foreach ($params as $k => $v) {
-            if ('sign' !== $k && $v !== null) {
-                $signStr .= $k . '=' . $v . '&';
+            if ('sign' !== $k) {
+                $signStr .= $k . '=' . ($v ? $v : '') . '&';
             }
         }
         $sign = md5($signStr . 'key=' . $key);
