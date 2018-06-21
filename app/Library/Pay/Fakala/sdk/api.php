@@ -12,8 +12,7 @@ class fakala
     public $key = APP_KEY;
 
 
-    function getSign($params, $key, &$out_url = null)
-    {
+    function getSignStr($params){
         ksort($params);
         $signStr = '';
         foreach ($params as $k => $v) {
@@ -21,8 +20,14 @@ class fakala
                 $signStr .= $k . '=' . ($v ? $v : '') . '&';
             }
         }
+        return $signStr;
+    }
+
+    function getSign($params, $key, &$out_url = false)
+    {
+        $signStr = self::getSignStr($params);
         $sign = md5($signStr . 'key=' . $key);
-        if ($out_url) {
+        if ($out_url !== false) {
             $out_url = $signStr . 'sign=' . $sign;
         }
         return $sign;
