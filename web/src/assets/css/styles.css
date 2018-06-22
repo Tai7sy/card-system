@@ -1,0 +1,72 @@
+.float-left {
+    float: left
+}
+
+.float-right {
+    float: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.cursor-pointer{
+  cursor: pointer;
+}
+
+.w100 {
+    width: 100%;
+}
+
+.h100 {
+    height: 100%;
+}
+
+.mt0 {
+    margin-top: 0;
+}
+
+.mt6 {
+    margin-top: 6px;
+}
+
+.mt12 {
+    margin-top: 12px;
+}
+
+.mb0 {
+    margin-bottom: 0;
+}
+.mb12 {
+    margin-bottom: 12px;
+}
+
+.ml0 {
+    margin-left: 0;
+}
+
+.mr0 {
+    margin-right: 0;
+}
+.mr12 {
+    margin-right: 12px;
+}
+.pt0 {
+    padding-top: 0;
+}
+
+.pt12 {
+    padding-top: 12px;
+}
+.p12 {
+    padding: 12px;
+}
+a {
+    color: #03a9f4;
+}
+
+.over-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

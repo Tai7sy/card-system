@@ -165,6 +165,11 @@ INSERT INTO `pays` VALUES ('1', '支付宝', '/plugins/images/ali.png', 'Alipay'
 INSERT INTO `pays` VALUES ('2', '手机支付宝', '/plugins/images/ali.png', 'Aliwap', 'Aliwap', '{\n  \"partner\": \"partner\",\n  \"key\": \"key\"\n}', null, '2', '2018-01-03 10:39:28', '2018-01-03 10:39:28');
 INSERT INTO `pays` VALUES ('3', '支付宝扫码(当面付)', '/plugins/images/ali.png', 'Aliqr', 'Aliqr', '{\n  \"app_id\": \"app_id\",\n  \"alipay_public_key\": \"alipay_public_key\",\n  \"merchant_private_key\": \"merchant_private_key\"\n}', null, '3', '2018-01-03 10:39:28', '2018-01-03 10:39:28');
 INSERT INTO `pays` VALUES ('4', '微信扫码支付', '/plugins/images/wx.png', 'Wechat', 'Wechat', '{\n  \"APPID\": \"APPID\",\n  \"MCHID\": \"商户ID\",\n  \"KEY\": \"KEY\",\n  \"APPSECRET\": \"APPSECRET\"\n}', null, '3', '2018-01-03 10:39:28', '2018-01-03 10:39:28');
+INSERT INTO `pays` (`id`, `name`, `img`, `driver`, `way`, `config`, `comment`, `enabled`, `created_at`, `updated_at`) VALUES
+(5, '支付宝', '/plugins/images/ali.png', 'Fakala', 'alipay', '{\n  "api_id": "api_id",\n  "api_key": "api_key"\n}', 'alipay', 3, '2018-06-17 06:20:24', '2018-06-21 12:28:07'),
+(6, '手机支付宝', '/plugins/images/ali.png', 'Fakala', 'alipaywap', '{\n  "api_id": "api_id",\n  "api_key": "api_key"\n}', 'alipaywap', 3, '2018-06-17 07:09:27', '2018-06-21 12:30:22'),
+(7, '手机微信', '/plugins/images/wx.png', 'Fakala', 'wxwap', '{\n  "api_id": "api_id",\n  "api_key": "api_key"\n}', 'wxwap', 3, '2018-06-17 07:10:09', '2018-06-21 12:28:29'),
+(8, '微信', '/plugins/images/wx.png', 'Fakala', 'wx', '{\n  "api_id": "api_id",\n  "api_key": "api_key"\n}', 'wx', 3, '2018-06-17 07:13:56', '2018-06-21 12:30:30');
 
 -- ----------------------------
 -- Table structure for users

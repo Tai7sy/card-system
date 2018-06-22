@@ -1,0 +1,40 @@
+
+.step-content {
+    margin: 0 16px !important;
+}
+
+@media (max-width: 600px) {
+    .step-content {
+        margin: 0 !important;
+    }
+
+    .mu-step-connector {
+        padding: 0 12px !important;
+    }
+
+    .mu-step-label {
+        padding: 0 !important;
+    }
+}
+
+
+@media (max-width: 500px) {
+    .mu-dialog{
+        width: 80% !important;
+    }
+}
+@media (max-width: 400px) {
+    .mu-dialog{
+        width: 90% !important;
+    }
+}
+.mu-dialog-title.scrollable{
+    border-bottom: 0 !important;
+}
+.mu-dialog-actions.scrollable{
+    border-top: 0 !important;
+}
+
+.mu-td, .mu-th {
+  padding-left: 0;
+}
