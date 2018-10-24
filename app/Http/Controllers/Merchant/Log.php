@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Http\Controllers\Merchant;
+
+use App\Library\Response;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+
+class Log extends Controller
+{
+    function get(Request $request)
+    {
+        $user_id = $request->post('user_id');
+        $action = $request->post('action', \App\Log::ACTION_LOGIN);
+        $query = \App\Log::where('action', $action);
+
+        if ($user_id && self::isAdmin()) {
+            $query->where('user_id', $user_id);
+        } else {
+            $query->where('user_id', Auth::id());
+        }
+
+        $start_at = $request->post('start_at');
+        if (strlen($start_at))
+            $query->where('created_at', '>=', $start_at . ' 00:00:00');
+
+        $end_at = $request->post('end_at');
+        if (strlen($end_at))
+            $query->where('created_at', '<=', $end_at . ' 23:59:59');
+
+        $page = $request->post('current_page', 1);
+        $pageSize = $request->post('per_page', 20);
+        $list = $query->orderBy('created_at', 'DESC')
+            ->paginate($pageSize, ['*'], 'page', $page);
+
+        return Response::success($list);
+    }
+}

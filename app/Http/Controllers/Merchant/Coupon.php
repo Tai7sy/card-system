@@ -1,0 +1,214 @@
+<?php
+
+namespace App\Http\Controllers\Merchant;
+
+use App\Library\Response;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+
+class Coupon extends Controller
+{
+    function get(Request $request)
+    {
+        $query = $this->authQuery($request, \App\Coupon::class)
+            ->with(['category' => function ($query) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
+                $query->select(['id', 'name']);
+            }])
+            ->with(['product' => function ($query) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
+                $query->select(['id', 'name']);
+            }]);
+
+        $searchType = $request->post('search', false);
+        $searchVal = $request->post('val', false);
+        if ($searchType && $searchVal) {
+            if ($searchType == 'id') {
+                $query->where('id', $searchVal);
+            } else {
+                $query->where($searchType, 'like', '%' . $searchVal . '%');
+            }
+        }
+        $category_id = (int)$request->post('category_id');
+        $product_id = $request->post('product_id', -1);
+
+        if ($category_id > 0) {
+            if ($product_id > 0) $query->where('product_id', $product_id);
+            else  $query->where('category_id', $category_id);
+        }
+
+        $status = $request->post('status');
+        if (strlen($status))
+            $query->whereIn('status', explode(',', $status));
+
+        $type = $request->post('type');
+        if (strlen($type))
+            $query->whereIn('type', explode(',', $type));
+
+
+        $query->orderByRaw('expire_at DESC,category_id,product_id,type,status');
+
+        $page = $request->post('current_page', 1);
+        $pageSize = $request->post('per_page', 20);
+        $list = $query->paginate($pageSize, ['*'], 'page', $page);
+        return Response::success($list);
+    }
+
+    // 批量创建
+    function create(Request $request)
+    {
+        $count = $request->post('count', 0);
+        $type = (int)$request->post('type', \App\Coupon::TYPE_ONETIME);
+        $expire_at = $request->post('expire_at');
+        $discount_val = (int)$request->post('discount_val');
+        $discount_type = (int)$request->post('discount_type', \App\Coupon::DISCOUNT_TYPE_AMOUNT);
+        $remark = $request->post('remark');
+
+        if ($discount_type === \App\Coupon::DISCOUNT_TYPE_AMOUNT)
+            if ($discount_val < 1 || $discount_val > 1000000000)
+                return Response::fail('优惠券面额需要在0.01-10000000之间');
+        if ($discount_type === \App\Coupon::DISCOUNT_TYPE_PERCENT)
+            if ($discount_val < 1 || $discount_val > 100)
+                return Response::fail('优惠券面额需要在1-100之间');
+
+
+        $category_id = (int)$request->post('category_id', -1); // -1 = 全部
+        $product_id = (int)$request->post('product_id', -1);   // -1 = 全部
+
+        if ($type === \App\Coupon::TYPE_REPEAT) {
+            $coupon = $request->post('coupon');
+            if (!$coupon) $coupon = strtoupper(str_random());
+            $c = new \App\Coupon;
+            $c->user_id = $this->getUserIdOrFail($request);
+            $c->category_id = $category_id;
+            $c->product_id = $product_id;
+            $c->coupon = $coupon;
+            $c->type = $type;
+            $c->discount_val = $discount_val;
+            $c->discount_type = $discount_type;
+            $c->count_all = (int)$request->post('count_all', 1);
+            if ($c->count_all < 1 || $c->count_all > 10000000)
+                return Response::fail('可用次数不能超过10000000');
+            $c->expire_at = $expire_at;
+
+            $c->saveOrFail();
+            return Response::success([$c->coupon]);
+        } elseif ($type === \App\Coupon::TYPE_ONETIME) {
+            if (!$count)
+                return Response::forbidden('请输入生成数量');
+
+            if ($count > 100)
+                return Response::forbidden('每次生成不能大于100张');
+
+            $coupons = [];
+            $coupons_ret = [];
+            $user_id = $this->getUserIdOrFail($request);
+            $created_at = Carbon::now();
+            for ($i = 0; $i < $count; $i++) {
+                $c = strtoupper(str_random());
+                $coupons_ret[] = $c;
+                $coupons[] = [
+                    'user_id' => $user_id,
+                    'coupon' => $c,
+                    'category_id' => $category_id,
+                    'product_id' => $product_id,
+                    'type' => $type,
+                    'discount_val' => $discount_val,
+                    'discount_type' => $discount_type,
+                    'status' => \App\Coupon::STATUS_NORMAL,
+                    'remark' => $remark,
+                    'created_at' => $created_at,
+                    'expire_at' => $expire_at
+                ];
+            }
+
+            \App\Coupon::insert($coupons);
+            return Response::success($coupons_ret);
+        } else {
+            return Response::forbidden('unknown type: ' . $type);
+        }
+    }
+
+    // 手动添加 or 编辑
+    function edit(Request $request)
+    {
+        $id = (int)$request->post('id');
+        $coupon = $request->post('coupon');
+        $category_id = (int)$request->post('category_id', -1);
+        $product_id = (int)$request->post('product_id', -1);
+        $expire_at = $request->post('expire_at', NULL);
+        $status = (int)$request->post('status', \App\Coupon::STATUS_NORMAL);
+        $type = (int)$request->post('type', \App\Coupon::TYPE_ONETIME);
+        $discount_val = (int)$request->post('discount_val');
+        $discount_type = (int)$request->post('discount_type', \App\Coupon::DISCOUNT_TYPE_AMOUNT);
+
+        if ($discount_type === \App\Coupon::DISCOUNT_TYPE_AMOUNT)
+            if ($discount_val < 1 || $discount_val > 1000000000)
+                return Response::fail('优惠券面额需要在0.01-10000000之间');
+        if ($discount_type === \App\Coupon::DISCOUNT_TYPE_PERCENT)
+            if ($discount_val < 1 || $discount_val > 100)
+                return Response::fail('优惠券面额需要在1-100之间');
+
+        /* @var \App\Coupon $c */
+        $c = $this->authQuery($request, \App\Coupon::class)->find($id);
+        if ($c) {
+            $c->coupon = $coupon;
+            $c->category_id = $category_id;
+            $c->product_id = $product_id;
+            $c->status = $status;
+            $c->type = $type;
+            $c->discount_val = $discount_val;
+            $c->discount_type = $discount_type;
+            if ($type === \App\Coupon::TYPE_REPEAT) {
+                $c->count_all = (int)$request->post('count_all', 1);
+                if ($c->count_all < 1 || $c->count_all > 10000000)
+                    return Response::fail('可用次数不能超过10000000');
+            }
+            if ($expire_at)
+                $c->expire_at = $expire_at;
+
+            $c->saveOrFail();
+
+        } else {
+            $coupon_arr = explode("\n", $coupon);
+            for ($i = 0; $i < count($coupon_arr); $i++) {
+                $coupon_no = str_replace("\r", '', trim($coupon_arr[$i]));
+                $c = new \App\Coupon;
+                $c->coupon = $coupon_no;
+                $c->category_id = $category_id;
+                $c->product_id = $product_id;
+                $c->status = $status;
+                $c->type = $type;
+                $c->discount_val = $discount_val;
+                $c->discount_type = $discount_type;
+                $coupon_arr[$i] = $c;
+            }
+            \App\Product::find($product_id)->coupons()->saveMany($coupon_arr);
+        }
+        return Response::success();
+    }
+
+    function enable(Request $request)
+    {
+        $ids = $request->post('ids', '');
+        if (strlen($ids) < 1) return Response::forbidden();
+        $enabled = (int)$request->post('enabled');
+
+        $this->authQuery($request, \App\Coupon::class)
+            ->whereIn('id', explode(',', $ids))
+            ->update(['enabled' => $enabled]);
+
+        return Response::success();
+    }
+
+    function delete(Request $request)
+    {
+        $ids = $request->post('ids', '');
+        if (strlen($ids) < 1) return Response::forbidden();
+
+        $this->authQuery($request, \App\Coupon::class)
+            ->whereIn('id', explode(',', $ids))->delete();
+        return Response::success();
+    }
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="93px" height="94px" viewBox="0 0 93 94" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 48</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <ellipse id="path-1" cx="42.4395209" cy="42.5257732" rx="42.4395209" ry="42.5257732"></ellipse>
+    </defs>
+    <g id="Page-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="首页-copy-3" transform="translate(-1047.000000, -273.000000)">
+            <g id="versatile_05" transform="translate(-10.000000, -500.000000)">
+                <g id="Group-67">
+                    <g id="Group-67-Copy" transform="translate(0.000000, 518.000000)">
+                        <g id="Group-51" transform="translate(1061.000000, 0.000000)">
+                            <g id="Group-50" transform="translate(0.000000, 0.015018)">
+                                <g id="Group-61" transform="translate(0.000000, -0.000000)">
+                                    <g id="Group-48" transform="translate(0.000000, 259.000000)">
+                                        <g id="Oval-2">
+                                            <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                                            <ellipse stroke-opacity="0.250566123" stroke="#FFFFFF" stroke-width="4" cx="42.4395209" cy="42.5257732" rx="44.4395209" ry="44.5257732"></ellipse>
+                                        </g>
+                                        <g id="Group-49" transform="translate(17.896074, 21.247868)">
+                                            <polygon id="Rectangle-36-Copy-2" fill="#005EFF" opacity="0.300000012" points="24.2464521 20.3384133 48.4567822 31.2364667 24.2464521 42.1345202 0.0361221168 31.2364667"></polygon>
+                                            <polygon id="Rectangle-36-Copy" fill="#005EFF" opacity="0.300000012" points="24.2464521 10.1692066 48.4567822 21.0672601 24.2464521 31.9653136 0.0361221168 21.0672601"></polygon>
+                                            <polygon id="Rectangle-36" fill="#00CCA7" points="24.2464521 -5.32907052e-14 48.4567822 10.8980535 24.2464521 21.7961069 0.0361221168 10.8980535"></polygon>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,50 @@
+<?php
+
+use Illuminate\Database\Seeder;
+
+class SystemSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        $sets = [
+            'app_name' => '发卡系统',
+            'app_url' => 'http://www.example.com',
+            'app_url_api' => 'http://www.example.com',
+
+            'keywords' => '在线发卡系统',
+            'description' => '我是一个发卡系统, 这里填写描述',
+            'shop_bkg' => 'http://api.izhao.me/img',
+            'shop_ann' => '欢迎来到XXX小店',
+            'shop_ann_pop' => '',
+            'shop_inventory' => 1,
+
+            'js_tj' => '',
+            'js_kf' => '',
+
+
+            'vcode_driver' => 'geetest',
+            'vcode_login' => '0', // 登录验证码
+            'vcode_shop_buy' => '0',   // 下单
+            'vcode_shop_search' => '0',// 查询订单
+
+            'storage_driver' => 'local',
+
+            'order_clean_unpay_open' => '0',
+            'order_clean_unpay_day' => '7'
+
+        ];
+        $systems = [];
+        foreach ($sets as $k => $v) {
+            $systems[] = [
+                'name' => $k,
+                'value' => $v
+            ];
+        }
+        DB::table('systems')->insert($systems);
+    }
+}

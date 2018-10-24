@@ -1,0 +1,251 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Library\Helper;
+use App\Library\Response;
+use App\Library\WeChatMessage;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+
+class System extends Controller
+{
+
+    private function set(Request $request, $names)
+    {
+        foreach ($names as $name) {
+            if ($request->has($name))
+                \App\System::_set($name, $request->post($name));
+        }
+    }
+
+    private function setMoney(Request $request, $names)
+    {
+        foreach ($names as $name) {
+            if ($request->has($name))
+                \App\System::_set($name, intval($request->post($name) * 100));
+        }
+    }
+
+    private function setInt(Request $request, $names)
+    {
+        foreach ($names as $name) {
+            if ($request->has($name))
+                \App\System::_set($name, (int)$request->post($name));
+        }
+    }
+
+
+    function setItem(Request $request)
+    {
+        $name = $request->post('name');
+        $value = $request->post('value');
+        if (!$name || !$value) return Response::forbidden();
+
+        \App\System::_set($name, $value);
+        return Response::success();
+    }
+
+    function info(Request $request)
+    {
+        $strConfig = [
+            'app_name',
+            'app_url',
+            'app_url_api',
+            'keywords',
+            'description',
+            'shop_bkg',
+            'shop_ann',
+            'shop_ann_pop',
+            'shop_qq',
+            'js_tj',
+            'js_kf'
+        ];
+
+        $intConfig = [
+            'shop_inventory',
+        ];
+        if ($request->isMethod('GET')) {
+
+            $config = [];
+            foreach ($strConfig as $name) {
+                $config[$name] = \App\System::_get($name);
+            }
+            foreach ($intConfig as $name) {
+                $config[$name] = (int)\App\System::_get($name);
+            }
+            return Response::success($config);
+        }
+
+        // 格式: http:// 开头 且末尾没有斜杠
+
+        $_POST['app_url'] = Helper::formatUrl($_POST['app_url']);
+        $_POST['app_url_api'] = Helper::formatUrl($_POST['app_url_api']);
+
+
+        $this->set($request, $strConfig);
+        $this->setInt($request, $intConfig);
+
+        return Response::success();
+    }
+
+    function order(Request $request)
+    {
+        $names = [
+            'order_clean_unpay_open',
+            'order_clean_unpay_day'
+        ];
+        if ($request->isMethod('GET')) {
+            $config = [];
+            foreach ($names as $name) {
+                $config[$name] = (int)\App\System::_get($name);
+            }
+            return Response::success($config);
+        }
+
+
+        $this->setInt($request, $names);
+
+        return Response::success();
+    }
+
+
+    function vcode(Request $request)
+    {
+        $strConfig = [
+            'vcode_driver',
+            'vcode_geetest_id',
+            'vcode_geetest_key',
+        ];
+        $intConfig = [
+            'vcode_login',
+            'vcode_shop_buy',
+            'vcode_shop_search'
+        ];
+        if ($request->isMethod('GET')) {
+            $config = [];
+            foreach ($strConfig as $name) {
+                $config[$name] = \App\System::_get($name);
+            }
+            foreach ($intConfig as $name) {
+                $config[$name] = (int)\App\System::_get($name);
+            }
+            return Response::success($config);
+        }
+
+        $this->set($request, $strConfig);
+        $this->setInt($request, $intConfig);
+
+        return Response::success();
+
+    }
+
+
+    function email(Request $request)
+    {
+        $strConfig = [
+            'mail_driver',
+            'mail_smtp_host',
+            'mail_smtp_port',
+            'mail_smtp_username',
+            'mail_smtp_password',
+            'mail_smtp_from_address',
+            'mail_smtp_from_name',
+            'mail_smtp_encryption',
+            'sendcloud_user',
+            'sendcloud_key',
+        ];
+
+        $intConfig = [
+            'mail_send_order'
+        ];
+        if ($request->isMethod('GET')) {
+            $config = [];
+            foreach ($strConfig as $name) {
+                $config[$name] = \App\System::_get($name);
+            }
+            foreach ($intConfig as $name) {
+                $config[$name] = (int)\App\System::_get($name);
+            }
+            return Response::success($config);
+        }
+
+        $this->set($request, $strConfig);
+        $this->setInt($request, $intConfig);
+
+        return Response::success();
+
+    }
+
+    function storage(Request $request)
+    {
+
+        $strConfig = [
+            'storage_driver',
+            'storage_s3_access_key',
+            'storage_s3_secret_key',
+            'storage_s3_region',
+            'storage_s3_bucket',
+            'storage_oss_access_key',
+            'storage_oss_secret_key',
+            'storage_oss_bucket',
+            'storage_oss_endpoint',
+            'storage_oss_cdn_domain',
+            'storage_qiniu_domains_default',
+            'storage_qiniu_domains_https',
+            'storage_qiniu_access_key',
+            'storage_qiniu_secret_key',
+            'storage_qiniu_bucket',
+            'storage_qiniu_notify_url'
+        ];
+
+        $intConfig = [
+            'storage_oss_is_ssl',
+            'storage_oss_is_cname',
+        ];
+
+        if ($request->isMethod('GET')) {
+            $config = [];
+            foreach ($strConfig as $name) {
+                $config[$name] = \App\System::_get($name);
+            }
+            foreach ($intConfig as $name) {
+                $config[$name] = (int)\App\System::_get($name);
+            }
+            return Response::success($config);
+        }
+
+        $this->set($request, $strConfig);
+        $this->set($request, $intConfig);
+
+        return Response::success();
+
+    }
+
+    function emailTest(Request $request)
+    {
+        $this->validate($request, [
+            'to' => 'required',
+        ]);
+        $to = $request->post('to');
+        try {
+            $ret = \Mail::to($to)->send(new \App\Mail\Test);
+            return Response::success($ret);
+        } catch (\Exception $e) {
+            \App\Library\LogHelper::setLogFile('mail');
+            \Log::error('Mail Test Exception:' . $e->getMessage());
+            return Response::fail($e->getMessage(), $e);
+        }
+    }
+
+    function orderClean(Request $request){
+        $this->validate($request, [
+            'day' => 'required|integer|min:1',
+        ]);
+        $day = (int)$request->post('day');
+        \App\Order::where('status', \App\Order::STATUS_UNPAY)
+            ->where('created_at', '<', (new \Carbon\Carbon)->addDays(-$day))
+            ->delete();
+        return Response::success();
+    }
+}

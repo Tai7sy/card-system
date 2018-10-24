@@ -1,0 +1,166 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Library\Helper;
+use function foo\func;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Library\Response;
+
+class Pay extends Controller
+{
+    function get(Request $request)
+    {
+        $query = \App\Pay::orderBy('sort');
+
+
+        $enabled = $request->post('enabled');
+        if (strlen($enabled))
+            $query->whereIn('enabled', explode(',', $enabled));
+
+        $searchType = $request->post('search', false);
+        if ($searchType == 'simple')
+            return Response::success($query->get(['id', 'name']));
+
+        $list = $query->get();
+
+        return Response::success($list);
+    }
+
+
+    function stat(Request $request)
+    {
+        $day = (int)$request->input('day', 7);
+        $list = \App\Order::where(function ($query) {
+            /** @var \Illuminate\Database\Eloquent\Builder $query */
+            $query->where('status', \App\Order::STATUS_PAID)
+                ->orWhere('status', \App\Order::STATUS_SUCCESS);
+        })->where('paid_at', '>=', Helper::getMysqlDate(-$day + 1))
+            ->with(['pay' => function ($query) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
+                $query->select(['id', 'name']);
+            }])
+            ->groupBy('pay_id')
+            ->selectRaw('`pay_id`,COUNT(*) as "count",SUM(`paid`) as "sum"')
+            ->get()->toArray();
+        $ret = [];
+        foreach ($list as $item) {
+            if (isset($item['pay']) && isset($item['pay']['name']))
+                $index = $item['pay']['name'];
+            else $index = '未知方式#' . $item['pay_id'];
+
+            $ret[$index] = [(int)$item['count'], (int)$item['sum']];
+        }
+
+        return Response::success($ret);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
+     */
+    function edit(Request $request)
+    {
+        $this->validate($request,[
+            'id' => 'required|integer',
+            'name' => 'required|string',
+            'img' => 'required|string',
+            'driver' => 'required|string',
+            'way' => 'required|string',
+            'config' => 'required|string',
+        ]);
+        $id = (int)$request->post('id');
+        $name = $request->post('name');
+        $img = $request->post('img');
+        $comment = $request->post('comment');
+        $driver = $request->post('driver');
+        $way = $request->post('way');
+        $config = $request->post('config');
+        $enabled = (int)$request->post('enabled');
+
+
+        $pay = \App\Pay::find($id);
+        if (!$pay) {
+            $pay = new \App\Pay;
+        }
+        $pay->name = $name;
+        $pay->img = $img;
+        $pay->comment = $comment;
+        $pay->driver = $driver;
+        $pay->way = $way;
+        $pay->config = $config;
+        $pay->enabled = $enabled;
+
+        $pay->fee_system = $request->post('fee_system');
+        $pay->saveOrFail();
+        return Response::success();
+    }
+
+    function comment(Request $request)
+    {
+        $id = (int)$request->post('id', -1);
+        if (!$id) return Response::forbidden();
+        /* @var \App\Pay $pay */
+        $pay = \App\Pay::findOrFail($id);
+        $pay->comment = $request->post('comment');
+        $pay->save();
+        return Response::success();
+    }
+
+
+    function sort(Request $request)
+    {
+        $id = (int)$request->post('id', -1);
+        if (!$id) return Response::forbidden();
+        /* @var \App\Pay $pay */
+        $pay = \App\Pay::findOrFail($id);
+        $pay->sort = (int)$request->post('sort', 1000);
+        $pay->save();
+        return Response::success();
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
+     */
+    function fee_system(Request $request)
+    {
+        $id = (int)$request->post('id');
+        if ($id < 1) return Response::forbidden();
+        /* @var \App\Pay $pay */
+        $pay = \App\Pay::findOrFail($id);
+        $pay->fee_system = $request->post('fee_system');
+        $pay->saveOrFail();
+        return Response::success();
+    }
+
+
+    function enable(Request $request)
+    {
+        $ids = $request->post('ids');
+        if (strlen($ids) < 1) return Response::forbidden();
+        $enabled = (int)$request->post('enabled');
+        \App\Pay::whereIn('id', explode(',', $ids))->update([
+            'enabled' => $enabled
+        ]);
+        return Response::success();
+
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    function delete(Request $request)
+    {
+        $id = (int)$request->post('id');
+        if ($id < 1) return Response::forbidden();
+
+        \App\Pay::whereId($id)->delete();
+        return Response::success();
+    }
+}
