@@ -13,7 +13,7 @@
     "ext-json": "*",
     "doctrine/dbal": "~2.3",
     "fideloper/proxy": "~3.3",
-    "hashids/hashids": "3.0.0",
+    "hashids/hashids": "2.0.4",
     "jacobcyl/ali-oss-storage": "dev-master",
     "laravel/framework": "5.5.*",
     "laravel/tinker": "~1.0",
