@@ -50,27 +50,33 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
-        if ($request->expectsJson()) {
-            if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
-                return Response::json(['message' => '记录未找到'], 404);
-            } elseif ($e instanceof \Illuminate\Auth\AuthenticationException) {
-                return Response::json(['message' => '请登录'], 401);
-            } elseif ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
-                return Response::json(['message' => '未授权的操作'], 403);
-            } elseif ($e instanceof \Illuminate\Validation\ValidationException) {
-                return parent::render($request, $e);
-            }
-        } else {
-            if ($e instanceof \Illuminate\Session\TokenMismatchException) { // CSRF
-                return response()->view('errors.419', ['exception' => null], 419);
-            } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
-                return response()->view('errors.404', ['exception' => null], 404);
-            } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException) {
-                return response()->view('errors.404', ['exception' => null], 404);
-            } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException) {
-                return response()->view('errors.503', ['exception' => null], 503);
-            }
+        if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+            return $request->expectsJson() ?
+                response()->json(['message' => '记录未找到'], 404) :
+                response()->view('errors._', ['code' => 404, 'message' => '记录未找到'], 404);
+        } elseif ($e instanceof \Illuminate\Auth\AuthenticationException) {
+            return $request->expectsJson() ?
+                response()->json(['message' => '请登录'], 401) :
+                response()->view('errors._', ['code' => 401, 'message' => '请登录'], 401);
+        } elseif ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
+            return $request->expectsJson() ?
+                response()->json(['message' => '未授权的操作'], 403) :
+                response()->view('errors._', ['code' => 403, 'message' => '未授权的操作'], 403);
+        } elseif ($e instanceof \Illuminate\Validation\ValidationException) {
+            return parent::render($request, $e);
+        } elseif ($e instanceof \Illuminate\Session\TokenMismatchException) { // CSRF
+            return parent::render($request, $e);
+        } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
+            return $request->expectsJson() ?
+                response()->json(['message' => '页面未找到'], 404) :
+                response()->view('errors._', ['code' => 404, 'message' => '页面未找到'], 404);
+        } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException) {
+            return parent::render($request, $e);
+        } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException) {
+            \Log::error('Uncaught a ServiceUnavailableHttpException', ['Exception' => $e]);
+            return parent::render($request, $e);
         }
+
         \Log::error('Uncaught Exception', ['Exception' => $e]);
 
         if (config('app.debug')) {

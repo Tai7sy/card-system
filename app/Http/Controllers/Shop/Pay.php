@@ -76,7 +76,7 @@ class Pay extends Controller
                 $request->input('geetest_validate'),
                 $request->input('geetest_seccode'));
             if (!$ret) {
-                self::renderResult($request, ['msg' => '系统无法接受您的验证结果，请刷新页面后重试。']);
+                return self::renderResult($request, ['msg' => '系统无法接受您的验证结果，请刷新页面后重试。']);
             }
         }
 

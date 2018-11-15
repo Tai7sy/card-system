@@ -253,7 +253,7 @@ class Order extends Controller
             }
         )) {
             if (!$errMsg) {
-                return Response::success($order->toArray());
+                return Response::success($order);
             } else {
                 return Response::fail($errMsg ? $errMsg : '未知错误');
             }
