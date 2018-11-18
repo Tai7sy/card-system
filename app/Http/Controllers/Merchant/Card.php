@@ -153,6 +153,7 @@ class Card extends Controller
      * 卡密删除到回收站
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     function trash(Request $request)
     {
@@ -279,7 +280,8 @@ class Card extends Controller
                 return Response::fail('请输入合法的卡密');
 
             try {
-                \App\Card::add_cards($this->getUserIdOrFail($request), $product_id, $type, $status, $card_txt, $is_check);
+                // \App\Card::add_cards($this->getUserIdOrFail($request), $product_id, $type, $status, $card_txt, $is_check);
+                \App\Card::add_cards($this->getUserIdOrFail($request), $product_id, $type, $status, $card_txt, false); // 这里检查, 数据量大了会卡
             } catch (\Exception $e) {
                 \Log::error('add_cards, function fatal error: ', ['exception' => $e]);
                 return Response::fail($e->getMessage());
