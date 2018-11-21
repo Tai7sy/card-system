@@ -95,12 +95,12 @@ if (!isset($result['success'])) {
     <title>支付结果</title>
 </head>
 <body id="page">
-<h3>{!! isset($result['title']) ? $result['title'] : ($result['success'] ? '恭喜，支付成功！' : '支付失败！' ) !!}</h3>
+<h3>{{ isset($result['title']) ? $result['title'] : ($result['success'] ? '恭喜，支付成功！' : '支付失败！' ) }}</h3>
 <div>
     <p class="status-msg">{!! $result['msg'] !!}</p>
     @if(isset($card_txt))
         <div>
-            <textarea title="卡号列表" rows="6" style="width: 100%" readonly>{!! $card_txt !!}</textarea>
+            <textarea title="卡号列表" rows="6" style="width: 100%" readonly>{{ $card_txt }}</textarea>
         </div>
     @endif
     <br/>
@@ -127,9 +127,6 @@ if (!isset($result['success'])) {
 
             document.getElementById('instructions').innerHTML = renderDescription({!! $product['instructions'] !!});
         </script>
-    @endif
-    @if(isset($order) && isset($order['order_no']))
-        <a style="float: left;" href="/s#/report?order_no={!! $order['order_no'] !!}" target="_blank">投诉此订单</a>
     @endif
     <a style="float:right" href="javascript:window.close()">关闭</a>
     <br/>
