@@ -30,11 +30,11 @@
         <div class="detail" id="orderDetail">
             <dl class="detail-ct" style="display: none;">
                 <dt>商品</dt>
-                <dd id="storeName"><?php echo $name ?></dd>
+                <dd id="storeName">{{ $name }}</dd>
                 <!--dt>说明</dt>
                 <dd id="productName">用户充值</dd-->
                 <dt>订单号</dt>
-                <dd id="billId"><?php echo $id?></dd>
+                <dd id="billId">{{ $id }}</dd>
                 <dt>时间</dt>
                 <dd id="createTime"><?php echo date('Y-m-d H:i:s')?></dd>
             </dl>
@@ -60,7 +60,7 @@
 </div>
 
 <script>
-    var code_url = '{!! str_replace('\'','%27',$qrcode) !!}';
+    var code_url = decodeURIComponent('{!! urlencode($qrcode) !!}');
 
     var qrcode = new QRCode("qrcode", {
         text: code_url,

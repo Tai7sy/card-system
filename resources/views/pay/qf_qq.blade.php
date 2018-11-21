@@ -24,11 +24,11 @@
         <div class="detail" id="orderDetail">
             <dl class="detail-ct" style="display: none;">
                 <dt>商品</dt>
-                <dd id="storeName"><?php echo $name ?></dd>
+                <dd id="storeName">{{ $name }}</dd>
                 <!--dt>说明</dt>
                 <dd id="productName">用户充值</dd-->
                 <dt>订单号</dt>
-                <dd id="billId"><?php echo $id?></dd>
+                <dd id="billId">{{ $id }}</dd>
                 <dt>时间</dt>
                 <dd id="createTime"><?php echo date('Y-m-d H:i:s')?></dd>
             </dl>
@@ -79,7 +79,7 @@
         jumpToPay = function () {
             $('#pay_body').hide();
             $('#jump_to_pay').show();
-            var pay_params = '{!! str_replace('\'','%27',$qrcode) !!}';
+            var pay_params = decodeURIComponent('{!! urlencode($qrcode) !!}');
             // 一个超级无敌尴尬的事情: pay_params是有了, 但是mqq.tenpay.pay()需要从腾讯认证的域名调用
             // 所以这个支付方式宣告破产
             mqq.tenpay.pay(pay_params, function (e) {
