@@ -1,9 +1,8 @@
 {
   "name": "card",
-  "description": "The Laravel Framework.",
+  "description": "card system",
   "keywords": [
-    "framework",
-    "laravel"
+    "card system"
   ],
   "license": "MIT",
   "type": "project",
