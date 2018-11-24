@@ -227,17 +227,17 @@ class Order extends Controller
                         'count_sold' => DB::raw('`count_sold`+1')
                     ]);
 
-
+                    $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，卡号列表：';
+                    $cards_txt_br = str_replace("\r\n", '<br>', $cards_txt);
                     try {
-                        \Mail::to($order->email)->Queue(new OrderShipped($order, $cards_txt));
+                        \Mail::to($order->email)->Queue(new OrderShipped($order, $card_msg, $cards_txt_br));
                         $order->email_sent = true;
                         $order->saveOrFail();
                     } catch (\Exception $e) {
-
                         // set to mail
                         \App\Library\LogHelper::setLogFile('mail');
                         \Log::error('Order.ship error, order_no:' . $order->order_no .
-                            ', email:' . $order->email . ', cards:' . $cards_txt .
+                            ', email:' . $order->email . ', cards:' . $cards_txt_br .
                             ', Exception:' . $e->getMessage());
 
                         // 还原

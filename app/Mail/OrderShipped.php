@@ -13,18 +13,21 @@ class OrderShipped extends Mailable
 
 
     public $order;
-    public $msg;
+    public $card_msg;
+    public $cards_txt;
 
     /**
      * Create a new message instance.
      *
      * @param \App\Order $order
-     * @param string $msg
+     * @param $card_msg
+     * @param $cards_txt
      */
-    public function __construct($order, $msg)
+    public function __construct($order, $card_msg, $cards_txt)
     {
         $this->order = $order;
-        $this->msg = $msg;
+        $this->card_msg = $card_msg;
+        $this->cards_txt = $cards_txt;
     }
 
     /**
@@ -34,7 +37,7 @@ class OrderShipped extends Mailable
      */
     public function build()
     {
-        return $this->subject(config('app.name') . '-订单提醒')
+        return $this->subject(config('app.name') . '-订单提醒 #' . $this->order->order_no)
             ->view('emails.order');
     }
 }

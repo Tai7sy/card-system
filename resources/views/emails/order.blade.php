@@ -5,8 +5,8 @@ if (!isset($order)) {
         'order_no' => '未知'
     );
 }
-if (!isset($msg)) {
-    $msg = '系统错误，请联系客服';
+if (!isset($card_msg)) {
+    $card_msg = '系统错误，请联系客服';
 }
 
 ?>
@@ -21,7 +21,7 @@ if (!isset($msg)) {
             <div class="email-text" style="background:#fff;padding:20px 32px 0;">
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;margin-top: 4px;">尊敬的用户:</p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">
-                    订单#{{ $order['order_no'] }}&nbsp;已完成，卡号列表：<br><?php echo $msg; ?></p>
+                    {!! $cards_msg !!}<br>{!! $cards_txt !!}</p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">感谢您的访问，祝您使用愉快！<br>此致</p>
             </div>
             <p style="color: #999999;font-size:13px;line-height:24px;text-align:right;padding:0 32px 16px">

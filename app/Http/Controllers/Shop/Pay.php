@@ -20,9 +20,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class Pay extends Controller
 {
@@ -51,9 +48,9 @@ class Pay extends Controller
     public function goPay($request, $order_no, $order_name, $payway, $pay_money)
     {
         try {
-            // Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step1');
+            // \Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step1');
             (new PayApi)->goPay($payway, $order_no, $order_name, $order_name, $pay_money);
-            // Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step2');
+            // \Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step2');
             return self::renderResult($request, [
                 'success' => false,
                 'title' => '请稍后',
@@ -231,14 +228,14 @@ class Pay extends Controller
             return self::renderResult($request, ['msg' => '订单未找到，请重试']);
         }
 
-        if($order->status !== \App\Order::STATUS_UNPAY){
+        if ($order->status !== \App\Order::STATUS_UNPAY) {
             return redirect('/pay/result/' . $order_no);
         }
 
         $logTag = 'pay: ' . $order->pay_id;
         $payway = $order->pay;
         if (!$payway) {
-            Log::error($logTag . ' cannot find Pay');
+            \Log::error($logTag . ' cannot find Pay');
             return $this->renderResult($request, ['msg' => '支付方式未找到']);
         }
         $logTag .= ',' . $payway->driver;
@@ -250,7 +247,7 @@ class Pay extends Controller
         try {
             $this->payApi = PayApi::getDriver($payway->id, $payway->driver);
         } catch (\Exception $e) {
-            Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
+            \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
             return $this->renderResult($request, ['msg' => '支付驱动未找到']);
         }
         // 如果已经支付成功, 直接返回
@@ -264,7 +261,7 @@ class Pay extends Controller
                 ]);
             }
         })) {
-            Log::notice($logTag . ' already success' . "\n\n");
+            \Log::notice($logTag . ' already success' . "\n\n");
             return redirect('/pay/result/' . $order_no);
         }
 
@@ -557,12 +554,8 @@ class Pay extends Controller
             throw new \Exception($order->remark);
         }
 
-        if ($order->product_id === \App\Product::ID_API) {
-            return (new ApiPay)->shipOrder($request, $order, $trade_no, $need_render);
-        }
-
         $cards = [];
-        $card_msg = '';
+        $card_msg = '订单#' . $order_no . '&nbsp;已支付，卡号列表：';
         $cards_txt = '';
         $product = null;
         $first_process = $order->status === Order::STATUS_UNPAY; //未处理过此订单
@@ -622,7 +615,7 @@ class Pay extends Controller
                         $order->cards()->attach($card_ids); // 使用了 card_order 这个中间表
                         Card::whereIn('id', $card_ids)->update([
                             'status' => Card::STATUS_SOLD,
-                            'count_sold' => DB::raw('`count_sold`+1')
+                            'count_sold' => \DB::raw('`count_sold`+1')
                         ]);
 
                         return Order::STATUS_SUCCESS;
@@ -671,7 +664,6 @@ class Pay extends Controller
             }
         } elseif ($need_render) {
             // result/{order_no} 渲染支付结果时进入此分支, 已经notify过(订单已经处理过, 直接渲染页面)
-            $card_msg = '订单已支付，卡号列表：';
             $cards = $order->cards;
             $product = $order->product;
             foreach ($cards as $card) {
@@ -685,9 +677,9 @@ class Pay extends Controller
                 // Tip:
                 // 卡密若包含可以重复使用, 则商品限购一件
                 // 即: $order->count === 1
-                if(count($cards)){
+                if (count($cards)) {
                     $card_msg = '目前库存不足，您还有' . ($order->count - count($cards)) . '张卡密未发货，请联系商家客服发货<br>已发货卡密见下方：<br>';
-                }else{
+                } else {
                     $card_msg = '目前库存不足，您购买的' . ($order->count - count($cards)) . '张卡密未发货，请联系商家客服发货<br>';
                 }
                 $qq = $order->user->qq;
@@ -700,16 +692,16 @@ class Pay extends Controller
 
         // $need_mail = $first_process && System::_getInt('mail_send_order') === 1 && filter_var($order->email, FILTER_VALIDATE_EMAIL);
         if ($need_mail) {
-            $card_txt_br = str_replace("\r\n",'<br>',$cards_txt);
+            $cards_txt_br = str_replace("\r\n", '<br>', $cards_txt);
             try {
-                \Mail::to($order->email)->Queue(new OrderShipped($order, $card_txt_br));
+                \Mail::to($order->email)->Queue(new OrderShipped($order, $card_msg, $cards_txt_br));
                 $order->email_sent = true;
                 $order->saveOrFail();
             } catch (\Exception $e) {
                 // set to mail
                 \App\Library\LogHelper::setLogFile('mail');
                 \Log::error('shipOrder.need_mail error, order_no:' . $order_no .
-                    ', email:' . $order->email . ', cards:' . $card_txt_br .
+                    ', email:' . $order->email . ', cards:' . $cards_txt_br .
                     ', Exception:' . $e->getMessage());
                 // 还原
                 \App\Library\LogHelper::setLogFile('card');
