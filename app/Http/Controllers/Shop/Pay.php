@@ -98,7 +98,7 @@ class Pay extends Controller
         /* @var \App\Category $category */
         $category = Category::findOrFail($category_id);
         if ($category->password_open) {
-            if ($category->password !== $request->post('category_password')) {
+            if ($category->password !== $request->input('category_password')) {
                 return Response::fail('分类密码输入错误');
             }
         }
@@ -116,7 +116,7 @@ class Pay extends Controller
             return self::renderResult($request, ['msg' => '该商品未找到，请重新选择']);
 
         if ($product->password_open) {
-            if ($product->password !== $request->post('product_password')) {
+            if ($product->password !== $request->input('product_password')) {
                 return Response::fail('分类密码输入错误');
             }
         }
@@ -213,8 +213,9 @@ class Pay extends Controller
             'created_at' => Carbon::now()
         ]);
 
-        // return $this->goPay($request, $order_no, $order_name, $pay, $pay_money);
-        return Response::success(['order_no' => $order_no]);
+        $order_name = $order_no;  // 商品名改成单号
+        return $this->goPay($request, $order_no, $order_name, $pay, $pay_money);
+        // return Response::success(['order_no' => $order_no]);
     }
 
     /**

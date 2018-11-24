@@ -102,7 +102,7 @@ Route::group(['prefix' => 'shop', 'middleware' => ['api']], function () {
     Route::post('product', 'Shop\Product@get');
     Route::post('product/password', 'Shop\Product@verifyPassword');
     Route::post('coupon', 'Shop\Coupon@info');
-    Route::post('buy', 'Shop\Pay@buy');
+    Route::any('buy', 'Shop\Pay@buy');
     Route::post('record/get', 'Shop\Order@get');
 
 });
