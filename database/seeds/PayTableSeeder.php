@@ -9,6 +9,49 @@ class PayTableSeeder extends Seeder
         $pay = new \App\Pay;
         $pay->name = '支付宝';
         $pay->img = '/plugins/images/ali.png';
+        $pay->driver = 'Fakala';
+        $pay->way = 'alipay';
+        $pay->comment = 'alipay、alipaywap、wx、wxwap、qq、qqwap';
+        $pay->config = '{
+  "gateway": "http://card.evil5.com",
+  "api_id": "your api_id",
+  "api_key": "your api_key"
+}';
+        $pay->enabled = \App\Pay::ENABLED_PC;
+        $pay->save();
+
+        $pay = new \App\Pay;
+        $pay->name = '支付宝';
+        $pay->img = '/plugins/images/ali.png';
+        $pay->driver = 'Fakala';
+        $pay->way = 'alipaywap';
+        $pay->comment = 'alipay、alipaywap、wx、wxwap、qq、qqwap';
+        $pay->config = '{
+  "gateway": "http://card.evil5.com",
+  "api_id": "your api_id",
+  "api_key": "your api_key"
+}';
+        $pay->enabled = \App\Pay::ENABLED_MOBILE;
+        $pay->save();
+
+        $pay = new \App\Pay;
+        $pay->name = '微信';
+        $pay->img = '/plugins/images/wx.png';
+        $pay->driver = 'Fakala';
+        $pay->way = 'wx';
+        $pay->comment = 'alipay、alipaywap、wx、wxwap、qq、qqwap';
+        $pay->config = '{
+  "gateway": "http://card.evil5.com",
+  "api_id": "your api_id",
+  "api_key": "your api_key"
+}';
+        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->save();
+
+
+        $pay = new \App\Pay;
+        $pay->name = '支付宝';
+        $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'Alipay';
         $pay->way = 'Alipay';
         $pay->comment = '支付宝 - 即时到账套餐(企业)V2';
