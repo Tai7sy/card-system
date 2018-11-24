@@ -81,6 +81,7 @@
 
     $(document).ready(function () {
         var time = 4000, interval;
+
         function getData() {
             $.post('/api/qrcode/query/{!! $pay_id !!}', {
                     id: '{!! $id !!}',
@@ -91,23 +92,28 @@
                     window.location = r.data;
                 }, 'json');
         }
+
         (function run() {
             interval = setInterval(getData, time);
         })();
     });
 
-    // call app
-    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios|SymbianOS)/i) !== null) {
-        var app_package = 'com.tencent.mobileqq';
-        var app_url = 'mqqapi://forward/url?version=1&src_type=web&url_prefix={!! base64_encode('http://ptlogin2.tencent.com/jump?u1='.urlencode($qrcode)) !!}';
-        $('#open-app').on('click', function () {
-            goPage(app_url, app_package);
-        });
-        setTimeout(function () {
-            goPage(app_url, app_package);
-        },100);
+    if (navigator.userAgent.match(/MQQBrowser/i) !== null) {
+        location.href = code_url;
     } else {
-        $('#open-app').hide();
+        // call app
+        if (navigator.userAgent.match(/(iPhone|iPod|Android|ios|SymbianOS)/i) !== null) {
+            var app_package = 'com.tencent.mobileqq';
+            var app_url = 'mqqapi://forward/url?version=1&src_type=web&url_prefix={!! base64_encode('http://ptlogin2.tencent.com/jump?u1='.urlencode($qrcode)) !!}';
+            $('#open-app').on('click', function () {
+                goPage(app_url, app_package);
+            });
+            setTimeout(function () {
+                goPage(app_url, app_package);
+            }, 100);
+        } else {
+            $('#open-app').hide();
+        }
     }
 </script>
 </body>

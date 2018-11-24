@@ -24,7 +24,8 @@
             <span style="display: block;margin-top: 24px">请截屏此界面或保存二维码，打开微信扫码，选择相册图片</span>
             <span style="display: block;color: red;margin-top: 8px">请支付成功后直接返回，不要重复支付！</span>
             <span style="display: block;color: red;margin-top: 8px">请支付成功后直接返回，不要重复支付！</span>
-            <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 8px" id="open-app" href="weixin://">点击打开微信</a>
+            <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 8px" id="open-app"
+               href="weixin://">点击打开微信</a>
         </div>
         <div class="detail" id="orderDetail">
             <dl class="detail-ct" style="display: none;">
@@ -86,6 +87,7 @@
 
     $(document).ready(function () {
         var time = 4000, interval;
+
         function getData() {
             $.post('/api/qrcode/query/{!! $pay_id !!}', {
                     id: '{!! $id !!}',
@@ -96,25 +98,27 @@
                     window.location = r.data;
                 }, 'json');
         }
+
         (function run() {
             interval = setInterval(getData, time);
         })();
     });
-    // call app
-    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios|SymbianOS)/i) !== null) {
-        // 想跳转微信, 真的跳不过去啊, 傻吊微信
-    } else {
-        $('#open-app-tip').hide();
-        $('#open-app').hide();
-    }
 
-    if(navigator.userAgent.match(/MicroMessenger/i) !== null){
+    if (navigator.userAgent.match(/MicroMessenger/i) !== null) {
         location.href = code_url;
+    } else {
+        // call app
+        if (navigator.userAgent.match(/(iPhone|iPod|Android|ios|SymbianOS)/i) !== null) {
+            // 想跳转微信, 真的跳不过去啊, 傻吊微信
+        } else {
+            $('#open-app-tip').hide();
+            $('#open-app').hide();
+        }
     }
 
     setTimeout(function () {
         alert('请支付成功后直接返回，不要重复支付！');
-    },100);
+    }, 100);
 </script>
 </body>
 </html>
