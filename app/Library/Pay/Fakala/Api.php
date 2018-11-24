@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Library\Pay\Alipay;
+namespace App\Library\Pay\Fakala;
+
 
 use App\Library\Pay\ApiInterface;
 
@@ -18,102 +19,52 @@ class Api implements ApiInterface
         $this->pay_id = $id;
     }
 
-
+    /**
+     * @param array $config
+     * @param string $out_trade_no
+     * @param string $subject
+     * @param string $body
+     * @param int $amount_cent
+     * @throws \Exception
+     */
     function goPay($config, $out_trade_no, $subject, $body, $amount_cent)
     {
-        $amount = sprintf('%.2f', $amount_cent / 100); //支付宝元为单位
+        if (!isset($config['gateway'])) {
+            throw new \Exception('请填写gateway');
+        }
+        if (!isset($config['api_id'])) {
+            throw new \Exception('请填写api_id');
+        }
+        if (!isset($config['api_key'])) {
+            throw new \Exception('请填写api_key');
+        }
+        include_once 'sdk.php';
+        $api = new \fakala($config['gateway'], $config['api_id'], $config['api_key']);
 
-        $alipay_config = $this->buildAliConfig($config);
-        require_once(__DIR__ . '/lib/alipay_submit.class.php');
+        $payway = strtolower($config['payway']);
 
-        // 服务器异步通知页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数
-        $alipay_config['notify_url'] = $this->url_notify;
-        // 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数
-        $alipay_config['return_url'] = $this->url_return . '/' . $out_trade_no;
-        //构造要请求的参数数组，无需改动
-        $parameter = array(
-            'service' => $alipay_config['service'],
-            'partner' => $alipay_config['partner'],
-            'seller_id' => $alipay_config['seller_id'],
-            'payment_type' => $alipay_config['payment_type'],
-            'notify_url' => $alipay_config['notify_url'],
-            'return_url' => $alipay_config['return_url'],
-            'out_trade_no' => $out_trade_no,
-            'total_fee' => $amount,
-            'subject' => $subject,//商品名称
-            'body' => $body,//商品描述
-            '_input_charset' => 'utf-8',
-            'anti_phishing_key' => $alipay_config['anti_phishing_key'],
-            'exter_invoke_ip' => $alipay_config['exter_invoke_ip']
-            //其他业务参数根据在线开发文档，添加参数.
-            //文档地址:https://doc.open.alipay.com/doc2/detail.htm?spm=a219a.7629140.0.0.kiX33I&treeId=62&articleId=103740&docType=1
-            //如'参数名'=>'参数值'
-        );
-        $alipaySubmit = new \AlipaySubmit($alipay_config);//建立请求
-        $html_text = $alipaySubmit->buildRequestForm($parameter, 'get', '确认');
-        echo '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>正在跳转到支付渠道...</title></head><body><h1 style="text-align: center">正在跳转到支付渠道...</h1>';
-        echo $html_text;
+        $api->goPay($payway, $out_trade_no, 0, $amount_cent, '', $this->url_return, $this->url_notify);
     }
-
 
     function verify($config, $successCallback)
     {
         $isNotify = isset($config['isNotify']) && $config['isNotify'];
-        $alipay_config = $this->buildAliConfig($config);
-
-        require __DIR__ . '/lib/alipay_notify.class.php';
-        $alipay = new \AlipayNotify($alipay_config);
+        include_once 'sdk.php';
+        $api = new \fakala($config['gateway'], $config['api_id'], $config['api_key']);
 
         if ($isNotify) {
-            $result = $alipay->verifyNotify();
+            $result = $api->notify_verify();
         } else {
-            $result = $alipay->verifyReturn();
+            $result = $api->return_verify();
         }
 
-        if ($result) {//验证成功
-            $out_trade_no = $_REQUEST['out_trade_no'];//商户订单号
-            $trade_no = $_REQUEST['trade_no'];//支付宝交易号
-            $trade_status = $_REQUEST['trade_status'];//交易状态
-            $total_fee = (int)($_REQUEST['total_fee'] * 100);
-
-            if ($trade_status == 'TRADE_FINISHED' || $trade_status == 'TRADE_SUCCESS') {//处理
-                $successCallback($out_trade_no, $total_fee, $trade_no);
-            }
-            if ($isNotify) echo 'success';
-            return true;
-        } else {
-            //验证失败
-            if ($isNotify) {
-                echo 'fail';
-                $logTag = 'payNotify pay_id: ' . $this->pay_id . ',Alipay';
-            }else{
-                $logTag = 'payReturn pay_id: ' . $this->pay_id . ',Alipay';
-            }
-            \Log::error($logTag . ' Alipay.Api.verify failed');
-            return false;
+        if ($result) {
+            $out_trade_no = $_REQUEST['out_trade_no'];  // 本系统订单号
+            $total_fee = $_REQUEST['total_fee'];
+            $fakala_no = $_REQUEST['order_no']; // API渠道订单号
+            $successCallback($out_trade_no, $total_fee, $fakala_no);
         }
-    }
 
-    private function buildAliConfig($config)
-    {
-        return [
-            'partner' => $config['partner'],         //合作身份者ID，
-            'seller_id' => $config['partner'],       //收款支付宝账号
-            'key' => $config['key'],                 // MD5密钥，安全检验码
-            'sign_type' => 'MD5',                    //签名方式
-            'input_charset' => 'utf-8',
-            //ca证书路径地址，用于curl中ssl校验,  请保证cacert.pem文件在当前文件夹目录中
-            'cacert' => __DIR__ . DIRECTORY_SEPARATOR . 'cacert.pem',
-            //访问模式,根据自己的服务器是否支持ssl访问，若支持请选择https；若不支持请选择http
-            'transport' => 'https',
-            'payment_type' => '1',                   //支付类型 ，无需修改
-            'service' => 'create_direct_pay_by_user',// 产品类型，无需修改
-
-            //↓↓↓↓↓↓↓↓↓↓ 请在这里配置防钓鱼信息，如果没开通防钓鱼功能，为空即可 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-            // 防钓鱼时间戳  若要使用请调用类文件submit中的query_timestamp函数
-            'anti_phishing_key' => '',
-            // 客户端的IP地址 非局域网的外网IP地址，如：221.0.0.1
-            'exter_invoke_ip' => ''
-        ];
+        return $result;
     }
 }

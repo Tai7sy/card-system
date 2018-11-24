@@ -6,7 +6,6 @@ use App\Card;
 use App\Category;
 use App\Library\FundHelper;
 use App\Library\Helper;
-use App\Library\WeChatMessage;
 use App\Product;
 use App\Order;
 use App\Library\Response;
@@ -647,13 +646,6 @@ class Pay extends Controller
                             // 还原
                             \App\Library\LogHelper::setLogFile('card');
                         }
-                        if ($order->user->wechat_is_notify('low_stocks')) {
-                            (new WeChatMessage())->low_stocks($order->user, $product);
-                        }
-                    }
-
-                    if ($order->user->wechat_is_notify('order_success')) {
-                        (new WeChatMessage())->order_success($order->user, $product, $order);
                     }
                 }
                 // ------------------------------------------------------------------------ 提醒库存 end
