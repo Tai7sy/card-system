@@ -20,7 +20,10 @@
         <div class="order"></div>
         <!--div class="amount">￥0.01</div-->
         <div class="qr-image" id="qrcode"></div>
-        <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 24px" id="open-app">点击打开手机QQ</a>
+        <div id="open-app-container">
+            <span style="display: block;margin-top: 24px">请截屏此界面或保存二维码，打开手机QQ扫码，选择相册图片</span>
+            <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 8px" id="open-app">点击打开手机QQ</a>
+        </div>
         <div class="detail" id="orderDetail">
             <dl class="detail-ct" style="display: none;">
                 <dt>商品</dt>
@@ -112,7 +115,7 @@
                 goPage(app_url, app_package);
             }, 100);
         } else {
-            $('#open-app').hide();
+            $('#open-app-container').hide();
         }
     }
 </script>

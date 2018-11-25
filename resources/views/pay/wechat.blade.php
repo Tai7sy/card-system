@@ -21,8 +21,7 @@
         <div class="qr-image" id="qrcode"></div>
         <div id="open-app-container">
             <span style="display: block;margin-top: 24px">请截屏此界面或保存二维码，打开微信扫码，选择相册图片</span>
-            <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 8px" id="open-app"
-               href="weixin://">点击打开微信</a>
+            <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 8px" id="open-app" href="weixin://">点击打开微信</a>
         </div>
         <div class="detail" id="orderDetail">
             <dl class="detail-ct" style="display: none;">
