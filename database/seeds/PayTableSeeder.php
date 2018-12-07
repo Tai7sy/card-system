@@ -94,7 +94,7 @@ class PayTableSeeder extends Seeder
         $pay = new \App\Pay;
         $pay->name = '微信扫码';
         $pay->img = '/plugins/images/wx.png';
-        $pay->driver = 'Wechat';
+        $pay->driver = 'WeChat';
         $pay->way = 'NATIVE';
         $pay->comment = '微信支付 - 扫码';
         $pay->config = '{
@@ -109,7 +109,7 @@ class PayTableSeeder extends Seeder
         $pay = new \App\Pay;
         $pay->name = '微信H5';
         $pay->img = '/plugins/images/wx.png';
-        $pay->driver = 'Wechat';
+        $pay->driver = 'WeChat';
         $pay->way = 'MWEB';
         $pay->comment = '微信支付 - H5 (需要开通权限)';
         $pay->config = '{
