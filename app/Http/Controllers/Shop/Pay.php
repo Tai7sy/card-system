@@ -7,7 +7,6 @@ use App\Category;
 use App\Library\FundHelper;
 use App\Library\Helper;
 use App\Product;
-use App\Order;
 use App\Library\Response;
 use App\Library\Pay\Pay as PayApi;
 use App\Library\Geetest;
@@ -185,10 +184,10 @@ class Pay extends Controller
         //商户订单号，网站订单系统中唯一订单号
 
         $order_no = date('YmdHis') . str_random(5);
-        while (Order::whereOrderNo($order_no)->exists()) {
+        while (\App\Order::whereOrderNo($order_no)->exists()) {
             $order_no = date('YmdHis') . str_random(5);
         }
-        Order::insert([
+        \App\Order::insert([
             'user_id' => $product->user_id,
             'order_no' => $order_no,
             'product_id' => $product_id,
@@ -205,7 +204,7 @@ class Pay extends Controller
             'fee' => $system_fee,
             'system_fee' => $system_fee,
             'income' => $merchant_income,
-            'status' => Order::STATUS_UNPAY,
+            'status' => \App\Order::STATUS_UNPAY,
             'created_at' => Carbon::now()
         ]);
 
@@ -222,7 +221,7 @@ class Pay extends Controller
      */
     function pay(Request $request, $order_no)
     {
-        $order = Order::whereOrderNo($order_no)->first();
+        $order = \App\Order::whereOrderNo($order_no)->first();
         if ($order == null) {
             return self::renderResult($request, ['msg' => '订单未找到，请重试']);
         }
@@ -295,7 +294,7 @@ class Pay extends Controller
      */
     function qrcode(Request $request, $order_no, $pay_file)
     {
-        $order = Order::whereOrderNo($order_no)->with('product')->first();
+        $order = \App\Order::whereOrderNo($order_no)->with('product')->first();
         if ($order == null) {
             return self::renderResult($request, ['msg' => '订单未找到，请重试']);
         }
@@ -346,8 +345,8 @@ class Pay extends Controller
 
         // check if already processed
         if (strlen($out_trade_no) > 0) {
-            $order = Order::whereOrderNo($out_trade_no)->first();
-            if ($order && ($order->status === Order::STATUS_PAID || $order->status === Order::STATUS_SUCCESS)) {
+            $order = \App\Order::whereOrderNo($out_trade_no)->first();
+            if ($order && ($order->status === \App\Order::STATUS_PAID || $order->status === \App\Order::STATUS_SUCCESS)) {
                 \Log::notice($logTag . ' already success' . "\n\n");
                 if ($request->ajax()) {
                     return self::renderResult($request, [
@@ -463,12 +462,12 @@ class Pay extends Controller
      */
     function result(Request $request, $order_no)
     {
-        $order = Order::whereOrderNo($order_no)->first();
+        $order = \App\Order::whereOrderNo($order_no)->first();
         if ($order == null) {
             return self::renderResult($request, ['msg' => '订单未找到，请重试']);
         }
 
-        if ($order->status === Order::STATUS_PAID) {
+        if ($order->status === \App\Order::STATUS_PAID) {
             // 处于已支付 (不是 SUCCESS) , 说明没货了
             $qq = $order->user->qq;
             $msg = '商家库存不足，因此卡密没有自动发货，请联系商家客服发货';
@@ -482,7 +481,7 @@ class Pay extends Controller
             ], [
                 'order' => $order
             ]);
-        } elseif ($order->status === Order::STATUS_SUCCESS) {
+        } elseif ($order->status === \App\Order::STATUS_SUCCESS) {
             // 说明已经 notify 过了, 订单已经成功, 直接取出card 渲染页面
             // 这里不会抛出异常($order->paid 时仅渲染页面)
             return $this->shipOrder($request, $order->order_no, $order->paid, 0, TRUE);
@@ -536,7 +535,7 @@ class Pay extends Controller
 
 
         /** @var \App\Order $order */
-        $order = Order::whereOrderNo($order_no)->first();
+        $order = \App\Order::whereOrderNo($order_no)->first();
         if ($order === null) {
 
             \Log::error('shipOrder: No query results for model [App\Order:' . $order_no . ',trade_no:' . $trade_no . ',amount:' . $amount . ']. die(\'success\');');
@@ -557,7 +556,7 @@ class Pay extends Controller
         $card_msg = '订单#' . $order_no . '&nbsp;已支付，卡号列表：';
         $cards_txt = '';
         $product = null;
-        $first_process = $order->status === Order::STATUS_UNPAY; //未处理过此订单
+        $first_process = $order->status === \App\Order::STATUS_UNPAY; //未处理过此订单
         $need_mail = $first_process && System::_getInt('mail_send_order') === 1 && filter_var($order->email, FILTER_VALIDATE_EMAIL);
 
         if ($first_process) {
@@ -572,8 +571,8 @@ class Pay extends Controller
                  */
                 function () use ($order_id, $trade_no, &$cards, &$cards_txt) {
                     /** @var \App\Order $order */
-                    $order = Order::where('id', $order_id)->lockForUpdate()->firstOrFail();
-                    if ($order->status !== Order::STATUS_UNPAY) {
+                    $order = \App\Order::where('id', $order_id)->lockForUpdate()->firstOrFail();
+                    if ($order->status !== \App\Order::STATUS_UNPAY) {
                         \Log::debug('shipOrder.first_process:' . $order->order_no . ' already processed!');
                         return -999;
                     }
@@ -599,12 +598,12 @@ class Pay extends Controller
 
                         // 库存不足了, GG
                         // 已支付 未发货
-                        $order->status = Order::STATUS_PAID;
+                        $order->status = \App\Order::STATUS_PAID;
                         $order->saveOrFail();
-                        return Order::STATUS_PAID;
+                        return \App\Order::STATUS_PAID;
                         // 这里需要商户到后台手动发货
                     } else {
-                        $order->status = Order::STATUS_SUCCESS;
+                        $order->status = \App\Order::STATUS_SUCCESS;
                         $order->saveOrFail();
                         $card_ids = [];
                         foreach ($cards as $card) {
@@ -617,7 +616,7 @@ class Pay extends Controller
                             'count_sold' => \DB::raw('`count_sold`+1')
                         ]);
 
-                        return Order::STATUS_SUCCESS;
+                        return \App\Order::STATUS_SUCCESS;
                     }
                 })
             ) {
