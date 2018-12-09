@@ -90,7 +90,7 @@ class Handler extends ExceptionHandler
         } else {
             return $request->expectsJson() ?
                 response()->json(['message' => '未知错误，请联系客服'], 500) :
-                response()->view('errors.500', [], 500);
+                response()->view('errors._', ['code' => 500, 'message' => '未知错误，请联系客服'], 500);
         }
     }
 }

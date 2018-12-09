@@ -86,6 +86,7 @@ class Api implements ApiInterface
             $result = $notify->GetH5PayUrl($input);
             $url = getResultUrl($out_trade_no,$result,'mweb_url');
             // header('location: ' . $url);
+            // 这里是为了API支付的时候跳转微信带上referer, 不然微信要发疯咬人
             echo view('utils.redirect', ['url' => $url]);
         }
         exit;
