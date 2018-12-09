@@ -43,32 +43,13 @@ class NativePay
     }
 
     /**
-     *
-     * 生成直接支付url，支付url有效期为2小时,模式二
+     * 统一下单
      * @param \WxPayUnifiedOrder $input
      * @return string|成功时返回，其他抛异常
      * @throws WxPayException
      */
-    public function GetPayUrl($input)
+    public function unifiedOrder($input)
     {
-        if ($input->GetTrade_type() == "NATIVE") {
-            $result = WxPayApi::unifiedOrder($input);
-            return $result;
-        }
-    }
-
-    /**
-     *
-     * 生成H5支付url，支付url有效期为2小时
-     * @param \WxPayUnifiedOrder $input
-     * @return string|成功时返回，其他抛异常
-     * @throws WxPayException
-     */
-    public function GetH5PayUrl($input)
-    {
-        if ($input->GetTrade_type() == "MWEB") {
-            $result = WxPayApi::unifiedOrder($input);
-            return $result;
-        }
+        return WxPayApi::unifiedOrder($input);
     }
 }

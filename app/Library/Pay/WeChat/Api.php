@@ -35,6 +35,9 @@ class Api implements ApiInterface
         // Log::debug('Pay.WeChat.goPay, order_no:' . $out_trade_no.', step1');
         $amount = $amount_cent;
         $payway = strtoupper($config['payway']);
+        if (strpos(@$_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) {
+            $payway = 'JSAPI'; // 微信内部
+        }
         $this->defineWxConfig($config);
         require_once __DIR__ . '/lib/WxPay.Api.php';
         require_once 'WxPay.NativePay.php';
@@ -62,7 +65,7 @@ class Api implements ApiInterface
         $input->SetSpbill_create_ip(Helper::getIP());
 
 
-        function getResultUrl($out_trade_no, $result, $key)
+        function getValue($out_trade_no, $result, $key)
         {
             if (!isset($result[$key])) {
                 Log::error('Pay.WeChat.goPay, order_no:' . $out_trade_no . ', error:' . json_encode($result));
@@ -77,14 +80,18 @@ class Api implements ApiInterface
 
         if ($payway === 'NATIVE') {
             // 二维码支付
-            $result = $notify->GetPayUrl($input);
-            $url = getResultUrl($out_trade_no,$result,'code_url');
+            $result = $notify->unifiedOrder($input);
+            $url = getValue($out_trade_no, $result, 'code_url');
             header('location: /qrcode/pay/' . $out_trade_no . '/wechat?url=' . urlencode($url));
-
+        } elseif ($payway === 'JSAPI') {
+            // 微信内部
+            $result = $notify->unifiedOrder($input);
+            $url = getValue($out_trade_no, $result, 'prepay_id');
+            header('location: /qrcode/pay/' . $out_trade_no . '/wechat?prepay_id=' . urlencode($url));
         } elseif ($payway === 'MWEB') {
             // H5支付
-            $result = $notify->GetH5PayUrl($input);
-            $url = getResultUrl($out_trade_no,$result,'mweb_url');
+            $result = $notify->unifiedOrder($input);
+            $url = getValue($out_trade_no, $result, 'mweb_url');
             // header('location: ' . $url);
             // 这里是为了API支付的时候跳转微信带上referer, 不然微信要发疯咬人
             echo view('utils.redirect', ['url' => $url]);

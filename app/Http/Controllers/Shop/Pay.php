@@ -301,11 +301,10 @@ class Pay extends Controller
         if ($order->product_id !== \App\Product::ID_API && $order->product == null) {
             return self::renderResult($request, ['msg' => '商品未找到，请重试']);
         }
-        $qr = $request->get('url');
         return view('pay/' . $pay_file, [
             'pay_id' => $order->pay_id,
             'name' => $order->product_id === \App\Product::ID_API ? $order->api_out_no : $order->product->name,
-            'qrcode' => $qr,
+            'qrcode' => $request->get('url'),
             'id' => $order_no
         ]);
     }
