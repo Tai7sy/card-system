@@ -175,6 +175,9 @@
       window.bus.$on('app-resize', this.resizeHandler);
       this.initData();
     },
+    beforeDestroy () {
+      window.bus.$off('app-resize', this.resizeHandler);
+    },
     methods: {
       resizeHandler () {
         ['order-count-line-chart', 'order-sum-line-chart', 'pay-pie-chart'].forEach(e => {

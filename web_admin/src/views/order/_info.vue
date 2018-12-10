@@ -93,7 +93,7 @@
       }
     },
     mounted () {
-      window.bus.$on(this.from + ':show:card', () => {
+      this._on_show_card = () => {
         if (this.orderInfo) {
           const cardInfo = this.orderInfo.card_orders.map(e => e.card ? e.card.card : '未知卡密#' + e.card_id).join('<br>');
           this.$msgbox({
@@ -102,8 +102,9 @@
             dangerouslyUseHTMLString: true
           });
         }
-      });
-      window.bus.$on(this.from + ':show:pay', () => {
+      };
+      window.bus.$on(this.from + ':show:card', this._on_show_card);
+      this._on_show_pay = () => {
         if (this.orderInfo) {
           const payName = this.orderInfo.pay ? this.orderInfo.pay.name : '支付方式#' + this.orderInfo.pay_id;
           const payInfo = '支付方式: ' + payName + '<br>支付时间: '
@@ -115,8 +116,9 @@
             dangerouslyUseHTMLString: true
           });
         }
-      });
-      window.bus.$on(this.from + ':send:card', () => {
+      };
+      window.bus.$on(this.from + ':show:pay', this._on_show_pay);
+      this._on_send_card = () => {
         if (this.orderInfo) {
           this.$confirm('当前订单状态为<' + orderStatus.get(this.orderInfo.status).name + '>, 是否确认发货?').then(() => {
             this.loading = true;
@@ -129,10 +131,9 @@
             });
           });
         }
-      });
-
-
-      window.bus.$on(this.from + ':send:notify', () => {
+      }
+      window.bus.$on(this.from + ':send:card', this._on_send_card);
+      this._on_send_notify = () => {
         if (this.orderInfo) {
           this.loading = true;
           notify(this.orderInfo.id).then(res => {
@@ -147,7 +148,14 @@
             this.loading = false;
           });
         }
-      });
+      }
+      window.bus.$on(this.from + ':send:notify', this._on_send_notify);
+    },
+    beforeDestroy () {
+      window.bus.$off(this.from + ':show:card', this._on_show_card);
+      window.bus.$off(this.from + ':show:pay', this._on_show_pay);
+      window.bus.$off(this.from + ':send:card', this._on_send_card);
+      window.bus.$off(this.from + ':send:notify', this._on_send_notify);
     },
     methods: {
       showOrder (info) {

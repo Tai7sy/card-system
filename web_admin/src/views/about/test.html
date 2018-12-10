@@ -53,6 +53,9 @@
       window.bus.$on('app-resize', this.resizeHandler);
       this.init();
     },
+    beforeDestroy () {
+      window.bus.$off('app-resize', this.resizeHandler);
+    },
     methods: {
       resizeHandler () {
         this.appHeight = window.innerHeight - 50 + 'px';
