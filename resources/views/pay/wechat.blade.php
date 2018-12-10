@@ -59,8 +59,14 @@
 <script>
     var code_url = decodeURIComponent('{!! urlencode($qrcode) !!}');
 
-    if (code_url.indexOf('weixin://') === -1 && navigator.userAgent.match(/MicroMessenger/i) !== null) {
-
+    if (code_url === 'h5') {
+        $('.tip>.ico-scan').remove();
+        $('.tip>.tip-text').html('<p>订单已支付, 正在处理...</p>');
+        $('#open-app-container').html('<p></p>');
+        $('#orderDetail>.detail-ct').show();
+        $('#orderDetail>.arrow').remove();
+    }
+    else if (code_url.indexOf('weixin://') === -1 && navigator.userAgent.match(/MicroMessenger/i) !== null) {
         $('.tip>.ico-scan').remove();
         $('.tip>.tip-text').html('<p>请在弹出的窗口完成支付</p>');
         $('#open-app-container').html('<p></p>');

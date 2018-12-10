@@ -120,9 +120,10 @@ class Api implements ApiInterface
         } elseif ($payway === 'MWEB') {
             // H5支付
             $url = getValue($out_trade_no, $result, 'mweb_url');
+            $result_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}" . '/qrcode/pay/' . $out_trade_no . '/wechat?url=h5';
             // header('location: ' . $url);
             // 这里是为了API支付的时候跳转微信带上referer, 不然微信要发疯咬人
-            echo view('utils.redirect', ['url' => $url]);
+            echo view('utils.redirect', ['url' => $url . '&redirect_url=' . urlencode($result_url)]);
         }
         exit;
     }
