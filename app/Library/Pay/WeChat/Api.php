@@ -2,6 +2,7 @@
 
 namespace App\Library\Pay\WeChat;
 
+use App\Library\CurlRequest;
 use App\Library\Helper;
 use App\Library\Pay\ApiInterface;
 use Illuminate\Support\Facades\Log;
@@ -37,6 +38,25 @@ class Api implements ApiInterface
         $payway = strtoupper($config['payway']);
         if (strpos(@$_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) {
             $payway = 'JSAPI'; // 微信内部
+            $pay_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}" . '/pay/' . $out_trade_no;
+            $auth_url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' . $config['APPID'] . '&redirect_uri=' . urlencode($pay_url) . '&response_type=code&scope=snsapi_base#wechat_redirect';
+
+            if (!isset($_GET['code'])) {
+                header('Location: ' . $auth_url);
+                exit;
+            }
+
+            $request_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' . $config['APPID'] . '&secret=' . $config['APPSECRET'] . '&code=' . $_GET['code'] . '&grant_type=authorization_code';
+            $ret = @json_decode(CurlRequest::get($request_url), true);
+            if (!$ret || !isset($ret['openid'])) {
+                if (isset($ret['errcode']) && $ret['errcode'] === 40163) {
+                    // code been used, 已经用过(用户的刷新行为), 重新发起
+                    header('Location: ' . $auth_url);
+                    exit;
+                }
+                die('<h1>获取微信OPENID<br>错误信息: ' . (isset($ret['errcode']) ? $ret['errcode'] : $ret) . '<br>' . (isset($ret['errmsg']) ? $ret['errmsg'] : $ret) . '<br>请返回重试</h1>');
+            }
+            $openid = $ret['openid'];
         }
         $this->defineWxConfig($config);
         require_once __DIR__ . '/lib/WxPay.Api.php';
@@ -61,9 +81,11 @@ class Api implements ApiInterface
         $input->SetTrade_type($payway);
         if ($payway === 'MWEB')
             $input->SetScene_info('{"h5_info": {"type":"Wap","wap_url": "' . SYS_URL . '","wap_name": "发卡平台"}}');
+        if ($payway === 'JSAPI')
+            $input->SetOpenid($openid);
         $input->SetProduct_id($out_trade_no);//商品ID  可自定义
         $input->SetSpbill_create_ip(Helper::getIP());
-
+        $result = $notify->unifiedOrder($input);
 
         function getValue($out_trade_no, $result, $key)
         {
@@ -80,17 +102,23 @@ class Api implements ApiInterface
 
         if ($payway === 'NATIVE') {
             // 二维码支付
-            $result = $notify->unifiedOrder($input);
             $url = getValue($out_trade_no, $result, 'code_url');
-            header('location: /qrcode/pay/' . $out_trade_no . '/wechat?url=' . urlencode($url));
+            header('Location: /qrcode/pay/' . $out_trade_no . '/wechat?url=' . urlencode($url));
         } elseif ($payway === 'JSAPI') {
             // 微信内部
-            $result = $notify->unifiedOrder($input);
-            $url = getValue($out_trade_no, $result, 'prepay_id');
-            header('location: /qrcode/pay/' . $out_trade_no . '/wechat?prepay_id=' . urlencode($url));
+            $params = [
+                'appId' => $config['APPID'],                // 公众号名称，由商户传入
+                'timeStamp' => time(),                      // 时间戳，自1970年以来的秒数
+                'nonceStr' => md5(time() . 'nonceStr'), // 随机串
+                'package' => 'prepay_id=' . getValue($out_trade_no, $result, 'prepay_id'),
+                'signType' => 'MD5',                        // 微信签名方式：
+            ];
+            $data = new \WxPayJsApiPay();
+            $data->FromArray($params);
+            $params['paySign'] = $data->MakeSign(); // 微信签名
+            header('Location: /qrcode/pay/' . $out_trade_no . '/wechat?url=' . urlencode(json_encode($params)));
         } elseif ($payway === 'MWEB') {
             // H5支付
-            $result = $notify->unifiedOrder($input);
             $url = getValue($out_trade_no, $result, 'mweb_url');
             // header('location: ' . $url);
             // 这里是为了API支付的时候跳转微信带上referer, 不然微信要发疯咬人

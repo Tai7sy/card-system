@@ -99,9 +99,9 @@ class PayTableSeeder extends Seeder
         $pay->comment = '微信支付 - 扫码';
         $pay->config = '{
   "APPID": "APPID",
+  "APPSECRET": "APPSECRET",
   "MCHID": "商户ID",
-  "KEY": "KEY",
-  "APPSECRET": "APPSECRET"
+  "KEY": "KEY"
 }';
         $pay->enabled = \App\Pay::ENABLED_ALL;
         $pay->save();
@@ -114,9 +114,9 @@ class PayTableSeeder extends Seeder
         $pay->comment = '微信支付 - H5 (需要开通权限)';
         $pay->config = '{
   "APPID": "APPID",
+  "APPSECRET": "APPSECRET",
   "MCHID": "商户ID",
-  "KEY": "KEY",
-  "APPSECRET": "APPSECRET"
+  "KEY": "KEY"
 }';
         $pay->enabled = \App\Pay::ENABLED_MOBILE;
         $pay->save();

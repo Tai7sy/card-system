@@ -2714,6 +2714,16 @@ class WxPayReverse extends WxPayDataBase
  */
 class WxPayJsApiPay extends WxPayDataBase
 {
+    /**
+     *
+     * 使用数组初始化
+     * @param array $array
+     */
+    public function FromArray($array)
+    {
+        $this->values = $array;
+    }
+
 	/**
 	* 设置微信分配的公众账号ID
 	* @param string $value 
