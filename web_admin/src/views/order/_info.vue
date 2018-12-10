@@ -131,7 +131,7 @@
             });
           });
         }
-      }
+      };
       window.bus.$on(this.from + ':send:card', this._on_send_card);
       this._on_send_notify = () => {
         if (this.orderInfo) {
@@ -148,7 +148,7 @@
             this.loading = false;
           });
         }
-      }
+      };
       window.bus.$on(this.from + ':send:notify', this._on_send_notify);
     },
     beforeDestroy () {
