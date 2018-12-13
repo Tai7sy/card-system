@@ -27,15 +27,6 @@ class Controller extends BaseController
     }
 
     /**
-     * 是否为管理员
-     * @return bool
-     */
-    protected function isAdmin()
-    {
-        return \Auth::getUser()->role === 'admin';
-    }
-
-    /**
      * 商户: 设置当前登录用户user_id <br>管理员: 设置user_id or 所有
      * @param Request $request
      * @param $model
@@ -46,14 +37,7 @@ class Controller extends BaseController
     function authQuery(Request $request, $model, $user_id_key = 'user_id', $post_key = 'user_id')
     {
         /* @var \App\Model_ $model */
-        if (self::isAdmin()) {
-            $user_id = (int)$request->input($post_key);
-            if ($user_id)
-                return $model::where($user_id_key, $user_id);
-            return $model::query();
-        } else {
-            return $model::where($user_id_key, \Auth::id());
-        }
+        return $model::where($user_id_key, \Auth::id());
     }
 
     /**
@@ -92,15 +76,7 @@ class Controller extends BaseController
      */
     protected function getUser(Request $request)
     {
-        if (self::isAdmin()) {
-            $user_id = (int)$request->post('user_id');
-            if (!$user_id) return null;
-            /* @var \App\User $user */
-            $user = \App\User::findOrFail($user_id);
-            return $user;
-        } else {
-            return \Auth::getUser();
-        }
+        return \Auth::getUser();
     }
 
 

@@ -17,8 +17,7 @@ class Login extends Controller
         $remember = $request->input('remember') == 'true';
         if (!Auth::attempt([
                 'email' => $request->input('email'),
-                'password' => $request->input('password')], $remember) ||
-            Auth::getUser()->role !== 'admin'
+                'password' => $request->input('password')], $remember)
         ) {
             return Response::fail('邮箱或密码错误, 请检查');
         } else {

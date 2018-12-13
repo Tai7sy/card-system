@@ -24,6 +24,10 @@ class User extends Authenticatable
 
     protected $appends = ['m_balance'];
 
+    protected $casts = [
+        'shop_theme' => 'array'
+    ];
+
     const ID_CUSTOMER = -1;
 
     // 商户库存显示类型
@@ -76,8 +80,8 @@ class User extends Authenticatable
         return $this->hasMany(Log::class);
     }
 
-    function shop_template()
+    function shop_theme()
     {
-        return $this->belongsTo(ShopTemplate::class);
+        return $this->belongsTo(ShopTheme::class);
     }
 }

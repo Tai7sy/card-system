@@ -18,7 +18,8 @@ class CreateUsersTable extends Migration
             $table->string('email', 100)->unique();
             $table->string('mobile')->nullable();
             $table->string('password', 100);
-            $table->string('role')->default('merchant');
+
+            $table->text('shop_theme')->nullable();
 
             $table->integer('m_paid')->default(0);
             $table->integer('m_frozen')->default(0);

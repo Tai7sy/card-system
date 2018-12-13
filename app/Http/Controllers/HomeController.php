@@ -27,7 +27,7 @@ class HomeController extends Controller
     private function _shop_render($user, $category = null, $product = null)
     {
         $config = [
-            'url' => config('app.url'),
+            'url' => config('app.url'),//支付域名
             'company' => System::_get('company'),
             'name' => config('app.name'),
             'logo' => System::_get('logo')
@@ -36,7 +36,6 @@ class HomeController extends Controller
             'qq' => System::_get('shop_qq'),
             'ann' => System::_get('shop_ann'),
             'ann_pop' => System::_get('shop_ann_pop'),
-            'bkg' => System::_get('shop_bkg'),
             'inventory' => System::_getInt('shop_inventory')
         ];
 
@@ -46,9 +45,12 @@ class HomeController extends Controller
             $config['categories'] = [$category];
             $config['product'] = $product;
             $name = $product->name . ' - ' . $config['name'];
-            $matches = [];
-            preg_match_all('/"insert":"(.+?)"/', $product->description, $matches);
-            $description = str_replace('\n', ' ', @join(' ', $matches[1]));
+            $description = $product->description;
+            if(@$description[0] === '{'){
+                $matches = [];
+                preg_match_all('/"insert":"(.+?)"/', $description, $matches);
+                $description = str_replace('\n', ' ', @join(' ', $matches[1]));
+            }
         } elseif ($category) {
             // 如果是分类连接
             $config['categories'] = [$category];
@@ -70,6 +72,11 @@ class HomeController extends Controller
 
             $name = $config['name'];
             $description = $config['shop']['ann'];
+            if(@$description[0] === '{'){
+                $matches = [];
+                preg_match_all('/"insert":"(.+?)"/', $description, $matches);
+                $description = str_replace('\n', ' ', @join(' ', $matches[1]));
+            }
         }
 
 
@@ -94,9 +101,14 @@ class HomeController extends Controller
             strlen($customer) !== 32 ? md5(str_random(16)) : $customer, 43200); // 30 days
 
 
-        $template_id = $user->shop_template ? $user->shop_template->id : 0;
+        $user_theme = $user->shop_theme ?
+            \App\ShopTheme::whereName($user->shop_theme['theme'])->firstOrFail() :
+            \App\ShopTheme::defaultTheme();
+        $config['theme'] = $user->shop_theme && isset($user->shop_theme[$user_theme->name]) ?
+            $user->shop_theme[$user_theme->name] :
+            \App\ShopTheme::defaultTheme()->config;
 
-        return response()->view('shop_template.' . $template_id . '.index', [
+        return response()->view('shop_theme.' . $user_theme . '.index', [
             'name' => $name,
             'keywords' => preg_replace('/[、，；。！？]/', ', ', $name),
             'description' => $description,

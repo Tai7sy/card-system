@@ -26,13 +26,8 @@ class UserPolicy
     {
     }
 
-    /**
-     * @param \App\User $user
-     * @param string $ability role
-     * @return bool
-     */
     public function before($user, $ability)
     {
-        return $user->role === $ability;
+        return true;
     }
 }

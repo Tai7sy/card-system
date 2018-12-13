@@ -14,8 +14,7 @@ class UsersSeeder extends Seeder
         DB::table('users')->insert([
             'email' => 'admin@qq.com',
             'password' => bcrypt('123456'),
-            'role' => 'admin',
-            'created_at' => \Carbon\Carbon::now()
+            'created_at' => \Carbon\Carbon::now(),
         ]);
     }
 }

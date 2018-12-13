@@ -128,7 +128,7 @@ class Card extends Controller
         /* @var \App\File $file */
         $file = \App\File::findOrFail($file_id);
         $user = Auth::getUser();
-        if ($user->role !== 'admin' && $user->id !== $file->user_id) {
+        if ($user->id !== $file->user_id) {
             $card_txt = 'Access Denied';
             $file_name = 'your_are_sb.txt';
         } else {
