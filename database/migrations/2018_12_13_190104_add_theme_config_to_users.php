@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddShopThemeToUsers extends Migration
+class AddThemeConfigToUsers extends Migration
 {
     /**
      * Run the migrations.
@@ -15,7 +15,7 @@ class AddShopThemeToUsers extends Migration
     {
         if (!Schema::hasColumn('users', 'shop_theme')) {
             Schema::table('users', function (Blueprint $table) {
-                $table->text('shop_theme')->nullable()->after('password');
+                $table->text('theme_config')->nullable()->after('password');
             });
         }
     }

@@ -25,7 +25,7 @@ class User extends Authenticatable
     protected $appends = ['m_balance'];
 
     protected $casts = [
-        'shop_theme' => 'array'
+        'theme_config' => 'array'
     ];
 
     const ID_CUSTOMER = -1;
@@ -48,6 +48,17 @@ class User extends Authenticatable
         $income_today = (int)\App\Order::where('user_id', $this->user_id)
             ->where('status', \App\Order::STATUS_SUCCESS)->whereDate('paid_at', Carbon::today())->sum('income');
         return $this->m_all - $this->m_paid - $this->m_frozen - $income_today;
+    }
+
+    /**
+     * @return ShopTheme
+     */
+    function getShopThemeAttribute(){
+        if($this->theme_config){
+            $ret = \App\ShopTheme::whereName($this->theme_config['theme'])->first();
+            if($ret)  return $ret;
+        }
+        return \App\ShopTheme::defaultTheme();
     }
 
     function categories()

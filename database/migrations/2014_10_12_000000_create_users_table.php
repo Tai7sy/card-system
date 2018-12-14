@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('mobile')->nullable();
             $table->string('password', 100);
 
-            $table->text('shop_theme')->nullable();
+            $table->text('theme_config')->nullable();
 
             $table->integer('m_paid')->default(0);
             $table->integer('m_frozen')->default(0);
