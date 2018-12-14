@@ -25,6 +25,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
 
 
     Route::any('system/info', 'Admin\System@info');
+    Route::any('system/theme', 'Admin\System@theme');
     Route::any('system/order', 'Admin\System@order');
     Route::any('system/vcode', 'Admin\System@vcode');
     Route::any('system/email', 'Admin\System@email');

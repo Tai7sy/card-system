@@ -53,7 +53,6 @@ class System extends Controller
             'app_url_api',
             'keywords',
             'description',
-            'shop_bkg',
             'shop_ann',
             'shop_ann_pop',
             'shop_qq',
@@ -84,6 +83,35 @@ class System extends Controller
 
         $this->set($request, $strConfig);
         $this->setInt($request, $intConfig);
+
+        return Response::success();
+    }
+
+    function theme(Request $request)
+    {
+        if ($request->isMethod('GET')) {
+            \App\ShopTheme::freshList();
+            return Response::success([
+                'themes' => \App\ShopTheme::get(),
+                'default' => \App\ShopTheme::defaultTheme()->name
+            ]);
+        }
+
+        $theme = $request->post('shop_theme');
+        if (!\App\ShopTheme::whereName($theme)->exists()) {
+            return Response::fail();
+        }
+        \App\System::_set('shop_theme_default', $theme);
+
+        \App\ShopTheme::each(function (\App\ShopTheme $e) use ($request) {
+            if ($e->name === 'Material') {
+                $e->config = [
+                    'list_type' => $request->post('shop_theme_material_list_type'),
+                    'background' => $request->post('shop_theme_material_background')
+                ];
+                $e->saveOrFail();
+            }
+        });
 
         return Response::success();
     }

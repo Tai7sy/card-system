@@ -6,6 +6,10 @@
         <set-info v-if="initialized.info"/>
       </el-tab-pane>
 
+      <el-tab-pane label="主题" name="theme">
+        <set-theme v-if="initialized.theme"/>
+      </el-tab-pane>
+
       <el-tab-pane label="订单" name="order">
         <set-order v-if="initialized.order"/>
       </el-tab-pane>
@@ -28,6 +32,7 @@
 <script>
   import NProgress from 'nprogress'; // Progress 进度条
   import setInfo from './_info'
+  import setTheme from './_theme'
   import setEmail from './_email.vue'
   import setOrder from './_order'
   import setVcode from './_vcode'
@@ -35,6 +40,7 @@
 
   const const_init = {
     info: false,
+    theme: false,
     email: false,
     order: false,
     vcode: false,
@@ -45,6 +51,7 @@
   export default {
     components: {
       setInfo,
+      setTheme,
       setEmail,
       setOrder,
       setVcode,

@@ -18,7 +18,6 @@ class CreateShopThemesTable extends Migration
             $table->string('name', 128)->unique();
             $table->string('description')->nullable();
             $table->text('config')->nullable();
-            $table->boolean('is_default')->default(false);
             $table->boolean('enabled')->default(true);
         });
 

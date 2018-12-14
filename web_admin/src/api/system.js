@@ -1,51 +1,60 @@
 import fetch from '../utils/fetch';
 
 
-export function info (params) {
+export function info (data) {
   return fetch({
     url: 'system/info',
-    method: params ? 'post' : 'get',
-    data: params
+    method: data ? 'post' : 'get',
+    data
   });
 }
 
-export function order (params) {
+export function theme (data) {
+  return fetch({
+    url: 'system/theme',
+    method: data ? 'post' : 'get',
+    data
+  });
+}
+
+
+export function order (data) {
   return fetch({
     url: 'system/order',
-    method: params ? 'post' : 'get',
-    data: params
+    method: data ? 'post' : 'get',
+    data
   });
 }
 
-export function vcode (params) {
+export function vcode (data) {
   return fetch({
     url: 'system/vcode',
-    method: params ? 'post' : 'get',
-    data: params
+    method: data ? 'post' : 'get',
+    data
   });
 }
 
-export function email (params) {
+export function email (data) {
   return fetch({
     url: 'system/email',
-    method: params ? 'post' : 'get',
-    data: params
+    method: data ? 'post' : 'get',
+    data
   });
 }
 
-export function security (params) {
+export function security (data) {
   return fetch({
     url: 'system/security',
-    method: params ? 'post' : 'get',
-    data: params
+    method: data ? 'post' : 'get',
+    data
   });
 }
 
-export function storage (params) {
+export function storage (data) {
   return fetch({
     url: 'system/storage',
-    method: params ? 'post' : 'get',
-    data: params
+    method: data ? 'post' : 'get',
+    data
   });
 }
 
