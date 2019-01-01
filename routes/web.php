@@ -20,17 +20,8 @@ if (config('app.debug')) {
     Route::get('/test', 'DevController@test');
 }
 
-Route::get('/storage/{file_path}', 'Merchant\File@renderImage')->where('file_path', '.+');
-;
-
-Route::group(['prefix' => '/api/admin', 'middleware' => ['auth', 'can:admin,App\User']], function () {
-    // 上传收款二维码后查看
-    Route::get('file/{file_id}/{file_name}', 'Merchant\File@renderQRCode');
-    // 导出卡密
-    Route::get('card/export/{file_id}', 'Merchant\Card@export_download');
-});
-
-Route::get('/admin/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index')->middleware(['auth', 'can:admin,App\User']);
+Route::get('/storage/{file_path}', 'Merchant\File@renderImage')
+    ->where('file_path', '.+');;
 
 
 // 传入单号, 进行支付 (重新支付)
@@ -51,7 +42,8 @@ Route::get('/pay/result/{order_no}', 'Shop\Pay@result');
 
 // 后台
 Route::get('/admin', 'HomeController@admin');
-Route::get('/admin/{all}', 'HomeController@admin')->where('all', '.*');
+Route::get('/admin/{all}', 'HomeController@admin')
+    ->where('all', '.*');
 
 
 // 店铺地址

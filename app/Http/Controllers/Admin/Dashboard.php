@@ -74,6 +74,7 @@ class Dashboard extends Controller
         if (function_exists('opcache_reset')) {
             opcache_reset();
         }
+        \Artisan::call('cache:clear');
         return Response::success();
     }
 }

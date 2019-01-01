@@ -2,30 +2,16 @@
 
 namespace App;
 
-use Hashids\Hashids;
+use App\Library\Helper;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
     protected $guarded = [];
 
-
-
-    public static function id_encode($id)
-    {
-        $hashids = new Hashids(config('app.key'));
-        return @$hashids->encode($id, 1);
-    }
-
-    public static function id_decode($en_id)
-    {
-        $hashids = new Hashids(config('app.key'));
-        return @$hashids->decode($en_id)[0];
-    }
-
     function getUrlAttribute()
     {
-        return config('app.url') . '/c/' . self::id_encode($this->id);
+        return config('app.url') . '/c/' . Helper::id_encode($this->id, Helper::ID_TYPE_CATEGORY);
     }
 
     function products()

@@ -81,6 +81,20 @@ class Handler extends ExceptionHandler
             return $request->expectsJson() ?
                 response()->json(['message' => '当前服务不可用，请稍后重试'], 503) :
                 response()->view('errors._', ['code' => 503, 'message' => '当前服务不可用，请稍后重试'], 503);
+        } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+            $statusCode = $request->expectsJson();
+            switch ($statusCode){
+                case 429:
+                    return $request->expectsJson() ?
+                        response()->json(['message' => '您的请求过于频繁，请稍后重试'], 429) :
+                        response()->view('errors._', ['code' => 429, 'message' => '您的请求过于频繁，请稍后重试'], 429);
+                    break;
+                default:
+                    \Log::error('Uncaught a UnknownHttpException', ['Exception' => $e]);
+                    return $request->expectsJson() ?
+                        response()->json(['message' => '当前服务不可用，请稍后重试'], $statusCode) :
+                        response()->view('errors._', ['code' => $statusCode, 'message' => '当前服务不可用，请稍后重试'], $statusCode);
+            }
         }
 
         \Log::error('Uncaught Exception', ['Exception' => $e]);

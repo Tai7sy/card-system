@@ -78,14 +78,4 @@ class MerchantTest extends TestCase
         $order = \App\Order::whereOrderNo('2018030321070543648')->first();
         var_dump($order->cards()->exists());
     }
-
-    function testIdEncode()
-    {
-        $user_id = 55555;
-        $en_id = \App\Category::id_encode($user_id);
-        var_dump($en_id);
-        $de_id = \App\Category::id_decode($en_id);
-        $this->assertEquals($user_id, $de_id);
-    }
-
 }

@@ -4,6 +4,8 @@
 namespace App\Library;
 
 
+use Hashids\Hashids;
+
 class Helper
 {
     public static function getMysqlDate($addDays = 0)
@@ -145,18 +147,36 @@ class Helper
         }
     }
 
-    public static function strBetween($str, $mark1, $mark2)
+    public static function str_between($str, $mark1, $mark2)
     {
-        $st = stripos($str, $mark1);
+        $st = strpos($str, $mark1);
         if ($st === false) return '';
-        $ed = stripos($str, $mark2, $st + strlen($mark1));
+        $ed = strpos($str, $mark2, $st + strlen($mark1));
         if ($ed === false || $st >= $ed) return '';
         $len = strlen($mark1);
         $ret = substr($str, $st + $len, ($ed - $st - $len));
         return $ret;
     }
 
-    public static function formatUrl($url){
+    /**
+     * 自动匹配最长段
+     * @param $str
+     * @param $mark1
+     * @param $mark2
+     * @return bool|string
+     */
+    public static function str_between_longest($str, $mark1, $mark2)
+    {
+        $st = strpos($str, $mark1);
+        if ($st === false) return '';
+        $ed = strrpos($str, $mark2, $st + strlen($mark1));
+        if ($ed === false || $st >= $ed) return '';
+        $len = strlen($mark1);
+        $ret = substr($str, $st + $len, ($ed - $st - $len));
+        return $ret;
+    }
+
+    public static function format_url($url){
         // 格式: http:// 开头 且末尾没有斜杠
         if (!starts_with($url, 'http://') && !starts_with($url, 'https://')) {
             $url = 'http://' . $url;
@@ -165,5 +185,56 @@ class Helper
             $url = substr($url, 0, -1);
         }
         return $url;
+    }
+
+    /**
+     * @param $str
+     * @return int 正整数
+     */
+    public static function lite_hash($str)
+    {
+        $hash = crc32((string)$str);
+        if ($hash < 0) {
+            $hash &= 1 << 7;
+        }
+        return $hash;
+    }
+
+    const ID_TYPE_USER = 0;
+    const ID_TYPE_CATEGORY = 1;
+    const ID_TYPE_PRODUCT = 2;
+
+    /**
+     * 加密ID
+     * @param $id
+     * @param $type
+     * @return string
+     * @throws \Exception
+     */
+    public static function id_encode($id, $type)
+    {
+        $hashids = new Hashids(config('app.key'), 8, 'abcdefghijklmnopqrstuvwxyz1234567890');
+        // lite_hash 保证了 encode_id 分布的随机性
+        return @$hashids->encode(self::lite_hash($id), $id, self::lite_hash($type), $type);
+    }
+
+    /**
+     * 解密ID
+     * @param $en_id
+     * @param $type
+     * @return int
+     */
+    public static function id_decode($en_id, $type)
+    {
+        if (strlen($en_id) < 8) { // 兼容旧版本
+            $hashids = new Hashids(config('app.key'));
+            if ($type === self::ID_TYPE_USER) {
+                return intval(@$hashids->decodeHex($en_id));
+            } else {
+                return intval(@$hashids->decode($en_id)[0]);
+            }
+        }
+        $hashids = new Hashids(config('app.key'), 8, 'abcdefghijklmnopqrstuvwxyz1234567890');
+        return intval(@$hashids->decode($en_id)[1]);
     }
 }

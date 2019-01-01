@@ -32,7 +32,19 @@ class Product extends Controller
             ->orderBy('sort')
             ->get();
         foreach ($products as $product) {
-            $product->setAttribute('count', count($product->cards) ? $product->cards[0]->count : 0);
+            $count = count($product->cards) ? intval($product->cards[0]->count) : 0;
+            if ($category->user->shop_inventory === \App\User::inventory_range) {
+                if ($count <= 0) {
+                    $count = '售罄';
+                } elseif ($count <= 10) {
+                    $count = '库存少量';
+                } elseif ($count <= 20) {
+                    $count = '库存一般';
+                } elseif ($count <= 50) {
+                    $count = '库存大量';
+                }
+            }
+            $product->setAttribute('count', $count);
             $product->setVisible(['id', 'name', 'description', 'count', 'buy_min', 'buy_max',
                 'support_coupon', 'password_open', 'price', 'price_whole']);
         }

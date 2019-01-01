@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Hashids\Hashids;
+use App\Library\Helper;
 use Illuminate\Database\Eloquent\Model;
 
 
@@ -13,21 +13,8 @@ class Product extends Model
     const ID_API = -1001;
 
 
-    public static function id_encode($id)
-    {
-        $hashids = new Hashids(config('app.key'));
-        return @$hashids->encode($id, 2);
-    }
-
-    public static function id_decode($en_id)
-    {
-        $hashids = new Hashids(config('app.key'));
-        return @$hashids->decode($en_id)[0];
-    }
-
-
     function getUrlAttribute(){
-        return config('app.url') . '/p/' . self::id_encode($this->id);
+        return config('app.url') . '/p/' . Helper::id_encode($this->id,Helper::ID_TYPE_PRODUCT);
     }
 
     function getCountAttribute(){

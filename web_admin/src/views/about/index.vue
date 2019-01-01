@@ -6,7 +6,7 @@
     </div>
 
     <div style="margin-top: 24px">
-      <el-button size="small"><a href="/admin/logs" target="_blank">系统日志</a></el-button>
+      <el-button size="small"><a href="/api/admin/web/logs" target="_blank">系统日志</a></el-button>
     </div>
   </div>
 </template>

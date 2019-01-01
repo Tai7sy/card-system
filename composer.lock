@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "971c4c81de6cf31a9ba6e971296cba15",
+    "content-hash": "bb9ca7f75d6f11779191cae690a56137",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -1749,6 +1749,68 @@
                 "schema"
             ],
             "time": "2018-02-14T22:26:30+00:00"
+        },
+        {
+            "name": "ken/blade-minify",
+            "version": "1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kenhyuwa/blade-minify.git",
+                "reference": "70bcac4e4587748bd48c137de7378fda50ed55fc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kenhyuwa/blade-minify/zipball/70bcac4e4587748bd48c137de7378fda50ed55fc",
+                "reference": "70bcac4e4587748bd48c137de7378fda50ed55fc",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://dl.laravel-china.org/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "illuminate/support": "5.3.x|5.4.x|5.5.x",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "orchestra/testbench": "3.x",
+                "phpunit/phpunit": "^4.8|^5.2",
+                "squizlabs/php_codesniffer": "^2.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Ken\\BladeMinify\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ken\\BladeMinify\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ken",
+                    "email": "wahyu.dhiraashandy8@gmail.com"
+                }
+            ],
+            "description": "Laravel Blade Minify",
+            "keywords": [
+                "blade",
+                "html",
+                "laravel",
+                "litepie",
+                "minify"
+            ],
+            "time": "2017-10-09T12:21:49+00:00"
         },
         {
             "name": "laravel/framework",

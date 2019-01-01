@@ -46,8 +46,8 @@ class Api implements ApiInterface
         // https://o2.qfpay.com/q/info?code=&huid=G39Mp&opuid=&reqid=
         // {"resperr":"","respcd":"0000","respmsg":"","data":{"profile":{"huid":"G39Mp","opuid":0,"currency":"156","appid":"","nickname":"\u4e1a\u52a1\u5458\u674e\u6587\u8c6a","currency_code":"\uffe5"},"customer":{"hcid":"vl","openid":"","balance":0},"reqid":"040a57f2c2ed4f9d","url":{"activity_tip":"https://marketing.qfpay.com/v1/mkw/activity_tip_page"}}}
         $userInfo = Request::get('https://o2.qfpay.com/q/info?code=&huid=' . $config['id'] . '&opuid=&reqid=' . $out_trade_no, $cookie, $headers);
-        $reqId = static::strBetween($userInfo, 'reqid":"', '"');
-        $currency = static::strBetween($userInfo, 'currency":"', '"');
+        $reqId = static::str_between($userInfo, 'reqid":"', '"');
+        $currency = static::str_between($userInfo, 'currency":"', '"');
         if ($reqId == '' || $currency == '') {
             Log::error('qfpay pay, 获取支付金额失败 - ' . $userInfo);
             throw new \Exception('获取支付请求id失败');
@@ -60,7 +60,7 @@ class Api implements ApiInterface
         );
         //{"resperr":"","respcd":"0000","respmsg":"","data":{"total_amt":11100,"reqid":"040a57f2c2ed4f9d","balance_amt":0,"coupon_code":"","coupon_title":"","pay_amt":11100,"redirect_uri":"https://marketing.qfpay.com/v1/mkw/payover_router?syssn=20180124000200020059243592","syssn":"20180124000200020059243592","pay_params":{"pubAccHint":"","pubAcc":"","tokenId":"6V437bc87d18b157dc0c218d68977a1b"},"coupon_amt":0,"type":"qqpay"}}
         $result = json_decode($payInfo, true);
-        $sysSN = static::strBetween($payInfo, 'syssn":"', '"');// qf 内部id
+        $sysSN = static::str_between($payInfo, 'syssn":"', '"');// qf 内部id
         if (!$result || $sysSN == '') {
             Log::error('qfpay pay, 生成支付单号失败#1 - ' . $payInfo);
             throw new \Exception('生成支付单号失败#1');
@@ -107,9 +107,9 @@ class Api implements ApiInterface
             return false;
         }
 
-        $pay_amount = (int)static::strBetween($queryRet, 'trade_amt":', ',');
+        $pay_amount = (int)static::str_between($queryRet, 'trade_amt":', ',');
         if ($pay_amount === 0) {
-            $pay_amount = (int)static::strBetween($queryRet, 'txamt":', ',');
+            $pay_amount = (int)static::str_between($queryRet, 'txamt":', ',');
             if ($pay_amount === 0) {
                 Log::error('qfpay query, 获取支付金额失败 - ' . $queryRet);
                 throw new \Exception('获取支付金额失败');
@@ -126,7 +126,7 @@ class Api implements ApiInterface
     }
 
 
-    public static function strBetween($str, $mark1, $mark2)
+    public static function str_between($str, $mark1, $mark2)
     {
         $st = stripos($str, $mark1);
         if ($st === false) return '';

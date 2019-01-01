@@ -88,7 +88,7 @@ class CurlRequest
         } else {
             $cookie = ';' . $cookie;
         }
-        $t = Helper::strBetween($cookie, ';' . $name . '=', ';');
+        $t = Helper::str_between($cookie, ';' . $name . '=', ';');
         if (!$withName || $t == '') {
             return $t;
         } else {

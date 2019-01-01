@@ -130,36 +130,13 @@ class HomeController extends Controller
         ]);
     }
 
-    /**
-     * 店铺
-     * 通过 /shop/{en_id} 匹配店铺
-     * @param $en_id
-     * @return \Illuminate\Http\Response
-     */
-    public function shop_user($en_id)
-    {
-        $this->checkIsInMaintain();
-
-        /* @var \App\User $user */
-        $user = User::find(\App\UserDomain::id_decode($en_id));
-        if (!$user) {
-            // Warning
-            // 2019-01-01 之后的用户将无法使用 id 的形式, 转变为 en_id
-            $user = User::where('created_at', '<', \Carbon\Carbon::createFromDate(2019, 1, 1))
-                ->find($en_id);
-        }
-        if (!$user) {
-            return $this->_shop_404();
-        }
-        return $this->_shop_render($user);
-    }
 
     public function shop_category($en_category_id)
     {
         $this->checkIsInMaintain();
 
-        $category = Category::whereId(\App\Category::id_decode($en_category_id))->with('user')->first();
-        if (!$category) {
+        $category = Category::whereId(Helper::id_decode($en_category_id,Helper::ID_TYPE_CATEGORY))->with('user')->first();
+        if (!$category && is_numeric($category)) {
             // Warning
             // 2019-01-01 之后的用户将无法使用 id 的形式, 转变为 en_id
             $category = Category::whereId($en_category_id)
@@ -178,14 +155,14 @@ class HomeController extends Controller
     {
         $this->checkIsInMaintain();
 
-        $product = Product::whereId(\App\Product::id_decode($en_product_id))
+        $product = Product::whereId(Helper::id_decode($en_product_id,Helper::ID_TYPE_PRODUCT))
             ->with(['user', 'category', 'cards' => function (Relation $query) {
                 $query->whereRaw('`count_all`>`count_sold`')
                     ->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count`')
                     ->groupBy('product_id');
             }])->first();
 
-        if (!$product) {
+        if (!$product && is_numeric($en_product_id)) {
             // Warning
             // 2019-01-01 之后的用户将无法使用 id 的形式, 转变为 en_id
             $product = Product::whereId($en_product_id)
