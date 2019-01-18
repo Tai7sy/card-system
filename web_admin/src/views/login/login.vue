@@ -130,6 +130,8 @@
               this.$router.push({ path: '/admin/' });
             }
           });
+        }).catch(() => {
+          this.handleReInitCapture();
         }).finally(() => {
           this.loading = false;
         });
@@ -137,8 +139,15 @@
       handleReInitCapture () {
         console.log('login - handleReInitCapture');
         this.geetestLoading = true;
+        this.validate = false;
         getVerify().then(ret => {
           const data = ret.data;
+          if (!data.geetest) {
+            if (this.vcode.geetest && this.vcode.login === 1) {
+              this.$alert('获取验证码失败，请刷新页面重试', '获取验证码失败');
+            }
+            return;
+          }
           if (data.driver === 'geetest') {
             this.renderGeeCaptcha(data.geetest);
           } else {

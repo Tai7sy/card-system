@@ -73,6 +73,7 @@
     ],
     "dev": [
       "echo 'Local dev test'",
+      "php composer.phar install",
       "php composer.phar dump-autoload --optimize",
       "php artisan route:clear",
       "php artisan config:clear",

@@ -10,6 +10,9 @@ class ShopTheme extends Model
 
     public $timestamps = false;
 
+    protected $casts = [
+        'config' => 'array'
+    ];
 
     private static $default_theme;
 
@@ -27,6 +30,7 @@ class ShopTheme extends Model
         return static::$default_theme;
     }
 
+
     public static function freshList()
     {
         $path = realpath(app_path(
@@ -34,10 +38,22 @@ class ShopTheme extends Model
             'resources' . DIRECTORY_SEPARATOR .
             'views' . DIRECTORY_SEPARATOR .
             'shop_theme'));
+        \App\ShopTheme::query()->get()->each(function ($theme) use ($path) {
+            /**
+             * @var \App\ShopTheme $theme
+             */
+            if (!file_exists($path . DIRECTORY_SEPARATOR . $theme->name . DIRECTORY_SEPARATOR . 'config.php')) {
+                $theme->delete();
+            }
+        });
         foreach (scandir($path) as $theme_name) {
             if ($theme_name === '.' || $theme_name === '..') continue;
             if (!\App\ShopTheme::query()->where('name', $theme_name)->exists()) {
-                @$theme = include($path . DIRECTORY_SEPARATOR . $theme_name . DIRECTORY_SEPARATOR . 'config.php');
+                try {
+                    @$theme = include($path . DIRECTORY_SEPARATOR . $theme_name . DIRECTORY_SEPARATOR . 'config.php');
+                } catch (\Exception $e) {
+                    continue;
+                }
                 if ($theme && isset($theme['description'])) {
                     \App\ShopTheme::query()->insert([
                         'name' => $theme_name,
@@ -45,7 +61,6 @@ class ShopTheme extends Model
                         'config' => json_encode(@$theme['config'])
                     ]);
                 }
-
             }
         }
     }

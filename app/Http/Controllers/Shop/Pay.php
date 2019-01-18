@@ -66,6 +66,11 @@ class Pay extends Controller
      */
     function buy(Request $request)
     {
+        $customer = $request->input('customer');
+        if (strlen($customer) !== 32) {
+            return self::renderResult($request, ['msg' => '请求来源错误，请返回页面重新下单']);
+        }
+
         if ((int)System::_get('vcode_shop_buy') === 1) {
             $ret = Geetest\API::verify($request->input('geetest_challenge'),
                 $request->input('geetest_validate'),
@@ -74,10 +79,6 @@ class Pay extends Controller
                 return self::renderResult($request, ['msg' => '系统无法接受您的验证结果，请刷新页面后重试。']);
             }
         }
-
-        $customer = Cookie::get('customer');
-        if (strlen($customer) !== 32)
-            return self::renderResult($request, ['msg' => '请返回页面重新下单']);
 
         $category_id = (int)$request->input('category_id');
         $product_id = (int)$request->input('product_id');
@@ -303,7 +304,10 @@ class Pay extends Controller
         }
         return view('pay/' . $pay_file, [
             'pay_id' => $order->pay_id,
-            'name' => $order->product_id === \App\Product::ID_API ? $order->api_out_no : $order->product->name,
+            'name' => $order->product_id === \App\Product::ID_API ?
+                $order->api_out_no :
+                ($order->product->name . ' x ' . $order->count . '件'),
+            'amount' => $order->paid,
             'qrcode' => $request->get('url'),
             'id' => $order_no
         ]);

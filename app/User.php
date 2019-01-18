@@ -31,8 +31,13 @@ class User extends Authenticatable
     const ID_CUSTOMER = -1;
 
     // 商户库存显示类型
-    const inventory_real = 1;
     const inventory_range = 0;
+    const inventory_real = 1;
+
+    /** 卖家承担 */
+    const FEE_TYPE_MERCHANT = 0;
+    /** 买家承担 */
+    const FEE_TYPE_CUSTOMER = 1;
 
     const STATUS_OK = 0;
     const STATUS_FROZEN = 1;

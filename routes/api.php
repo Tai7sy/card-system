@@ -96,6 +96,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
     Route::post('web/cache/clear', 'Admin\Dashboard@clearCache');
     // 查看 storage/logs
     Route::get('web/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+
     // 上传收款二维码后查看
     Route::get('file/{file_id}/{file_name}', 'Merchant\File@renderQRCode');
     // 导出卡密

@@ -10,6 +10,16 @@
         </el-radio-group>
       </el-form-item>
 
+      <el-form-item prop="mail_smtp_from_address" class="item-container">
+        <span>发件人地址</span>
+        <el-input type="text" placeholder="发件人地址" v-model="form.mail_smtp_from_address"/>
+      </el-form-item>
+
+      <el-form-item prop="mail_smtp_from_name" class="item-container">
+        <span>发件人姓名</span>
+        <el-input type="text" placeholder="发件人姓名" v-model="form.mail_smtp_from_name"/>
+      </el-form-item>
+
       <div v-if="form.mail_driver === 'smtp'">
         <el-form-item prop="mail_smtp_host" class="item-container">
           <span>服务器地址</span>
@@ -29,16 +39,6 @@
         <el-form-item prop="mail_smtp_password" class="item-container">
           <span>密码</span>
           <el-input type="text" placeholder="密码" v-model="form.mail_smtp_password"/>
-        </el-form-item>
-
-        <el-form-item prop="mail_smtp_from_address" class="item-container">
-          <span>发件人地址</span>
-          <el-input type="text" placeholder="发件人地址" v-model="form.mail_smtp_from_address"/>
-        </el-form-item>
-
-        <el-form-item prop="mail_smtp_from_name" class="item-container">
-          <span>发件人姓名</span>
-          <el-input type="text" placeholder="发件人姓名" v-model="form.mail_smtp_from_name"/>
         </el-form-item>
 
         <el-form-item prop="mail_smtp_encryption" class="item-container">

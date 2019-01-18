@@ -18,7 +18,7 @@
     </h1>
     <div class="mod-ct">
         <div class="order"></div>
-        <!--div class="amount">￥0.01</div-->
+        <div class="amount">￥{{ sprintf('%0.2f',$amount/100) }}</div>
         <div class="qr-image" id="qrcode"></div>
 
         <div id="open-app-container">

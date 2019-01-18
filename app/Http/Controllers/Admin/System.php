@@ -49,6 +49,7 @@ class System extends Controller
     {
         $strConfig = [
             'app_name',
+            'app_title',
             'app_url',
             'app_url_api',
             'keywords',

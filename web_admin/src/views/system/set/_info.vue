@@ -8,6 +8,11 @@
         <el-input type="text" placeholder="网站名称" v-model="form.app_name"/>
       </el-form-item>
 
+      <el-form-item prop="app_title" class="item-container">
+        <span>标题</span>
+        <el-input type="text" placeholder="网站标题" v-model="form.app_title"/>
+      </el-form-item>
+
       <el-form-item prop="shop_bkg" class="item-container">
         <span>店铺背景</span>
         <el-input type="text" placeholder="店铺背景(图片URL)" v-model="form.shop_bkg"/>
@@ -99,6 +104,7 @@
         labelWidth: '0px', // this.$store.state.app.isMobile ? '70px' : '90px',
         form: {
           app_name: '加载中',
+          app_title: '',
           app_url: '',
           app_url_api: '',
           keywords: '',

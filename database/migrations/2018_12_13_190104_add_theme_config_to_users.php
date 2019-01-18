@@ -13,7 +13,7 @@ class AddThemeConfigToUsers extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('users', 'shop_theme')) {
+        if (!Schema::hasColumn('users', 'theme_config')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->text('theme_config')->nullable()->after('password');
             });

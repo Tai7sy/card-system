@@ -23,6 +23,7 @@ class ConfigServiceProvider extends ServiceProvider
         try {
             config()->set([
                 'app.name' => System::_get('app_name'),
+                'app.title'=> System::_get('app_title'),
                 'app.url' => System::_get('app_url'),
                 'app.url_api' => System::_get('app_url_api'),
 

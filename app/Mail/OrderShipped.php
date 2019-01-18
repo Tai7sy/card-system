@@ -37,7 +37,7 @@ class OrderShipped extends Mailable
      */
     public function build()
     {
-        return $this->subject(config('app.name') . '-订单提醒 #' . $this->order->order_no)
+        return $this->subject('订单提醒(#' . $this->order->order_no . ')-' . config('app.name'))
             ->view('emails.order');
     }
 }
