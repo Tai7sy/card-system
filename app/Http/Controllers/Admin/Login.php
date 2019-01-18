@@ -3,21 +3,30 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Library\Helper;
-use Auth;
+use App\Library\Geetest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Library\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class Login extends Controller
 {
+    function getVerify()
+    {
+        $verify = [
+            'driver' => 'geetest',
+            'geetest' => Geetest\API::get()
+        ];
+        return Response::success($verify);
+    }
 
     public function login(Request $request)
     {
         $remember = $request->input('remember') == 'true';
         if (!Auth::attempt([
-                'email' => $request->input('email'),
-                'password' => $request->input('password')], $remember)
+            'email' => $request->input('email'),
+            'password' => $request->input('password')], $remember)
         ) {
             return Response::fail('邮箱或密码错误, 请检查');
         } else {

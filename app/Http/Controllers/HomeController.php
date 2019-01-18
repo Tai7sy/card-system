@@ -34,6 +34,7 @@ class HomeController extends Controller
             'logo' => System::_get('logo')
         ];
         $config['shop'] = [
+            'name' => config('app.name'),
             'qq' => System::_get('shop_qq'),
             'ann' => System::_get('shop_ann'),
             'ann_pop' => System::_get('shop_ann_pop'),
@@ -47,7 +48,7 @@ class HomeController extends Controller
             $config['product'] = $product;
             $name = $product->name . ' - ' . $config['name'];
             $description = $product->description;
-            if(@$description[0] === '{'){
+            if (@$description[0] === '{') {
                 $matches = [];
                 preg_match_all('/"insert":"(.+?)"/', $description, $matches);
                 $description = str_replace('\n', ' ', @join(' ', $matches[1]));
@@ -73,7 +74,7 @@ class HomeController extends Controller
 
             $name = $config['name'];
             $description = $config['shop']['ann'];
-            if(@$description[0] === '{'){
+            if (@$description[0] === '{') {
                 $matches = [];
                 preg_match_all('/"insert":"(.+?)"/', $description, $matches);
                 $description = str_replace('\n', ' ', @join(' ', $matches[1]));
@@ -86,7 +87,12 @@ class HomeController extends Controller
             'buy' => (int)System::_get('vcode_shop_buy'),
             'search' => (int)System::_get('vcode_shop_search')
         ];
-        if ($config['vcode']['driver'] === 'geetest') {
+        if ($config['vcode']['driver'] === 'geetest' &&
+            (
+                $config['vcode'] ||
+                $config['search']
+            )
+        ) {
             $config['vcode']['geetest'] = Geetest\API::get();
         }
 
@@ -100,7 +106,7 @@ class HomeController extends Controller
         $customer = Cookie::get('customer');
         $cookie = Cookie::make('customer',
             strlen($customer) !== 32 ? md5(str_random(16)) : $customer,
-            43200, null, null, false,false); // 30 days
+            43200, null, null, false, false); // 30 days
 
 
         /* @var $shop_theme \App\ShopTheme */
@@ -109,7 +115,7 @@ class HomeController extends Controller
             $shop_theme = \App\ShopTheme::whereName($_GET['theme'])->first();
         }
         if (!$shop_theme) {
-            $shop_theme = $user->shop_theme;
+            $shop_theme = \App\ShopTheme::defaultTheme();
         }
 
         $config['theme'] = $user->theme_config && isset($user->theme_config[$shop_theme->name]) ?
@@ -118,6 +124,7 @@ class HomeController extends Controller
 
         return response()->view('shop_theme.' . $shop_theme->name . '.index', [
             'name' => $name,
+            'title' => config('app.title'),
             'keywords' => preg_replace('/[、，；。！？]/', ', ', $name),
             'description' => $description,
             'js_tj' => System::_get('js_tj'),
@@ -135,8 +142,14 @@ class HomeController extends Controller
         return view('message', [
             'title' => '404 NotFound',
             'message' => '该链接不存在<br>
-<a style="font-size: 18px" href="/#/record">查询订单</a>'
+<a style="font-size: 18px" href="/s/#/record">查询订单</a>'
         ]);
+    }
+
+    public function shop_default(Request $request)
+    {
+        $tab = $request->get('tab', '');
+        return response()->redirectTo('/?theme=Material&tab=' . $tab . '#/record');
     }
 
 
@@ -144,7 +157,7 @@ class HomeController extends Controller
     {
         $this->checkIsInMaintain();
 
-        $category = Category::whereId(Helper::id_decode($en_category_id,Helper::ID_TYPE_CATEGORY))->with('user')->first();
+        $category = Category::whereId(Helper::id_decode($en_category_id, Helper::ID_TYPE_CATEGORY))->with('user')->first();
         if (!$category && is_numeric($category)) {
             // Warning
             // 2019-01-01 之后的用户将无法使用 id 的形式, 转变为 en_id
@@ -164,7 +177,7 @@ class HomeController extends Controller
     {
         $this->checkIsInMaintain();
 
-        $product = Product::whereId(Helper::id_decode($en_product_id,Helper::ID_TYPE_PRODUCT))
+        $product = Product::whereId(Helper::id_decode($en_product_id, Helper::ID_TYPE_PRODUCT))
             ->with(['user', 'category', 'cards' => function (Relation $query) {
                 $query->whereRaw('`count_all`>`count_sold`')
                     ->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count`')

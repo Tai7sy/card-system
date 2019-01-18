@@ -424,7 +424,7 @@ function order(type) {
     window.open(orderUrl, '_blank');
 
     showOrderTip('请在弹出的窗口完成付款<br><span style="font-size:13px">如果没有弹出窗口或付款失败，您也可以返回重新发起付款</span>', function () {
-        window.open('/s#/record?tab=cookie', '_blank')
+        window.open('/s?tab=cookie', '_blank')
     });
 }
 
@@ -463,7 +463,7 @@ $(function () {
         if (ann_pop) {
             swal({
                 title: '店铺公告',
-                html: ann_pop
+                html: '<div class="ql-editor quill-html">' + ann_pop + '</div>'
             });
         }
     }

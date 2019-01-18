@@ -6,29 +6,38 @@
       <el-form-item prop="shop_theme" class="item-container">
         <span style="display: block">默认主题</span>
         <el-select v-model="form.shop_theme">
-          <el-option v-for="item in themes" :key="item.id" :label="item.name" :value="item.name"/>
+          <el-option v-for="item in themes" :key="item.id" :label="item.name + ' - ' + item.description"
+                     :value="item.name"/>
         </el-select>
       </el-form-item>
 
-      <el-card class="child-option">
-        <p class="child-option-title">默认配置</p>
-        <template v-show="form.shop_theme==='Material'">
-          <el-form-item class="item-container">
-            <span style="display: block">商品排列方式</span>
-            <el-select v-model="form.shop_theme_material_list_type">
-              <el-option value="dropdown" label="下拉式"/>
-              <el-option value="button" label="按钮式"/>
-            </el-select>
-          </el-form-item>
-          <el-form-item class="item-container">
-            <span style="display: block">店铺背景</span>
-            <el-input type="text" placeholder="店铺背景(图片URL)"
-                      v-model="form.shop_theme_material_background" :disabled="themeMaterialNoBackground"/>
-            <el-checkbox size="small" v-model="themeMaterialNoBackground">
-              不显示背景图片
-            </el-checkbox>
-          </el-form-item>
-        </template>
+      <el-card class="child-option" v-show="form.shop_theme==='Material'">
+        <p class="child-option-title">默认主题设置</p>
+        <el-form-item class="item-container">
+          <span style="display: block">商品排列方式</span>
+          <el-select v-model="form.shop_theme_material_list_type">
+            <el-option value="dropdown" label="下拉式"/>
+            <el-option value="button" label="按钮式"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item class="item-container">
+          <span style="display: block">店铺背景</span>
+          <el-input type="text" placeholder="店铺背景(图片URL)"
+                    v-model="form.shop_theme_material_background" :disabled="themeMaterialNoBackground"/>
+          <el-checkbox size="small" v-model="themeMaterialNoBackground">
+            不显示背景图片
+          </el-checkbox>
+        </el-form-item>
+      </el-card>
+      <el-card class="child-option" v-show="form.shop_theme==='Classic'">
+        <p class="child-option-title">默认主题设置</p>
+        <el-form-item class="item-container">
+          <span style="display: block">商品排列方式</span>
+          <el-select v-model="form.shop_theme_classic_list_type">
+            <el-option value="dropdown" label="下拉式"/>
+            <el-option value="button" label="按钮式"/>
+          </el-select>
+        </el-form-item>
       </el-card>
 
     </el-form>
@@ -54,7 +63,7 @@
           shop_theme: '',
           shop_theme_material_list_type: '',
           shop_theme_material_background: '',
-          shop_theme_demo_value1: '',
+          shop_theme_classic_list_type: '',
         },
         formRules: {},
         themeMaterialNoBackground: false,
@@ -81,8 +90,9 @@
             if (e.name === 'Material') {
               this.form.shop_theme_material_list_type = e.config.list_type;
               this.form.shop_theme_material_background = e.config.background;
-            } else if (e.name === 'Demo') {
-              this.form.shop_theme_demo_value1 = e.config.value1;
+              this.themeMaterialNoBackground = this.form.shop_theme_material_background === '0';
+            } else if (e.name === 'Classic') {
+              this.form.shop_theme_classic_list_type = e.config.list_type;
             }
           });
           this.form.shop_theme = res.data.default;

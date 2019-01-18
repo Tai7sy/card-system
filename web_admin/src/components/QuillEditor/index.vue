@@ -35,7 +35,10 @@
     <div v-if="showUpload" ref="upload_wrapper" @click="onUploadClose" style="z-index: 1011"
          class="el-message-box__wrapper">
       <div class="upload-box">
-        <el-upload drag
+        <el-radio v-model="upload.type" label="upload">手动上传</el-radio>
+        <el-radio v-model="upload.type" label="input">网络图片</el-radio>
+        <el-upload v-show="upload.type === 'upload'"
+                   drag
                    list-type="picture"
                    :action="upload_url"
                    :multiple="false"
@@ -50,6 +53,10 @@
             <div style="font-size: 12px">只能上传图片文件，且不超过5MB</div>
           </div>
         </el-upload>
+        <el-input v-show="upload.type === 'input'"
+                  type="text" v-model="upload.manual" placeholder="请输入图片URL地址">
+          <el-button slot="append" type="text" @click="handleUploadInputUrl">确定</el-button>
+        </el-input>
       </div>
     </div>
   </div>
@@ -101,7 +108,11 @@
         id_editor: 'editor-' + id,
         id_toolbar: 'editor-toolbar-' + id,
         quill_editor: null,
-        showUpload: false
+        showUpload: false,
+        upload: {
+          type: 'upload',
+          manual: ''
+        },
       }
     },
     mounted () {
@@ -121,6 +132,7 @@
       this.quill_editor.getModule('toolbar').addHandler('image', () => {
         const pos = this.quill_editor.getSelection();
         this.showUpload = true;
+        this.upload.manual = '';
         this.uploadSuccess = url => {
           console.log(this.id_editor + ' uploadSuccess', url);
           this.quill_editor.insertEmbed(pos.index, 'image', url);
@@ -160,6 +172,17 @@
           this.$message({ message: '文件上传失败，请检查文件大小和格式', type: 'error' });
         }
       },
+      handleUploadInputUrl () {
+        this.upload.manual = this.upload.manual.trim();
+        if (!this.upload.manual.startsWith('http://') &&
+          !this.upload.manual.startsWith('https://') &&
+          !this.upload.manual.startsWith('ftp://')) {
+          this.$alert('请输入合法的图片URL地址');
+          return;
+        }
+        this.uploadSuccess(this.upload.manual);
+        this.showUpload = false;
+      },
       getValue () {
         return JSON.stringify(this.quill_editor.getContents());
       },
@@ -184,6 +207,7 @@
     border: 1px solid #ebeef5;
     min-width: 100px;
     min-height: 100px;
+
     .el-upload-dragger {
       padding: 0 48px;
       width: auto !important;

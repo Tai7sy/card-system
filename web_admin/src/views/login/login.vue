@@ -131,7 +131,7 @@
             }
           });
         }).catch(() => {
-          this.handleReInitCapture();
+          // this.handleReInitCapture();
         }).finally(() => {
           this.loading = false;
         });

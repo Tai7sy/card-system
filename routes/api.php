@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 
 
 Route::post('admin/login', 'Admin\Login@login')->middleware('api');
+Route::post('admin/login/verify', 'Admin\Login@getVerify');
+
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function () {
 
     Route::post('login/info', 'Admin\Login@info');
@@ -97,8 +99,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
     // 查看 storage/logs
     Route::get('web/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
-    // 上传收款二维码后查看
-    Route::get('file/{file_id}/{file_name}', 'Merchant\File@renderQRCode');
     // 导出卡密
     Route::get('card/export/{file_id}', 'Merchant\Card@export_download');
 });

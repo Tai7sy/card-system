@@ -151,7 +151,7 @@
     <div style="padding-bottom:5px;font-weight:bold;color:#449CF3"><span>卖家QQ：</span>
         <a target="_blank" href="mqqwpa://im/chat?chat_type=wpa&uin={{ $config['shop']['qq'] }}&version=1&src_type=web&web_src=">{{ $config['shop']['qq'] }}</a>
     </div>
-    <div class="container" style="max-height:500px;overflow: scroll"></div>
+    <div class="container ql-editor quill-html" style="max-height:500px;overflow: scroll"></div>
 </div>
 <!--/ 商家公告 -->
 

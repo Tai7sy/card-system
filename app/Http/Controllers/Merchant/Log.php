@@ -15,11 +15,7 @@ class Log extends Controller
         $action = $request->post('action', \App\Log::ACTION_LOGIN);
         $query = \App\Log::where('action', $action);
 
-        if ($user_id && self::isAdmin()) {
-            $query->where('user_id', $user_id);
-        } else {
-            $query->where('user_id', Auth::id());
-        }
+        $query->where('user_id', Auth::id());
 
         $start_at = $request->post('start_at');
         if (strlen($start_at))

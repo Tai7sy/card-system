@@ -106,12 +106,6 @@ class Order extends Controller
 
         $list = $query->orderBy('id', 'DESC')->paginate($pageSize, ['*'], 'page', $page);
 
-        if (!$this->isAdmin()) {
-            foreach ($list->items() as $order) {
-                /* @var \App\Order $order */
-                $order->addHidden(['system_fee']);
-            }
-        }
         if ($only_profit) {
             $list = $list->toArray();
             $list['profit_sum'] = $profit_sum;

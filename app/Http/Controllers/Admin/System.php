@@ -112,6 +112,12 @@ class System extends Controller
                 ];
                 $e->saveOrFail();
             }
+            if ($e->name === 'Classic') {
+                $e->config = [
+                    'list_type' => $request->post('shop_theme_classic_list_type')
+                ];
+                $e->saveOrFail();
+            }
         });
 
         return Response::success();

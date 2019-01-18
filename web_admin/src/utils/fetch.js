@@ -11,7 +11,7 @@ window.jQuery = $;
 
 let HOST = '/api/admin/';
 if (process.env.NODE_ENV === 'development') {
-  HOST = 'http://127.0.0.2/api/admin/'
+  HOST = 'http://127.0.0.5/api/admin/'
 }
 window.API_HOST = HOST;
 // 创建axios实例

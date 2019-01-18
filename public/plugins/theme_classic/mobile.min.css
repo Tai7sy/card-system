@@ -42,4 +42,5 @@ select:disabled{appearance:none;-moz-appearance:none;-webkit-appearance:none;}
 .button-select-item {position: relative;border-radius: 2px;border: 1px solid transparent;display: inline-block;user-select: none;cursor: pointer;padding: 4px 8px;margin: 0 12px 8px 0;transition: all 0.3s ease;box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2);}
 .button-select-item:hover {box-shadow: 0 1px 4px 0 rgba(101, 143, 225, .3);}
 .button-select-item.checked {border: 1px solid #658fe1;}
-
+.quill-html img{max-width:100%}
+.quill-html p{margin:0!important}

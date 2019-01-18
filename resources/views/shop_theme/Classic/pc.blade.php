@@ -10,7 +10,7 @@
     <link href="/plugins/theme_classic/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
     <script src="/plugins/theme_classic/sweetalert2/sweetalert2.min.js"></script>
     <link href="/plugins/theme_classic/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
-    <link href="/plugins/theme_classic/pc.css?v={!! $version !!}" rel="stylesheet" type="text/css">
+    <link href="/plugins/theme_classic/pc.min.css?v={!! $version !!}" rel="stylesheet" type="text/css">
     <script src="/plugins/theme_classic/layui/layer.js"></script>
     <link rel="stylesheet" href="/assets/css/quill.snow.css">
     <script type="text/javascript" src="/assets/js/quill.min.js"></script>
@@ -54,7 +54,7 @@
                 <br><span style="color:red;font-size:12px">商品问题联系卖家</span>
             </p>
             <p>
-                <b>卖家公告 </b><span id="ann"><span class="container"></span></span>
+                <b>卖家公告 </b><span id="ann ql-editor quill-html"><span class="container"></span></span>
             </p>
         </div>
         <div class="right_form">
@@ -132,7 +132,7 @@
                 @if(1 || @$config['theme']['list_type'] !== 'button')
                     <li style="width: calc( 100% - 40px ); height: auto">
                         <span class="span_up">商品说明</span>
-                        <p id="description">
+                        <p id="description" class="ql-editor quill-html">
                         </p>
                     </li>
                 @endif
@@ -143,7 +143,7 @@
                 <ul>
                     <li style="margin: 0 0 24px 0; width: 100%">
                         <span class="span_up">商品说明</span>
-                        <p id="description">
+                        <p id="description" class="ql-editor quill-html">
                         </p>
                     </li>
                 </ul>

@@ -12,12 +12,6 @@
         <span>标题</span>
         <el-input type="text" placeholder="网站标题" v-model="form.app_title"/>
       </el-form-item>
-
-      <el-form-item prop="shop_bkg" class="item-container">
-        <span>店铺背景</span>
-        <el-input type="text" placeholder="店铺背景(图片URL)" v-model="form.shop_bkg"/>
-      </el-form-item>
-
       <!--el-form-item label="店铺主题" prop="shop_template_id">
         <el-select v-model="form.shop_template_id">
           <el-option label="默认主题" :value="0"/>
@@ -109,7 +103,6 @@
           app_url_api: '',
           keywords: '',
           description: '',
-          shop_bkg: '',
           shop_ann: '',
           shop_inventory: 0,
           shop_qq: '',

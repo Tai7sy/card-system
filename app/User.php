@@ -22,7 +22,7 @@ class User extends Authenticatable
         'password', 'remember_token'
     ];
 
-    protected $appends = ['m_balance'];
+    protected $appends = ['m_balance', 'role'];
 
     protected $casts = [
         'theme_config' => 'array'
@@ -48,6 +48,10 @@ class User extends Authenticatable
         return $this->m_all - $this->m_paid - $this->m_frozen;
     }
 
+    function getRoleAttribute(){
+        return 'admin';
+    }
+
     function getMBalanceWithoutTodayAttribute()
     {
         $income_today = (int)\App\Order::where('user_id', $this->user_id)
@@ -58,10 +62,11 @@ class User extends Authenticatable
     /**
      * @return ShopTheme
      */
-    function getShopThemeAttribute(){
-        if($this->theme_config){
+    function getShopThemeAttribute()
+    {
+        if ($this->theme_config) {
             $ret = \App\ShopTheme::whereName($this->theme_config['theme'])->first();
-            if($ret)  return $ret;
+            if ($ret) return $ret;
         }
         return \App\ShopTheme::defaultTheme();
     }
