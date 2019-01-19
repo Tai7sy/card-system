@@ -54,7 +54,7 @@
                 <br><span style="color:red;font-size:12px">商品问题联系卖家</span>
             </p>
             <p>
-                <b>卖家公告 </b><span id="ann ql-editor quill-html"><span class="container"></span></span>
+                <b>卖家公告 </b><span id="ann"><span class="container ql-editor quill-html"></span></span>
             </p>
         </div>
         <div class="right_form">

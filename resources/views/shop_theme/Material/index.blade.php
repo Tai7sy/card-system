@@ -51,4 +51,4 @@
     setTimeout(function () {
       var element = document.getElementById('progress-timeout');
       if (element) element.style.display = 'block';
-    }, 10000);</script></div><div id=bkg></div><div id=app></div><script type=text/javascript>var config = @json($config);</script>{!! $js_tj !!} {!! $js_kf !!}<script type=text/javascript src=/dist/js/manifest.ae2041ba.js></script><script type=text/javascript src=/dist/js/vendor.1dd89d6e.js></script><script type=text/javascript src=/dist/js/app.73d9a8cf.js></script></body></html>
+    }, 10000);</script></div><div id=bkg></div><div id=app></div><script type=text/javascript>var config = @json($config);</script>{!! $js_tj !!} {!! $js_kf !!}<script type=text/javascript src=/dist/js/manifest.ae2041ba.js></script><script type=text/javascript src=/dist/js/vendor.1dd89d6e.js></script><script type=text/javascript src=/dist/js/app.2ce61768.js></script></body></html>

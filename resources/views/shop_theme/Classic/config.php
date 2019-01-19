@@ -7,5 +7,3 @@ return [
         'list_type' => 'dropdown',
     ]
 ];
-
-// TODO 验证码, 按钮式列表

@@ -149,7 +149,7 @@ class HomeController extends Controller
     public function shop_default(Request $request)
     {
         $tab = $request->get('tab', '');
-        return response()->redirectTo('/?theme=Material&tab=' . $tab . '#/record');
+        return response()->redirectTo('/?theme=Material#/record?tab=' . $tab);
     }
 
 
@@ -250,7 +250,7 @@ class HomeController extends Controller
 
         $config['vcode'] = [
             'driver' => System::_get('vcode_driver'),
-            'login' => System::_get('vcode_login'),
+            'login' => (int)System::_get('vcode_login'),
         ];
         if ($config['vcode']['driver'] === 'geetest') {
             $config['vcode']['geetest'] = Geetest\API::get();

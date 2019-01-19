@@ -49,6 +49,7 @@ service.interceptors.response.use(
         duration: 3000,
         showClose: true
       });
+      return Promise.reject();
     }
     return response.data
   },

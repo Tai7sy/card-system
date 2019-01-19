@@ -19,4 +19,4 @@
     setTimeout(function () {
       var element = document.getElementById('progress-timeout');
       if (element) element.style.display = 'block';
-    }, 10000);</script></div><div id=app></div><script type=text/javascript>var config = @json($config);</script><script type=text/javascript src=/dist/js/manifest.9c6b0ef337da51a61345.js></script><script type=text/javascript src=/dist/js/vendor.c68908fc76f08b3bdf33.js></script><script type=text/javascript src=/dist/js/app.56013a6562df8a18ca9f.js></script></body></html>
+    }, 10000);</script></div><div id=app></div><script type=text/javascript>var config = @json($config);</script><script type=text/javascript src=/dist/js/manifest.9c6b0ef337da51a61345.js></script><script type=text/javascript src=/dist/js/vendor.c68908fc76f08b3bdf33.js></script><script type=text/javascript src=/dist/js/app.95da0836e5bedc9db246.js></script></body></html>

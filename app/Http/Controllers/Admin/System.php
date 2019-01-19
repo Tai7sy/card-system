@@ -77,10 +77,11 @@ class System extends Controller
         }
 
         // 格式: http:// 开头 且末尾没有斜杠
-
-        $_POST['app_url'] = Helper::format_url($_POST['app_url']);
-        $_POST['app_url_api'] = Helper::format_url($_POST['app_url_api']);
-
+        $url = [
+            'app_url' => Helper::format_url($_POST['app_url']),
+            'app_url_api' => Helper::format_url($_POST['app_url_api'])
+        ];
+        $request->merge($url);
 
         $this->set($request, $strConfig);
         $this->setInt($request, $intConfig);

@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 
 
 Route::post('admin/login', 'Admin\Login@login')->middleware('api');
-Route::post('admin/login/verify', 'Admin\Login@getVerify');
+Route::post('admin/login/verify', 'Admin\Login@getVerify')->middleware('api');
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function () {
 

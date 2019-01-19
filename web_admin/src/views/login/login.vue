@@ -66,7 +66,7 @@
       this.verticalCenter();
       window.addEventListener('resize', this.verticalCenter);
 
-      if (this.vcode.geetest && this.vcode.login === 1) {
+      if (this.vcode.geetest && +this.vcode.login === 1) {
         if (this.vcode.geetest.gt !== false) {
           this.renderGeeCaptcha(this.vcode.geetest);
           this.vcode.geetest.gt = false;
