@@ -140,11 +140,15 @@
         console.log('login - handleReInitCapture');
         this.geetestLoading = true;
         this.validate = false;
+        // 这里登录失败, 就会重新拉取验证码
         getVerify().then(ret => {
           const data = ret.data;
           if (!data.geetest) {
             if (this.vcode.geetest && this.vcode.login === 1) {
               this.$alert('获取验证码失败，请刷新页面重试', '获取验证码失败');
+            } else {
+              // 如果没有开启登录验证, 登录失败拉取拉不到的
+              this.geetestLoading = true;
             }
             return;
           }
