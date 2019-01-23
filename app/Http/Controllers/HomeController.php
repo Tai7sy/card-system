@@ -29,9 +29,9 @@ class HomeController extends Controller
     {
         $config = [
             'url' => config('app.url'),//支付域名
-            'company' => System::_get('company'),
+            'company' => config('app.company'),
             'name' => config('app.name'),
-            'logo' => System::_get('logo')
+            'logo' => config('app.logo')
         ];
         $config['shop'] = [
             'name' => config('app.name'),

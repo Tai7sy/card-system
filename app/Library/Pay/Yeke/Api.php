@@ -105,7 +105,7 @@ class Api implements ApiInterface
             // $P_custom_1 = $_POST['P_custom_1'];
             // 订单成功状态
             if ($_REQUEST['P_status'] == 'SUCCESS') {
-                $successCallback($P_api_orderid, (int)($P_money * 100), $P_orderid);
+                $successCallback($P_api_orderid, (int)round($P_money * 100), $P_orderid);
                 if ($isNotify) echo 'success';
                 return true;
             } else {

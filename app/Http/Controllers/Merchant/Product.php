@@ -96,8 +96,8 @@ class Product extends Controller
         $password = $request->post('password');
         $password_open = $request->post('password_open', 0) === 'true';
 
-        $cost = (int)($request->post('cost') * 100);
-        $price = (int)($request->post('price') * 100);
+        $cost = (int)round($request->post('cost') * 100);
+        $price = (int)round($request->post('price') * 100);
         $price_whole = $request->post('price_whole'); // [1:]
         $enabled = (int)$request->post('enabled');
 

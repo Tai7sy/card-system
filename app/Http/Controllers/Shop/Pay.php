@@ -167,7 +167,7 @@ class Pay extends Controller
                     }
                     if ($c->discount_type === \App\Coupon::DISCOUNT_TYPE_PERCENT) {
                         $used_coupon = $c;
-                        $pay_money = $pay_money - intval($pay_money * $c->discount_val / 100);
+                        $pay_money = $pay_money - (int)round($pay_money * $c->discount_val / 100);
                         break;
                     }
                 }

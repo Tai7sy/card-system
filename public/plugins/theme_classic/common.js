@@ -270,14 +270,16 @@ function calcTotalPrice() {
         var DISCOUNT_TYPE_AMOUNT = 0;
         var DISCOUNT_TYPE_PERCENT = 1;
         var off = 0;
+        var discount = 0;
         if (currentCouponInfo.discount_type === DISCOUNT_TYPE_AMOUNT && price > currentCouponInfo.discount_val) {
-            price_pay = price_pay - currentCouponInfo.discount_val;
+            discount = currentCouponInfo.discount_val;
             off = (currentCouponInfo.discount_val / 100).toFixed(2)
         } else if (currentCouponInfo.discount_type === DISCOUNT_TYPE_PERCENT) {
-            price_pay = price_pay - parseInt(price_pay * currentCouponInfo.discount_val / 100);
+            discount = Math.round(price_pay * currentCouponInfo.discount_val / 100);
             off = currentCouponInfo.discount_val + '%'
         }
-        $('#coupon-tip').text('立减' + off + ', 已优惠:' + ((price - price_pay) / 100).toFixed(2));
+        price_pay -= discount;
+        $('#coupon-tip').text('立减' + off + ', 已优惠:' + (discount / 100).toFixed(2));
     }
     var pay_amount = (price_pay / 100).toFixed(2);
     if (1 === +window.config.shop.fee_type) {

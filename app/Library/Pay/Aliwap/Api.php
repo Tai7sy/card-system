@@ -83,7 +83,7 @@ class Api implements ApiInterface
             $out_trade_no = $_REQUEST['out_trade_no'];//商户订单号
             $trade_no = $_REQUEST['trade_no'];//支付宝交易号
             $trade_status = $_REQUEST['trade_status'];//交易状态
-            $total_fee = (int)($_REQUEST['total_fee'] * 100);
+            $total_fee = (int)round($_REQUEST['total_fee'] * 100);
 
             if ($trade_status == 'TRADE_FINISHED' || $trade_status == 'TRADE_SUCCESS') {//处理
                 $successCallback($out_trade_no, $total_fee, $trade_no);

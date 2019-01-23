@@ -153,7 +153,7 @@ class Api implements ApiInterface
             case 'SUCCESS':
                 $response = $queryResult->getResponse();
                 $trade_no = $response->trade_no;//支付宝交易号
-                $total_fee = (int)($response->receipt_amount * 100);
+                $total_fee = (int)round($response->receipt_amount * 100);
                 $successCallback($out_trade_no, $total_fee, $trade_no);
 
                 if ($isNotify) echo 'success';

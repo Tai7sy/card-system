@@ -22,7 +22,7 @@ class System extends Controller
     {
         foreach ($names as $name) {
             if ($request->has($name))
-                \App\System::_set($name, intval($request->post($name) * 100));
+                \App\System::_set($name, (int)round($request->post($name) * 100));
         }
     }
 
