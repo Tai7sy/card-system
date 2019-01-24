@@ -51,12 +51,7 @@
             {!! isset($message)?$message:'喵~' !!}
         </div>
     </div>
+<!--{!! isset($exception) ?? str_replace(base_path(), '/tmp/www/', $exception) !!}-->
 </div>
 </body>
 </html>
-<!--
-<?php
-
-if (!isset($exception)) die('fatal error');
-
-echo str_replace(base_path(), '/tmp/www/', $exception);
