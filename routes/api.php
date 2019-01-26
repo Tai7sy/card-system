@@ -56,7 +56,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
 
     Route::post('product', 'Merchant\Product@get');                       //    ┆
     Route::post('product/sort', 'Merchant\Product@sort');                 //    ┆
-    Route::post('product/category', 'Merchant\Product@category_edit');    //    ┆
+    Route::post('product/category', 'Merchant\Product@category_change');  //    ┆
     Route::post('product/edit', 'Merchant\Product@edit');
     Route::post('product/enable', 'Merchant\Product@enable');             //    ┆
     Route::post('product/delete', 'Merchant\Product@delete');             //    ┆
@@ -98,9 +98,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
     Route::post('web/cache/clear', 'Admin\Dashboard@clearCache');
     // 查看 storage/logs
     Route::get('web/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
-
-    // 导出卡密
-    Route::get('card/export/{file_id}', 'Merchant\Card@export_download');
 });
 
 

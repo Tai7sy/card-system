@@ -51,8 +51,8 @@
         </el-form-item>
 
         <el-form-item style="float: right;margin-right: 0;">
-          <a class="icon-btn" @click="handleExport" :disabled="exporting">
-            <icon :name="exporting?'spinner':'file-text'" :pulse="exporting"/>&nbsp;{{exporting?'导出中':('导出('+list.total+')')}}</a>
+          <a class="icon-btn" @click="handleExport">
+            <icon name="file-text"/>&nbsp;{{'导出('+list.total+')'}}</a>
           <a class="icon-btn" @click="handleAdd" v-if="!onlyTrashed">
             <icon name="plus"/>&nbsp;添加</a>
           <iframe ref="exportFrame" style="display: none;width: 0;height: 0"></iframe>
@@ -168,7 +168,6 @@
     cardStatus,
     cardType,
     deleteAll,
-    exportList as exportCardList,
     getList as getCardList,
     moveToTrash,
     trashDelete,
@@ -202,7 +201,6 @@
     data () {
       return {
         loading: false,
-        exporting: false,
         showAddBox: false,
         addBoxLoaded: false,
         cardType,
@@ -347,24 +345,7 @@
         });
       },
       handleExport () {
-        if (this.exporting) return;
-        this.exporting = true;
-        this.where.current_page = this.list.current_page;
-        this.where.per_page = this.list.per_page;
-        this.where.trashed = this.onlyTrashed;
-        exportCardList(this.where)
-          .then(res => {
-            this.$refs['exportFrame'].src =
-              window.API_HOST + 'card/export/' + res.data;
-            setTimeout(() => {
-              this.exporting = false;
-            }, 1000);
-          })
-          .catch(() => {
-            setTimeout(() => {
-              this.exporting = false;
-            }, 1000);
-          });
+        window.open(window.API_HOST + 'card/export?' + $.param(this.where), '_blank');
       },
       handleSearch () {
         const where = { search: this.search.type, val: this.search.value };

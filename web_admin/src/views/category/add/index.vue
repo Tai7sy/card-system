@@ -55,7 +55,7 @@
         loading: false,
         labelWidth: this.$store.state.app.isMobile ? '70px' : '90px',
         form: {
-          id: 0,
+          id: null,
           name: '',
           sort: 1000,
           password: '',

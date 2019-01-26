@@ -89,7 +89,7 @@
             this.loading = false;
             this.$notify({
               title: '提示',
-              message: '编辑商品成功',
+              message: '编辑卡密成功',
               type: 'success', duration: 3000
             });
             this.handleClose(true);

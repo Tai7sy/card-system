@@ -70,36 +70,11 @@ class Card extends Controller
                 }
             });
 
-            $fileName = 'export_cards_' . $this->getUserIdOrFail($request) . '_' . date('YmdHis') . '.txt';
-            $path = 'card_export/' . $fileName;
-
-            $driver = System::_get('storage_driver');
-            try {
-                if (!Storage::disk($driver)->put($path, $card_txt)) {
-                    return Response::fail('文件生成失败');
-                }
-            } catch (\Exception $e) {
-                \Log::error('Card.export Exception: ' . $e->getMessage());
-                if (config('app.debug')) {
-                    return Response::fail($e->getMessage());
-                } else {
-                    return Response::fail('生成文件失败, 内部错误, 请联系客服');
-                }
-            }
-
-
-            $file_id = \App\File::insertGetId([
-                'user_id' => $this->getUserIdOrFail($request),
-                'driver' => $driver,
-                'path' => $path,
-                'url' => Storage::disk($driver)->url($path)
-            ]);
-
-            if ($file_id <= 0) {
-                return Response::fail('数据库繁忙，插入文件记录失败');
-            }
-
-            return Response::success($file_id);
+            $file_name = 'export_cards_' . $this->getUserIdOrFail($request) . '_' . date('YmdHis') . '.txt';
+            $headers = ['Content-type' => 'text/plain',
+                'Content-Disposition' => sprintf('attachment; filename="%s"', $file_name),
+                'Content-Length' => strlen($card_txt)];
+            return response()->make($card_txt, 200, $headers);
         } else if ($is_delete === true) {
             if ($isTrashed) {
                 $query->forceDelete();
@@ -122,32 +97,6 @@ class Card extends Controller
     {
         return self::get($request, true);
     }
-
-    function export_download($file_id)
-    {
-        /* @var \App\File $file */
-        $file = \App\File::findOrFail($file_id);
-        $user = Auth::getUser();
-        if ($user->id !== $file->user_id) {
-            $card_txt = 'Access Denied';
-            $file_name = 'your_are_sb.txt';
-        } else {
-            $driver = System::_get('storage_driver');
-            $card_txt = Storage::disk($driver)->get($file->path);
-            $file_name = pathinfo($file->path, PATHINFO_BASENAME);
-            Storage::disk($driver)->delete($file->path);
-            try {
-                $file->delete();
-            } catch (\Exception $e) {
-            }
-        }
-
-        $headers = ['Content-type' => 'text/plain',
-            'Content-Disposition' => sprintf('attachment; filename="%s"', $file_name),
-            'Content-Length' => strlen($card_txt)];
-        return response()->make($card_txt, 200, $headers);
-    }
-
 
     /**
      * 卡密删除到回收站
@@ -306,12 +255,12 @@ class Card extends Controller
             // $c->status = $status;
             $c->type = $type;
             if ($type === \App\Card::TYPE_REPEAT) {
-
                 $product = $c->product;
                 $product->buy_max = 1;
                 $product->saveOrFail();
                 $c->count_all = (int)$request->post('count_all', 1);
-
+                if ($c->count_all < 1 || $c->count_all > 10000000)
+                    return Response::forbidden('可售总次数不能超过10000000');
             } else {
                 $c->count_all = 1;
             }
