@@ -19,7 +19,6 @@ class Api implements ApiInterface
         $this->url_return = SYS_URL . '/pay/return/' . $id;
     }
 
-
     /**
      * @param array $config
      * @param string $out_trade_no
@@ -57,6 +56,15 @@ class Api implements ApiInterface
                 die('<h1>获取微信OPENID<br>错误信息: ' . (isset($ret['errcode']) ? $ret['errcode'] : $ret) . '<br>' . (isset($ret['errmsg']) ? $ret['errmsg'] : $ret) . '<br>请返回重试</h1>');
             }
             $openid = $ret['openid'];
+        }else{
+            // 如果在微信外部, 且支付方式是JSAPI, 二维码为当前页面
+            if ($payway === 'JSAPI'){
+                $pay_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}" . '/pay/' . $out_trade_no;
+                // $auth_url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' . $config['APPID'] . '&redirect_uri=' . urlencode($pay_url) . '&response_type=code&scope=snsapi_base#wechat_redirect';
+                // $auth_url 太复杂了以至于不能生成二维码....
+                header('Location: /qrcode/pay/' . $out_trade_no . '/wechat?url=' . urlencode($pay_url));
+                exit;
+            }
         }
         $this->defineWxConfig($config);
         require_once __DIR__ . '/lib/WxPay.Api.php';
@@ -108,7 +116,7 @@ class Api implements ApiInterface
             // 微信内部
             $params = [
                 'appId' => $config['APPID'],                // 公众号名称，由商户传入
-                'timeStamp' => time(),                      // 时间戳，自1970年以来的秒数
+                'timeStamp' => strval(time()),              // 时间戳，自1970年以来的秒数
                 'nonceStr' => md5(time() . 'nonceStr'), // 随机串
                 'package' => 'prepay_id=' . getValue($out_trade_no, $result, 'prepay_id'),
                 'signType' => 'MD5',                        // 微信签名方式：
@@ -120,7 +128,7 @@ class Api implements ApiInterface
         } elseif ($payway === 'MWEB') {
             // H5支付
             $url = getValue($out_trade_no, $result, 'mweb_url');
-            $result_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}" . '/qrcode/pay/' . $out_trade_no . '/wechat?url=h5';
+            $result_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}" . '/qrcode/pay/' . $out_trade_no . '/wechat?url=query';
             // header('location: ' . $url);
             // 这里是为了API支付的时候跳转微信带上referer, 不然微信要发疯咬人
             echo view('utils.redirect', ['url' => $url . '&redirect_url=' . urlencode($result_url)]);
