@@ -23,6 +23,15 @@ class Login extends Controller
 
     public function login(Request $request)
     {
+        if ((int)System::_get('vcode_login') === 1) {
+            $ret = Geetest\API::verify($request->input('geetest_challenge'),
+                $request->input('geetest_validate'),
+                $request->input('geetest_seccode'));
+            if (!$ret) {
+                return self::renderResult($request, ['msg' => '滑动验证超时，请返回页面重试。']);
+            }
+        }
+
         $remember = $request->input('remember') == 'true';
         if (!Auth::attempt([
             'email' => $request->input('email'),
