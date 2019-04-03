@@ -45,4 +45,56 @@ class Card extends Model
     {
         DB::statement('call add_cards(?,?,?,?,?,?)', [$user_id, $product_id, $type, $status, $card_arr, (int)$is_check]);
     }
+
+    /**
+     * 删除卡密
+     * @param \Illuminate\Database\Eloquent\Builder|\App\Card $query
+     * @throws \Throwable
+     */
+    public static function _trash($query)
+    {
+        DB::transaction(function () use ($query) {
+            $tmp = clone $query;
+            $tmp->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count_left`')
+                ->groupBy('product_id')->orderByRaw('`product_id`')
+                ->chunk(100, function ($card_groups) {
+                    foreach ($card_groups as $card_group) {
+                        /** @var \App\Product $product */
+                        $product = \App\Product::where('id', $card_group->product_id)->lockForUpdate()->first();
+                        if ($product) {
+                            $product->count_all -= $card_group->count_left;
+                            $product->saveOrFail();
+                        }
+                    }
+                });
+            $query->delete();
+            return true;
+        });
+    }
+
+    /**
+     * 恢复卡密
+     * @param \Illuminate\Database\Eloquent\Builder|\App\Card $query
+     * @throws \Throwable
+     */
+    public static function _restore($query)
+    {
+        DB::transaction(function () use ($query) {
+            $tmp = clone $query;
+            $tmp->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count_left`')
+                ->groupBy('product_id')->orderByRaw('`product_id`')
+                ->chunk(100, function ($card_groups) {
+                    foreach ($card_groups as $card_group) {
+                        /** @var \App\Product $product */
+                        $product = \App\Product::where('id', $card_group->product_id)->lockForUpdate()->first();
+                        if ($product) {
+                            $product->count_all += $card_group->count_left;
+                            $product->saveOrFail();
+                        }
+                    }
+                });
+            $query->restore();
+            return true;
+        });
+    }
 }

@@ -14,13 +14,14 @@ class IndexController extends Controller
     {
         $this->checkIsInMaintain();
         $this->config = [
-            'logo' => System::_get('logo'),
+            'logo' => config('app.logo'),
             'name' => config('app.name'),
-            'description' => System::_get('description'),
-            'keywords' => System::_get('keywords'),
+            'title' => config('app.title'),
+            'description' => config('app.description'),
+            'keywords' => config('app.keywords'),
+            'company' => config('app.company'),
+            'icp' => config('app.icp'),
             'home_links' => System::_get('home_links'),
-            'company' => System::_get('company'),
-            'icp' => System::_get('icp'),
             'js_tj' => System::_get('js_tj'),
             'js_kf' => System::_get('js_kf'),
         ];

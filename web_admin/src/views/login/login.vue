@@ -131,7 +131,9 @@
             }
           });
         }).catch(() => {
-          // this.handleReInitCapture();
+          if (this.vcode.geetest && this.vcode.login === 1) {
+            this.handleReInitCapture();
+          }
         }).finally(() => {
           this.loading = false;
         });
@@ -164,8 +166,9 @@
       },
       renderGeeCaptcha (geetest) {
         if (geetest) {
+          this.geetestLoading = true;
+          $('#embed-captcha').html('');
           try {
-            this.geetestLoading = true;
             window.initGeetest({
               gt: geetest.gt,
               challenge: geetest.challenge,

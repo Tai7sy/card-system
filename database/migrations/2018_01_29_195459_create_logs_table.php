@@ -16,7 +16,7 @@ class CreateLogsTable extends Migration
     {
         Schema::create('logs', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id');
+            $table->integer('user_id')->index();
             $table->string('ip');
             $table->integer('action')->default(\App\Log::ACTION_LOGIN);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));

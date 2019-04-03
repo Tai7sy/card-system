@@ -18,10 +18,6 @@ class Product extends Controller
         $query = $this->authQuery($request, \App\Product::class)
             ->with(['category' => function (Relation $query) {
                 $query->select(['id', 'name', 'password_open']);
-            }])->with(['cards' => function (Relation $query) {
-                $query->whereRaw('`count_all`>`count_sold`')
-                    ->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count`')
-                    ->groupBy('product_id');
             }]);
 
         $searchType = $request->post('search', false);
@@ -31,6 +27,8 @@ class Product extends Controller
                 return Response::success($query->where('category_id', $searchVal)->get(['id', 'name']));
             } elseif ($searchType == 'id') {
                 $query->where('id', $searchVal);
+            } elseif ($searchType == 'category_id') {
+                $query->where('category_id', $searchVal);
             } else {
                 $query->where($searchType, 'like', '%' . $searchVal . '%');
             }

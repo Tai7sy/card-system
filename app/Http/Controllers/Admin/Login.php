@@ -87,8 +87,15 @@ class Login extends Controller
         if (!Hash::check($old, $user->password))
             return Response::fail('旧密码错误，请检查');
 
-        $user->password = bcrypt($password);
+
+        $user->password = Hash::make($password);
+        $user->setRememberToken(str_random(60));
         $user->saveOrFail();
+
+        event(new PasswordReset($user));
+
+        Auth::guard()->login($user);
+
         return Response::success();
     }
 }

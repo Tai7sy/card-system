@@ -156,8 +156,8 @@
 <!--/ 商家公告 -->
 
 <script type=text/javascript>var config = @json($config);</script>
-<script type=text/javascript src="/plugins/theme_classic/common.js?v={!! $version !!}"></script>
-<script type=text/javascript src="/plugins/theme_classic/mobile.js?v={!! $version !!}"></script>
+<script type=text/javascript src="/plugins/theme_classic/common.min.js?v={!! $version !!}"></script>
+<script type=text/javascript src="/plugins/theme_classic/mobile.min.js?v={!! $version !!}"></script>
 {!! $js_tj !!} {!! $js_kf !!}
 </body>
 </html>

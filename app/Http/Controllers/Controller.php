@@ -14,18 +14,6 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
 
-    function is_mobile()
-    {
-        //判断手机发送的客户端标志
-        if (isset ($_SERVER['HTTP_USER_AGENT'])) {
-            // 从HTTP_USER_AGENT中查找手机浏览器的关键字
-            if (preg_match('/(iPhone|iPod|Android|ios|SymbianOS|Windows Phone)/i', $_SERVER['HTTP_USER_AGENT'])) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * 商户: 设置当前登录用户user_id <br>管理员: 设置user_id or 所有
      * @param Request $request

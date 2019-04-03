@@ -15,7 +15,7 @@ class CreateCardOrderTable extends Migration
     {
         Schema::create('card_order', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('order_id');
+            $table->integer('order_id')->index();
             $table->integer('card_id');
             // $table->timestamps();
         });

@@ -15,14 +15,13 @@ class CreateCategoriesTable extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id');
+            $table->integer('user_id')->index();
             $table->text('name');
             $table->integer('sort')->default(1000);
             $table->string('password')->nullable();
             $table->boolean('password_open')->default(false);
             $table->boolean('enabled');
             $table->timestamps();
-            $table->index('user_id');
         });
     }
 

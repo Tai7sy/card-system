@@ -7,10 +7,19 @@ use App\System;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class Card extends Controller
 {
+    /**
+     * @param Request $request
+     * @param bool $is_export
+     * @param bool $is_delete
+     * @param bool $is_restore
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
+     */
     function get(Request $request, $is_export = false, $is_delete = false, $is_restore = false)
     {
         /* @var \App\Card $query */
@@ -20,8 +29,8 @@ class Card extends Controller
                 $query->select(['id', 'name']);
             }]);
 
-        $searchType = $request->post('search', false);
-        $searchVal = $request->post('val', false);
+        $searchType = $request->input('search', false);
+        $searchVal = $request->input('val', false);
         if ($searchType && $searchVal) {
             if ($searchType == 'id') {
                 $query->where('id', $searchVal);
@@ -29,8 +38,8 @@ class Card extends Controller
                 $query->where($searchType, 'like', '%' . $searchVal . '%');
             }
         }
-        $category_id = (int)$request->post('category_id');
-        $product_id = $request->post('product_id', -1);
+        $category_id = (int)$request->input('category_id');
+        $product_id = $request->input('product_id', -1);
 
         if ($category_id > 0) {
             if ($product_id > 0) $query->where('product_id', $product_id);
@@ -42,52 +51,53 @@ class Card extends Controller
             }
         }
 
-        $status = $request->post('status');
+        $status = $request->input('status');
         if (strlen($status))
             $query->whereIn('status', explode(',', $status));
 
-        $onlyCanSell = (int)$request->post('onlyCanSell');
+        $onlyCanSell = (int)$request->input('onlyCanSell');
         if ($onlyCanSell)
             $query->whereRaw('`count_all`>`count_sold`');
 
 
-        $type = $request->post('type');
+        $type = $request->input('type');
         if (strlen($type))
             $query->whereIn('type', explode(',', $type));
 
-        $isTrashed = $request->post('trashed') === 'true';
+        $isTrashed = $request->input('trashed') === 'true';
         if ($isTrashed)
             $query->onlyTrashed();
 
-        $query->orderByRaw('product_id,type,status');
-
-        if ($is_export === true) {
-            $card_txt = '';
-            $query->chunk(100, function ($cards) use (&$card_txt) {
-                /* @var \App\Card[] $cards */
-                foreach ($cards as $card) {
-                    $card_txt .= $card->card . "\r\n";
-                }
-            });
-
-            $file_name = 'export_cards_' . $this->getUserIdOrFail($request) . '_' . date('YmdHis') . '.txt';
-            $headers = ['Content-type' => 'text/plain',
-                'Content-Disposition' => sprintf('attachment; filename="%s"', $file_name),
-                'Content-Length' => strlen($card_txt)];
-            return response()->make($card_txt, 200, $headers);
-        } else if ($is_delete === true) {
+        if ($is_delete === true) {
             if ($isTrashed) {
                 $query->forceDelete();
             } else {
-                $query->delete();
+                \App\Card::_trash($query);
             }
             return Response::success();
         } else if ($isTrashed && $is_restore === true) {
-            $query->restore();
+            \App\Card::_restore($query);
             return Response::success();
         } else {
-            $page = $request->post('current_page', 1);
-            $pageSize = $request->post('per_page', 20);
+            $query->orderByRaw('`product_id`,`type`,`status`,`id`');
+
+            if ($is_export === true) {
+                $card_txt = '';
+                $query->chunk(100, function ($cards) use (&$card_txt) {
+                    /* @var \App\Card[] $cards */
+                    foreach ($cards as $card) {
+                        $card_txt .= $card->card . "\r\n";
+                    }
+                });
+
+                $file_name = 'export_cards_' . $this->getUserIdOrFail($request) . '_' . date('YmdHis') . '.txt';
+                $headers = ['Content-type' => 'text/plain',
+                    'Content-Disposition' => sprintf('attachment; filename="%s"', $file_name),
+                    'Content-Length' => strlen($card_txt)];
+                return response()->make($card_txt, 200, $headers);
+            }
+            $page = $request->input('current_page', 1);
+            $pageSize = $request->input('per_page', 20);
             $list = $query->paginate($pageSize, ['*'], 'page', $page);
             return Response::success($list);
         }
@@ -99,22 +109,46 @@ class Card extends Controller
     }
 
     /**
-     * 卡密删除到回收站
+     * 卡密 - 删除到回收站
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
+     * @throws \Throwable
      */
     function trash(Request $request)
     {
         $ids = $request->post('ids', '');
         if (strlen($ids) < 1) return Response::forbidden();
 
-        $this->authQuery($request, \App\Card::class)
-            ->whereIn('id', explode(',', $ids))->delete();
+        $query = $this->authQuery($request, \App\Card::class)
+            ->whereIn('id', explode(',', $ids));
+
+        \App\Card::_trash($query);
         return Response::success();
     }
 
+    /**
+     * 回收站 - 选中恢复
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
+     */
+    function restoreTrashed(Request $request)
+    {
+        $ids = $request->post('ids', '');
+        if (strlen($ids) < 1) return Response::forbidden();
 
+        $query = $this->authQuery($request, \App\Card::class)
+            ->whereIn('id', explode(',', $ids));
+
+        \App\Card::_restore($query);
+        return Response::success();
+    }
+
+    /**
+     * 回收站 - 选中彻底删除
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     function deleteTrashed(Request $request)
     {
         $ids = $request->post('ids', '');
@@ -126,43 +160,46 @@ class Card extends Controller
         return Response::success();
     }
 
+    /**
+     * 删除全部 - 自动判断是否回收站
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     function deleteAll(Request $request)
     {
         return $this->get($request, false, true);
     }
 
-    function restoreTrashed(Request $request)
-    {
-        $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
 
-        /* @var \App\Card $query */
-        $query = $this->authQuery($request, \App\Card::class);
-
-        $query->whereIn('id', explode(',', $ids))
-            ->restore();
-        return Response::success();
-    }
-
+    /**
+     * 回收站 - 当前筛选条件全部恢复
+     * 借用 get 函数筛选, 进行回收站恢复操作
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
+     */
     function restoreAll(Request $request)
     {
         return $this->get($request, false, false, true);
     }
 
 
+    /**
+     * 添加卡密
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     * @throws \Throwable
+     */
     function add(Request $request)
     {
         $product_id = (int)$request->post('product_id');
         $cards = $request->post('card');
-        // $status = (int)$request->post('status', \App\Card::STATUS_NORMAL);
-        $status = \App\Card::STATUS_NORMAL;
         $type = (int)$request->post('type', \App\Card::TYPE_ONETIME);
         $is_check = $request->post('is_check') === 'true';
         // $delimiter = $request->post('delimiter', " ");
 
         if (str_contains($cards, '<') || str_contains($cards, '>'))
-            return Response::fail('卡密不能用 < 或 > 分割');
-
+            return Response::fail('卡密不能包含 < 或 > 符号');
 
         if (\App\Card::where('user_id', \Auth::id())
                 ->where('status', \App\Card::STATUS_NORMAL)
@@ -170,9 +207,10 @@ class Card extends Controller
             return Response::fail('您的库存卡密已经超过10000张，本次添加失败');
         }
 
+        $user_id = $this->getUserIdOrFail($request);
         /* @var \App\Product $product */
-        $product = $this->authQuery($request, \App\Product::class)->findOrFail($product_id);
-
+        $product_sql = $this->authQuery($request, \App\Product::class)->where('id', $product_id);
+        $product_sql->firstOrFail(['id']);
 
         if ($type === \App\Card::TYPE_REPEAT) {
             if ($is_check) {
@@ -180,20 +218,26 @@ class Card extends Controller
                     return Response::fail('该卡密已经存在，添加失败');
                 }
             }
-            $product->buy_max = 1;
-            $product->saveOrFail();
-
-            $card = new \App\Card;
-            $card->user_id = $this->getUserIdOrFail($request);
-            $card->product_id = $product_id;
-            $card->card = $cards;
-            $card->type = $type;
-            $card->status = $status;
-            $card->count_sold = 0;
-            $card->count_all = (int)$request->post('count_all', 1);
+            $card = new \App\Card([
+                'user_id' => $user_id,
+                'product_id' => $product_id,
+                'card' => $cards,
+                'type' => \App\Card::TYPE_REPEAT,
+                'count_sold' => 0,
+                'count_all' => (int)$request->post('count_all', 1)
+            ]);
             if ($card->count_all < 1 || $card->count_all > 10000000)
                 return Response::forbidden('可售总次数不能超过10000000');
-            $card->saveOrFail();
+
+            return DB::transaction(function () use ($product_sql, $card) {
+                $card->saveOrFail();
+                /* @var \App\Product $product */
+                $product = $product_sql->lockForUpdate()->firstOrFail();
+                $product->buy_max = 1;
+                $product->count_all += $card->count_all;
+                $product->saveOrFail();
+                return Response::success();
+            });
         } else {
             $card_arr = explode("\n", $cards);
             $card_count = count($card_arr);
@@ -201,8 +245,19 @@ class Card extends Controller
             if ($card_count > $per_round) {
                 return Response::fail('每次添加不能超过 ' . $per_round . ' 张');
             }
-            $card_added = [];
-            $card_txt = '';
+
+            $cards_all = [];
+            if ($is_check) {
+                $cards_tmp = \App\Card::where('user_id', $user_id)
+                    ->where('product_id', $product_id)
+                    ->get(['card'])->all();
+                foreach ($cards_tmp as $cards_i) {
+                    $cards_all[] = $cards_i['card'];
+                }
+            }
+
+            $cards_to_insert = [];
+            $card_count_real = 0;
             for ($i = 0; $i < $card_count; $i++) {
                 $card = trim($card_arr[$i]);
                 if (strlen($card) < 1)
@@ -212,63 +267,95 @@ class Card extends Controller
                     return Response::fail('第 ' . $i . ' 张卡密 ' . $card . ' 长度错误<br>卡密最大长度为100');
 
                 if ($is_check) {
-                    if (in_array($card, $card_added)) {
+                    if (in_array($card, $cards_all)) {
                         continue;
                     }
-                    $card_added[] = $card;
+                    $cards_all[] = $card;
                 }
 
-                if ($card_txt === '') {
-                    $card_txt .= $card;
-                } else {
-                    $card_txt .= '<' . $card;
-                }
+                $cards_to_insert[] = [
+                    'user_id' => $user_id,
+                    'product_id' => $product_id,
+                    'card' => $card,
+                    'type' => \App\Card::TYPE_ONETIME
+                ];
+                $card_count_real++;
             }
 
-            if ($card_txt === '')
-                return Response::fail('请输入合法的卡密');
+            if ($card_count_real === 0)
+                return Response::success();
 
-            try {
-                // \App\Card::add_cards($this->getUserIdOrFail($request), $product_id, $type, $status, $card_txt, $is_check);
-                \App\Card::add_cards($this->getUserIdOrFail($request), $product_id, $type, $status, $card_txt, false); // 这里检查, 数据量大了会卡
-            } catch (\Exception $e) {
-                \Log::error('add_cards, function fatal error: ', ['exception' => $e]);
-                return Response::fail($e->getMessage());
-            }
+            return DB::transaction(function () use ($product_sql, $cards_to_insert, $card_count_real) {
+                \App\Card::insert($cards_to_insert);
+
+                /* @var \App\Product $product */
+                $product = $product_sql->lockForUpdate()->firstOrFail();
+                $product->count_all += $card_count_real;
+                $product->saveOrFail();
+                return Response::success();
+            });
         }
-
-
-        return Response::success();
     }
 
+    /**
+     * 编辑卡密
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     * @throws \Throwable
+     */
     function edit(Request $request)
     {
         $id = (int)$request->post('id');
-        $card = $request->post('card');
-        // $status = (int)$request->post('status', \App\Card::STATUS_NORMAL);
+        $cardNumber = $request->post('card'); // 卡号
         $type = (int)$request->post('type', \App\Card::TYPE_ONETIME);
 
-        /* @var \App\Card $c */
-        $c = $this->authQuery($request, \App\Card::class)->findOrFail($id);
-        if ($c) {
-            $c->card = $card;
-            // $c->status = $status;
-            $c->type = $type;
-            if ($type === \App\Card::TYPE_REPEAT) {
-                $product = $c->product;
-                $product->buy_max = 1;
-                $product->saveOrFail();
-                $c->count_all = (int)$request->post('count_all', 1);
-                if ($c->count_all < 1 || $c->count_all > 10000000)
-                    return Response::forbidden('可售总次数不能超过10000000');
-            } else {
-                $c->count_all = 1;
-            }
+        /* @var \App\Card $card */
+        $card = $this->authQuery($request, \App\Card::class)->findOrFail($id);
+        if ($card) {
+            $card->card = $cardNumber;
+            $card->type = $type;
+            $count_all = (int)$request->post('count_all', 1);
+            $product_sql = $card->product();
 
-            $c->saveOrFail();
+            if ($type === \App\Card::TYPE_REPEAT) {
+                return DB::transaction(function () use ($product_sql, $card, $count_all) {
+                    /* @var \App\Card $card */
+                    $card = \App\Card::where('id', $card->id)->lockForUpdate()->firstOrFail();
+
+                    if ($count_all < $card->count_sold)
+                        return Response::forbidden('可售总次数不能低于当前已售次数');
+
+                    if ($count_all < 1 || $count_all > 10000000)
+                        return Response::forbidden('可售总次数不能超过10000000');
+
+                    /* @var \App\Product $product */
+                    $product = $product_sql->lockForUpdate()->firstOrFail();
+                    $product->buy_max = 1;
+                    $product->count_all -= $card->count_all; // 删去原有的
+                    $product->count_all += $count_all; // 加上现在的
+                    $product->saveOrFail();
+
+                    $card->count_all = $count_all;
+                    $card->saveOrFail();
+                    return Response::success();
+                });
+            } else {
+                return DB::transaction(function () use ($product_sql, $card, $count_all) {
+                    /* @var \App\Card $card */
+                    $card = \App\Card::where('id', $card->id)->lockForUpdate()->firstOrFail();
+                    /* @var \App\Product $product */
+                    $product = $product_sql->lockForUpdate()->firstOrFail();
+                    $product->count_all -= $card->count_all; // 删去原有的
+                    $product->count_all += 1; // 加上现在的
+                    $product->saveOrFail();
+
+                    $card->count_all = 1;
+                    $card->saveOrFail();
+                    return Response::success();
+                });
+            }
         }
         return Response::success();
     }
-
 
 }

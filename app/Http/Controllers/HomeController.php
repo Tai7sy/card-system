@@ -98,7 +98,7 @@ class HomeController extends Controller
 
         // bit operate   pc & mobile = result_enabled
         $config['pays'] = Pay::whereRaw('enabled&' .
-            (self::is_mobile() ? Pay::ENABLED_MOBILE : Pay::ENABLED_PC) . '!=0')
+            (Helper::is_mobile() ? Pay::ENABLED_MOBILE : Pay::ENABLED_PC) . '!=0')
             ->orderBy('sort')
             ->get(['id', 'name', 'img']);
 
@@ -121,6 +121,10 @@ class HomeController extends Controller
         $config['theme'] = $user->theme_config && isset($user->theme_config[$shop_theme->name]) ?
             $user->theme_config[$shop_theme->name] :
             $shop_theme->config;
+
+        if(isset($config['theme']['background']) && $config['theme']['background'] === '内置1'){
+            $config['theme']['background'] = Helper::b1_rand_background();
+        }
 
         return response()->view('shop_theme.' . $shop_theme->name . '.index', [
             'name' => $name,
@@ -178,22 +182,14 @@ class HomeController extends Controller
         $this->checkIsInMaintain();
 
         $product = Product::whereId(Helper::id_decode($en_product_id, Helper::ID_TYPE_PRODUCT))
-            ->with(['user', 'category', 'cards' => function (Relation $query) {
-                $query->whereRaw('`count_all`>`count_sold`')
-                    ->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count`')
-                    ->groupBy('product_id');
-            }])->first();
+            ->with(['user', 'category'])->first();
 
         if (!$product && is_numeric($en_product_id)) {
             // Warning
             // 2019-01-01 之后的用户将无法使用 id 的形式, 转变为 en_id
             $product = Product::whereId($en_product_id)
                 ->where('created_at', '<', \Carbon\Carbon::createFromDate(2019, 1, 1))
-                ->with(['user', 'category', 'cards' => function (Relation $query) {
-                    $query->whereRaw('`count_all`>`count_sold`')
-                        ->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count`')
-                        ->groupBy('product_id');
-                }])->first();
+                ->with(['user', 'category'])->first();
         }
         if (!$product || !$product->category) {
             return $this->_shop_404();

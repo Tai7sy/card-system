@@ -177,8 +177,8 @@
 
 </div>
 <script type=text/javascript>var config = @json($config);</script>
-<script type=text/javascript src="/plugins/theme_classic/common.js?v={!! $version !!}"></script>
-<script type=text/javascript src="/plugins/theme_classic/pc.js?v={!! $version !!}"></script>
+<script type=text/javascript src="/plugins/theme_classic/common.min.js?v={!! $version !!}"></script>
+<script type=text/javascript src="/plugins/theme_classic/pc.min.js?v={!! $version !!}"></script>
 {!! 1/*$js_tj*/ !!} {!! $js_kf !!}
 </body>
 </html>

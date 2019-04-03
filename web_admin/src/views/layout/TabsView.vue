@@ -30,6 +30,9 @@
     },
     methods: {
       closeViewTabs (view, $event) {
+        if (this.visitedViews.length > 1 && view === this.visitedViews[this.visitedViews.length - 1]) {
+          this.$router.back()
+        }
         this.$store.dispatch('delVisitedViews', view);
         $event.preventDefault()
       },

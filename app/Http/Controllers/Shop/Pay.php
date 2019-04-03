@@ -108,11 +108,7 @@ class Pay extends Controller
         $product = Product::where('id', $product_id)
             ->where('category_id', $category_id)
             ->where('enabled', 1)
-            ->with(['cards' => function (Relation $query) {
-                $query->whereRaw('`count_all`>`count_sold`')
-                    ->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count`')
-                    ->groupBy('product_id');
-            }])->first();
+            ->with(['user'])->first();
         if ($product == null || $product->user == null)
             return self::renderResultPage($request, ['msg' => '该商品未找到，请重新选择']);
 
@@ -271,11 +267,7 @@ class Pay extends Controller
 
         $product = Product::where('id', $order->product_id)
             ->where('enabled', 1)
-            ->with(['cards' => function (Relation $query) {
-                $query->whereRaw('`count_all`>`count_sold`')
-                    ->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count`')
-                    ->groupBy('product_id');
-            }])->first();
+            ->first();
         if ($product == null) {
             return self::renderResultPage($request, ['msg' => '该商品已下架']);
         }

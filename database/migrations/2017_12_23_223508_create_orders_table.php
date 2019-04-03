@@ -15,8 +15,8 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id');
-            $table->string('order_no', 128); //订单序列号 带有时间的很长的那种
+            $table->integer('user_id')->index();
+            $table->string('order_no', 128)->index(); //订单序列号 带有时间的很长的那种
             $table->integer('product_id');
             $table->integer('count'); //购买数量
             $table->string('email')->nullable(); //购买者邮箱 or 联系方式
@@ -43,7 +43,6 @@ class CreateOrdersTable extends Migration
 
             $table->dateTime('paid_at')->nullable(); //支付时间
             $table->timestamps();
-            $table->index(['user_id', 'order_no']);
         });
 
 

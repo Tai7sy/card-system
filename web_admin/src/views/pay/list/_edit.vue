@@ -117,6 +117,12 @@
           name: [
             { required: true, message: '请输入名称', trigger: 'blur' }
           ],
+          img: [
+            { required: true, message: '请输入支付方式图片', trigger: 'blur' }
+          ],
+          way: [
+            { required: true, message: '请输入支付方式代码', trigger: 'blur' }
+          ],
           fee_system: [
             { required: true, message: '请输入支付通道费率', trigger: 'blur' }
           ],

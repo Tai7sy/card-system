@@ -15,7 +15,6 @@ class CORS
      */
     public function handle($request, Closure $next)
     {
-        $response = $next($request);
         if (config('app.debug')) {
             $headers = [
                 'Access-Control-Allow-Origin' => $request->header('Origin'),
@@ -23,10 +22,16 @@ class CORS
                 'Access-Control-Allow-Headers' => 'Content-Type, Accept, Authorization, Cookie, X-Requested-With, X-XSRF-TOKEN',
                 'Access-Control-Allow-Credentials' => 'true'
             ];
+            if ($request->isMethod('OPTIONS')) {
+                return response()->make('', 200, $headers);
+            }
+
+            $response = $next($request);
             foreach ($headers as $key => $value) {
                 $response->headers->set($key, $value);
             }
+            return $response;
         }
-        return $response;
+        return $next($request);
     }
 }

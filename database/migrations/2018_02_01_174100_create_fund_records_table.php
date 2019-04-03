@@ -15,7 +15,7 @@ class CreateFundRecordsTable extends Migration
     {
         Schema::create('fund_records', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id');
+            $table->integer('user_id')->index();
             $table->integer('type')->default(\App\FundRecord::TYPE_OUT);
             $table->integer('amount');
             $table->integer('balance')->default(0); //操作后余额
@@ -23,7 +23,6 @@ class CreateFundRecordsTable extends Migration
             $table->string('withdraw_id')->nullable(); //关联订单
             $table->string('remark')->nullable();
             $table->timestamps();
-            $table->index('user_id');
         });
 
         DB::unprepared('ALTER TABLE `fund_records` CHANGE COLUMN `created_at` `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP;');

@@ -15,12 +15,12 @@ class CreateCouponsTable extends Migration
     {
         Schema::create('coupons', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id');
+            $table->integer('user_id')->index();
             $table->integer('category_id')->default(-1);
             $table->integer('product_id')->default(-1);
             $table->integer('type')->default(\App\Coupon::TYPE_REPEAT);
             $table->integer('status')->default(\App\Coupon::STATUS_NORMAL);
-            $table->string('coupon', 100);
+            $table->string('coupon', 100)->index();
             $table->integer('discount_type');
             $table->integer('discount_val');
             $table->integer('count_used')->default(0); // type 为 TYPE_REPEAT 时, 表示已用次数
@@ -28,7 +28,6 @@ class CreateCouponsTable extends Migration
             $table->string('remark')->nullable();
             $table->dateTime('expire_at')->nullable();
             $table->timestamps();
-            $table->index(['user_id', 'coupon']);
         });
     }
 

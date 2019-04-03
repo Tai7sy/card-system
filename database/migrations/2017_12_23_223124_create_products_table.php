@@ -16,8 +16,8 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id');
-            $table->integer('category_id');
+            $table->integer('user_id')->index();
+            $table->integer('category_id')->index();
             $table->string('name');
             $table->longText('description');
             $table->integer('sort')->default(1000);
@@ -26,6 +26,7 @@ class CreateProductsTable extends Migration
             $table->integer('buy_max')->default(10);
 
             $table->integer('count_sold')->default(0);
+            $table->integer('count_all')->default(0); // 库存数量, 用后面的 add_count_to_products 计算一下
             $table->integer('count_warn')->default(0); //库存预警
 
             $table->boolean('support_coupon')->default(false);
@@ -40,7 +41,6 @@ class CreateProductsTable extends Migration
 
             $table->boolean('enabled');
             $table->timestamps();
-            $table->index(['user_id', 'category_id']);
         });
 
     }

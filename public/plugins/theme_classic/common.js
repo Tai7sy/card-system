@@ -26,6 +26,27 @@ $(function () {
     });
 });
 
+function randomString(len) {
+    len = len || 16;
+    var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+    /** **默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+    var maxPos = $chars.length;
+    var pwd = '';
+    for (var i = 0; i < len; i++) {
+        pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+    }
+    return pwd;
+}
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
 
 function renderQuill(delta, checkEmpty) {
     if (!delta) {
@@ -97,6 +118,7 @@ function getProducts(category_id) {
     if (category_id < 1) return;
 
     selectProduct(-1);
+    currentProduct = null;
     if (config.theme.list_type === 'dropdown') {
         $('#products > option:first-child').text('加载中...');
     }
@@ -154,6 +176,7 @@ function getProducts(category_id) {
             if (!password || !password.length) {
                 showToast('warn', '请输入分类密码');
                 selectCategory(-1);
+                currentCategory = null;
                 if (config.theme.list_type === 'button') {
                     $('#products').html('');
                 } else {
@@ -207,6 +230,7 @@ function showProductInfo(product) {
             if (!password || !password.length) {
                 showToast('warn', '请输入商品密码');
                 selectProduct(-1);
+                currentProduct = null;
                 return;
             }
             $.post('/api/shop/product/password', {
@@ -217,6 +241,7 @@ function showProductInfo(product) {
                 next();
             }).error(function () {
                 selectProduct(-1);
+                currentProduct = null;
             });
         });
     } else {
@@ -354,9 +379,20 @@ var device = {
     }
 };
 
+function setCookie(name, value, expire) {
+    if (!name || !value) return;
+    if (expire !== undefined) {
+        var expTime = new Date();
+        expTime.setTime(expTime.getTime() + expire);
+        document.cookie = name + '=' + encodeURI(value) + '; expires=' + expTime.toUTCString() + '; path=/'
+    } else {
+        document.cookie = name + '=' + encodeURI(value) + '; path=/'
+    }
+}
+
 function getCookie(name) {
     var parts = ('; ' + document.cookie).split('; ' + name + '=');
-    if (parts.length === 2) return parts.pop().split(';').shift();
+    if (parts.length >= 2) return parts.pop().split(';').shift();
 }
 
 function getPayway() {
@@ -384,7 +420,7 @@ function order(type) {
 
     if (!currentProduct) {
         showToast('error', '请选择商品');
-        ('#products').focus();
+        $('#products').focus();
         return false;
     }
     var contact = $('#contact').val();
@@ -402,6 +438,13 @@ function order(type) {
     if (!calcTotalPrice()) {
         return;
     }
+
+    var customer = getCookie('customer');
+    if (!customer || customer.length !== 32) {
+        customer = randomString(32);
+        setCookie('customer', customer, 24 * 60 * 60 * 30 * 1000)
+    }
+
     var orderUrl = window.config.url + '/api/shop/buy?category_id=' + currentCategory.id + '&product_id=' + currentProduct.id;
     if (buyParam.category_password)
         orderUrl += '&category_password=' + encodeURIComponent(buyParam.category_password);
@@ -411,7 +454,7 @@ function order(type) {
         '&coupon=' + encodeURIComponent($('#coupon').val()) +
         '&email=' + encodeURIComponent(contact) +
         '&pay_id=' + $('input[name=payway]:checked').val() +
-        '&customer=' + getCookie('customer');
+        '&customer=' + customer;
     if (window.config['vcode']['buy']) {
         for (var key in codeValidate) {
             if (codeValidate.hasOwnProperty(key)) {
@@ -426,7 +469,7 @@ function order(type) {
     window.open(orderUrl, '_blank');
 
     showOrderTip('请在弹出的窗口完成付款<br><span style="font-size:13px">如果没有弹出窗口或付款失败，您也可以返回重新发起付款</span>', function () {
-        window.open('/s?tab=cookie', '_blank')
+        window.open('/s#/record?tab=cookie', '_blank')
     });
 }
 
@@ -459,6 +502,8 @@ function checkOrder() {
 }
 
 $(function () {
+    buyParam.product_password = getParameterByName('p');
+
     $('#ann>.container').html(renderQuill(config.shop.ann));
     if (config.shop.ann_pop) {
         var ann_pop = renderQuill(config.shop.ann_pop, true);
@@ -525,8 +570,11 @@ $(function () {
         categories.append(categoriesElement);
 
         if (config.categories.length === 1) {
-            categories.val(config.categories[0].id).prop('disabled', true);
+            categories.val(config.categories[0].id);
             getProducts(config.categories[0].id);
+            if(config.categories[0].password_open === false){
+                categories.prop('disabled', true);
+            }
         }
 
         if (config.theme.list_type === 'button') {

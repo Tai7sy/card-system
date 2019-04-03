@@ -24,11 +24,6 @@ class Product extends Controller
 
         $products = \App\Product::where('category_id', $category_id)
             ->where('enabled', 1)
-            ->with(['cards' => function (Relation $query) {
-                $query->whereRaw('`count_all`>`count_sold`')
-                    ->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count`')
-                    ->groupBy('product_id');
-            }])
             ->orderBy('sort')
             ->get();
         foreach ($products as $product) {
