@@ -36,6 +36,7 @@ window.Vue = Vue;
 window.Router = require('vue-router');
 window.Vuex = require('vuex');
 window.$http = axios;
+window.$router = router;
 window.plugins = [];
 window.ElementUI = ElementUI;
 window.NProgress = NProgress;

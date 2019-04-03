@@ -13,7 +13,7 @@ class PayTableSeeder extends Seeder
         $pay->way = 'alipay';
         $pay->comment = 'alipay、alipaywap、wx、wxwap、qq、qqwap';
         $pay->config = '{
-  "gateway": "http://card.evil5.com",
+  "gateway": "https://www.327ka.com",
   "api_id": "your api_id",
   "api_key": "your api_key"
 }';
@@ -27,7 +27,7 @@ class PayTableSeeder extends Seeder
         $pay->way = 'alipaywap';
         $pay->comment = 'alipay、alipaywap、wx、wxwap、qq、qqwap';
         $pay->config = '{
-  "gateway": "http://card.evil5.com",
+  "gateway": "https://www.327ka.com",
   "api_id": "your api_id",
   "api_key": "your api_key"
 }';
@@ -41,13 +41,26 @@ class PayTableSeeder extends Seeder
         $pay->way = 'wx';
         $pay->comment = 'alipay、alipaywap、wx、wxwap、qq、qqwap';
         $pay->config = '{
-  "gateway": "http://card.evil5.com",
+  "gateway": "https://www.327ka.com",
   "api_id": "your api_id",
   "api_key": "your api_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_PC;
         $pay->save();
 
+        $pay = new \App\Pay;
+        $pay->name = '微信';
+        $pay->img = '/plugins/images/wx.png';
+        $pay->driver = 'Fakala';
+        $pay->way = 'wxwap';
+        $pay->comment = 'alipay、alipaywap、wx、wxwap、qq、qqwap';
+        $pay->config = '{
+  "gateway": "https://www.327ka.com",
+  "api_id": "your api_id",
+  "api_key": "your api_key"
+}';
+        $pay->enabled = \App\Pay::ENABLED_MOBILE;
+        $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '支付宝';
@@ -59,7 +72,7 @@ class PayTableSeeder extends Seeder
   "partner": "partner",
   "key": "key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_PC;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -72,7 +85,7 @@ class PayTableSeeder extends Seeder
   "partner": "partner",
   "key": "key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_MOBILE;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
 
@@ -87,7 +100,7 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -101,7 +114,7 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -115,7 +128,7 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
 
@@ -131,7 +144,7 @@ class PayTableSeeder extends Seeder
   "MCHID": "商户ID",
   "KEY": "KEY"
 }';
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -146,7 +159,7 @@ class PayTableSeeder extends Seeder
   "MCHID": "商户ID",
   "KEY": "KEY"
 }';
-        $pay->enabled = \App\Pay::ENABLED_MOBILE;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -159,7 +172,7 @@ class PayTableSeeder extends Seeder
   "mch_id": "mch_id",
   "mch_key": "mch_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -173,7 +186,7 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -187,7 +200,7 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -201,7 +214,7 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -215,7 +228,7 @@ class PayTableSeeder extends Seeder
   "key": "key"
 }';
         $pay->fee_system = 0;
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -229,7 +242,7 @@ class PayTableSeeder extends Seeder
   "key": "key"
 }';
         $pay->fee_system = 0;
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -243,7 +256,7 @@ class PayTableSeeder extends Seeder
   "key": "key"
 }';
         $pay->fee_system = 0;
-        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
     }

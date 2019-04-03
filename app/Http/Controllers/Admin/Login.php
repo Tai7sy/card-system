@@ -23,12 +23,12 @@ class Login extends Controller
 
     public function login(Request $request)
     {
-        if ((int)System::_get('vcode_login') === 1) {
-            $ret = Geetest\API::verify($request->input('geetest_challenge'),
-                $request->input('geetest_validate'),
-                $request->input('geetest_seccode'));
+        if ((int)\App\System::_get('vcode_login') === 1) {
+            $ret = Geetest\API::verify($request->post('gt_c'),
+                $request->post('gt_v'),
+                $request->post('gt_s'));
             if (!$ret) {
-                return self::renderResult($request, ['msg' => '滑动验证超时，请返回页面重试。']);
+                return Response::fail('滑动验证超时，请返回页面重试。');
             }
         }
 
@@ -67,7 +67,7 @@ class Login extends Controller
     {
         //$request->session()->flush();
         //$request->session()->regenerate();
-        Auth::logout();
+        @Auth::logout();
         return Response::success();
     }
 

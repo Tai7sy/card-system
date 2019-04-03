@@ -15,12 +15,12 @@ use Illuminate\Http\Request;
 
 
 Route::post('admin/login', 'Admin\Login@login')->middleware('api');
+Route::post('admin/login/logout', 'Admin\Login@logout')->middleware('api');
 Route::post('admin/login/verify', 'Admin\Login@getVerify')->middleware('api');
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function () {
 
     Route::post('login/info', 'Admin\Login@info');
-    Route::post('login/logout', 'Admin\Login@logout');
     Route::post('login/password', 'Admin\Login@changePassword');
 
     Route::post('dashboard', 'Admin\Dashboard@index');

@@ -59,7 +59,7 @@
 <script>
     var code_url = decodeURIComponent('{!! urlencode($qrcode) !!}');
 
-    if (navigator.userAgent.match(/MicroMessenger/i) !== null && code_url.indexOf('http:') === 0) {
+    if (navigator.userAgent.match(/MicroMessenger/i) !== null && code_url.indexOf('http') === 0) {
         // 当前在微信内, URL直接跳转
         location.href = code_url;
     } else if (code_url === 'query') {
