@@ -4,7 +4,7 @@ namespace App\Library\Pay\WeChat;
 
 require_once __DIR__ . '/lib/WxPay.Api.php';
 require_once __DIR__ . '/lib/WxPay.Notify.php';
-require_once 'wxLog.php';
+require_once 'WxLog.php';
 
 
 class PayNotifyCallBack extends \WxPayNotify

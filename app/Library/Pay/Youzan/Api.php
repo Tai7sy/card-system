@@ -158,7 +158,7 @@ class Api implements ApiInterface
                 $order = \App\Order::where('pay_trade_no', $trade['qr_id'])->first();
                 if ($order) {
                     $pay_trade_no = $msg['tid']; //有赞里面的订单号
-                    $successCallback($order->order_no, intval($trade['payment'] * 100), $pay_trade_no);
+                    $successCallback($order->order_no, (int)round($trade['payment'] * 100), $pay_trade_no);
                 }
             }
             return true;
@@ -205,7 +205,7 @@ class Api implements ApiInterface
                 $yzTrades = $info['qr_trades'][0];
 
                 $pay_trade_no = $yzTrades['tid'];  //有赞里面的订单号
-                $successCallback($out_trade_no, intval($yzTrades['real_price'] * 100), $pay_trade_no);
+                $successCallback($out_trade_no, (int)round($yzTrades['real_price'] * 100), $pay_trade_no);
                 return true;
             } else {
                 return false;

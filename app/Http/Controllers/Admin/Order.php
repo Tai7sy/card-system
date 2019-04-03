@@ -130,7 +130,7 @@ class Order extends Controller
         $amount = $order->paid;
         try {
             Log::debug($logTag . " shipOrder start, order_no: $order_no, amount: $amount, trade_no: $trade_no");
-            (new \App\Http\Controllers\Shop\Pay)->shipOrder($request, $order_no, $amount, $trade_no, FALSE);
+            (new \App\Http\Controllers\Shop\Pay)->shipOrder($request, $order_no, $amount, $trade_no);
             Log::debug($logTag . ' shipOrder end, order_no: ' . $order_no);
             $success = true;
             $msg = '发货成功';

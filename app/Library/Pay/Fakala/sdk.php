@@ -90,7 +90,7 @@ class fakala
     function notify_verify()
     {
         $params = $_POST;
-        if ($params['sign'] === $this->getSign($params, $this->key)) {
+        if (@$params['sign'] === $this->getSign($params, $this->key)) {
             echo 'success';
             return true;
         } else {
@@ -106,7 +106,7 @@ class fakala
     function return_verify()
     {
         $params = $_GET;
-        if ($params['sign'] === $this->getSign($params, $this->key)) {
+        if (@$params['sign'] === $this->getSign($params, $this->key)) {
             return true;
         } else {
             return false;

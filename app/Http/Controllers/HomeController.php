@@ -98,7 +98,8 @@ class HomeController extends Controller
 
         $customer = Cookie::get('customer');
         $cookie = Cookie::make('customer',
-            strlen($customer) !== 32 ? md5(str_random(16)) : $customer, 43200); // 30 days
+            strlen($customer) !== 32 ? md5(str_random(16)) : $customer,
+            43200, null, null, false,false); // 30 days
 
 
         $user_theme = $user->shop_theme ?

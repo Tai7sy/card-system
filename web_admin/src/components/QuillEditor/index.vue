@@ -40,6 +40,7 @@
                    :action="upload_url"
                    :multiple="false"
                    :data="{user_id:userInfo_?userInfo_.id:''}"
+                   :headers="{'X-Requested-With': 'XMLHttpRequest'}"
                    :limit="1"
                    :with-credentials="true"
                    :on-error="handleUploadError"

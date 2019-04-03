@@ -7,11 +7,7 @@
 <?php
 require_once "../lib/WxPay.Api.php";
 require_once "WxPay.MicroPay.php";
-require_once 'log.php';
-
-//初始化日志
-$logHandler= new CLogFileHandler("../logs/".date('Y-m-d').'.log');
-$log = Log::Init($logHandler, 15);
+require_once '../WxLog.php';
 
 //打印输出数组信息
 function printf_info($data)

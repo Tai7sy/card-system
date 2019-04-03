@@ -114,7 +114,7 @@ class Api implements ApiInterface
             // money 实际付款的金额, 码支付用于区分不同订单而设立的规则
 
             $out_trade_no = $_POST['pay_id']; //需要充值的ID 或订单号 或用户名
-            $total_fee = intval((float)$_POST['price'] * 100);
+            $total_fee = (int)round($_POST['price'] * 100);
             $trade_no = $_POST['pay_no']; //流水号
             $successCallback($out_trade_no, $total_fee, $trade_no);
 

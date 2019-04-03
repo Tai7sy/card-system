@@ -53,7 +53,7 @@ class PayTableSeeder extends Seeder
         $pay->name = '支付宝';
         $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'Alipay';
-        $pay->way = 'Alipay';
+        $pay->way = 'pc';
         $pay->comment = '支付宝 - 即时到账套餐(企业)V2';
         $pay->config = '{
   "partner": "partner",
@@ -66,7 +66,7 @@ class PayTableSeeder extends Seeder
         $pay->name = '支付宝';
         $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'Aliwap';
-        $pay->way = 'Aliwap';
+        $pay->way = 'wap';
         $pay->comment = '支付宝 - 高级手机网站支付V4';
         $pay->config = '{
   "partner": "partner",
@@ -79,9 +79,37 @@ class PayTableSeeder extends Seeder
         $pay = new \App\Pay;
         $pay->name = '支付宝扫码';
         $pay->img = '/plugins/images/ali.png';
-        $pay->driver = 'Aliqr';
-        $pay->way = 'Aliqr';
+        $pay->driver = 'AliAop';
+        $pay->way = 'f2f';
         $pay->comment = '支付宝 - 当面付';
+        $pay->config = '{
+  "app_id": "app_id",
+  "alipay_public_key": "alipay_public_key",
+  "merchant_private_key": "merchant_private_key"
+}';
+        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->save();
+
+        $pay = new \App\Pay;
+        $pay->name = '支付宝';
+        $pay->img = '/plugins/images/ali.png';
+        $pay->driver = 'AliAop';
+        $pay->way = 'pc';
+        $pay->comment = '支付宝 - 电脑网站支付 (新)';
+        $pay->config = '{
+  "app_id": "app_id",
+  "alipay_public_key": "alipay_public_key",
+  "merchant_private_key": "merchant_private_key"
+}';
+        $pay->enabled = \App\Pay::ENABLED_ALL;
+        $pay->save();
+
+        $pay = new \App\Pay;
+        $pay->name = '手机支付宝';
+        $pay->img = '/plugins/images/ali.png';
+        $pay->driver = 'AliAop';
+        $pay->way = 'mobile';
+        $pay->comment = '支付宝 - 手机网站支付 (新)';
         $pay->config = '{
   "app_id": "app_id",
   "alipay_public_key": "alipay_public_key",

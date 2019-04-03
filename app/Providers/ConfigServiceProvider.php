@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Library\Response;
 use App\System;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class ConfigServiceProvider extends ServiceProvider
@@ -20,6 +20,23 @@ class ConfigServiceProvider extends ServiceProvider
         if (app()->runningInConsole()) {
             return;
         }
+
+        try {
+            DB::connection()->getPdo();
+            if (DB::table('migrations')->count() === 0) {
+                die(" * No migration table, please install your website first.\r\n");
+            }
+            if (!Schema::hasTable('systems')) {
+                die(" * No system table, please install your website first.\r\n");
+            }
+        } catch (\Exception $e) {
+            if (config('database.connections.mysql.host') === '数据库地址') {
+                die(" * Please change your config of database in '.env' file \r\n");
+            } else {
+                die(" * Database connection error: " . $e->getMessage() . "\r\n");
+            }
+        }
+
         try {
             config()->set([
                 'app.name' => System::_get('app_name'),

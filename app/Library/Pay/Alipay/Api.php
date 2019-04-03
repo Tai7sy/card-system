@@ -18,19 +18,28 @@ class Api implements ApiInterface
         $this->pay_id = $id;
     }
 
-
+    /**
+     * @param array $config
+     * @param string $out_trade_no 外部订单号
+     * @param string $subject
+     * @param string $body
+     * @param $amount_cent
+     * @internal param int $amount 1 = 0.01元
+     */
     function goPay($config, $out_trade_no, $subject, $body, $amount_cent)
     {
         $amount = sprintf('%.2f', $amount_cent / 100); //支付宝元为单位
 
         $alipay_config = $this->buildAliConfig($config);
-        require_once(__DIR__ . '/lib/alipay_submit.class.php');
+        require_once(__DIR__ . '/sdk/alipay_submit.class.php');
 
         // 服务器异步通知页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数
         $alipay_config['notify_url'] = $this->url_notify;
         // 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数
         $alipay_config['return_url'] = $this->url_return . '/' . $out_trade_no;
-        //构造要请求的参数数组，无需改动
+
+        // 即时到账: https://doc.open.alipay.com/doc2/detail.htm?spm=a219a.7629140.0.0.kiX33I&treeId=62&articleId=103740&docType=1
+        // 手机网站支付: https://doc.open.alipay.com/doc2/detail.htm?spm=a219a.7629140.0.0.2Z6TSk&treeId=60&articleId=103693&docType=1
         $parameter = array(
             'service' => $alipay_config['service'],
             'partner' => $alipay_config['partner'],
@@ -42,12 +51,9 @@ class Api implements ApiInterface
             'total_fee' => $amount,
             'subject' => $subject,//商品名称
             'body' => $body,//商品描述
+            'show_url' => config('app.url'), // 收银台页面上，商品展示的超链接，必填
+            'app_pay' => 'Y',//启用此参数能唤起钱包APP支付宝
             '_input_charset' => 'utf-8',
-            'anti_phishing_key' => $alipay_config['anti_phishing_key'],
-            'exter_invoke_ip' => $alipay_config['exter_invoke_ip']
-            //其他业务参数根据在线开发文档，添加参数.
-            //文档地址:https://doc.open.alipay.com/doc2/detail.htm?spm=a219a.7629140.0.0.kiX33I&treeId=62&articleId=103740&docType=1
-            //如'参数名'=>'参数值'
         );
         $alipaySubmit = new \AlipaySubmit($alipay_config);//建立请求
         $html_text = $alipaySubmit->buildRequestForm($parameter, 'get', '确认');
@@ -61,7 +67,7 @@ class Api implements ApiInterface
         $isNotify = isset($config['isNotify']) && $config['isNotify'];
         $alipay_config = $this->buildAliConfig($config);
 
-        require __DIR__ . '/lib/alipay_notify.class.php';
+        require __DIR__ . '/sdk/alipay_notify.class.php';
         $alipay = new \AlipayNotify($alipay_config);
 
         if ($isNotify) {
@@ -74,7 +80,7 @@ class Api implements ApiInterface
             $out_trade_no = $_REQUEST['out_trade_no'];//商户订单号
             $trade_no = $_REQUEST['trade_no'];//支付宝交易号
             $trade_status = $_REQUEST['trade_status'];//交易状态
-            $total_fee = (int)($_REQUEST['total_fee'] * 100);
+            $total_fee = (int)round($_REQUEST['total_fee'] * 100);
 
             if ($trade_status == 'TRADE_FINISHED' || $trade_status == 'TRADE_SUCCESS') {//处理
                 $successCallback($out_trade_no, $total_fee, $trade_no);
@@ -86,7 +92,7 @@ class Api implements ApiInterface
             if ($isNotify) {
                 echo 'fail';
                 $logTag = 'payNotify pay_id: ' . $this->pay_id . ',Alipay';
-            }else{
+            } else {
                 $logTag = 'payReturn pay_id: ' . $this->pay_id . ',Alipay';
             }
             \Log::error($logTag . ' Alipay.Api.verify failed');
@@ -99,21 +105,17 @@ class Api implements ApiInterface
         return [
             'partner' => $config['partner'],         //合作身份者ID，
             'seller_id' => $config['partner'],       //收款支付宝账号
-            'key' => $config['key'],                 // MD5密钥，安全检验码
+            'key' => $config['key'],                 //MD5密钥，安全检验码
             'sign_type' => 'MD5',                    //签名方式
             'input_charset' => 'utf-8',
             //ca证书路径地址，用于curl中ssl校验,  请保证cacert.pem文件在当前文件夹目录中
             'cacert' => __DIR__ . DIRECTORY_SEPARATOR . 'cacert.pem',
             //访问模式,根据自己的服务器是否支持ssl访问，若支持请选择https；若不支持请选择http
             'transport' => 'https',
-            'payment_type' => '1',                   //支付类型 ，无需修改
-            'service' => 'create_direct_pay_by_user',// 产品类型，无需修改
-
-            //↓↓↓↓↓↓↓↓↓↓ 请在这里配置防钓鱼信息，如果没开通防钓鱼功能，为空即可 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-            // 防钓鱼时间戳  若要使用请调用类文件submit中的query_timestamp函数
-            'anti_phishing_key' => '',
-            // 客户端的IP地址 非局域网的外网IP地址，如：221.0.0.1
-            'exter_invoke_ip' => ''
+            'payment_type' => '1',                   // 支付类型 ，无需修改
+            'service' => $config['payway'] === 'wap' ?
+                'alipay.wap.create.direct.pay.by.user' : // 手机网站支付
+                'create_direct_pay_by_user', // 即时到账
         ];
     }
 }

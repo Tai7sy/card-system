@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Library\Geetest;
+
 use Illuminate\Support\Facades\Session;
 
 
@@ -15,7 +16,12 @@ class API
 
     public static function get()
     {
-        $GtSdk = new Lib(config('services.geetest.id'), config('services.geetest.key'));
+        $id = config('services.geetest.id');
+        $key = config('services.geetest.key');
+        if (!strlen($id) || !strlen($key)) {
+            return null;
+        }
+        $GtSdk = new Lib($id, $key);
         $user_id = time() . rand(1, 10000);
         $status = $GtSdk->pre_process($user_id);
         $ret = json_decode($GtSdk->get_response_str());

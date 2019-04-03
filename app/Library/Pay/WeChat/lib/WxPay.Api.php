@@ -572,7 +572,7 @@ class WxPayApi
             return $data;
         } else {
             $error = curl_errno($ch);
-            \Log::error('WxPat.Api.postXmlCurl Error: ' . curl_error($ch));
+            \WxLog::error('WxPat.Api.postXmlCurl Error: ' . curl_error($ch));
             curl_close($ch);
             throw new WxPayException("curl出错，错误码: $error");
         }

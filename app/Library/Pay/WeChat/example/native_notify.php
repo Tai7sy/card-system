@@ -4,11 +4,7 @@ error_reporting(E_ERROR);
 
 require_once "../lib/WxPay.Api.php";
 require_once '../lib/WxPay.Notify.php';
-require_once 'log.php';
-
-//初始化日志
-$logHandler= new CLogFileHandler("../logs/".date('Y-m-d').'.log');
-$log = Log::Init($logHandler, 15);
+require_once '../WxLog.php';
 
 class NativeNotifyCallBack extends WxPayNotify
 {
@@ -28,14 +24,14 @@ class NativeNotifyCallBack extends WxPayNotify
 		$input->SetOpenid($openId);
 		$input->SetProduct_id($product_id);
 		$result = WxPayApi::unifiedOrder($input);
-		Log::DEBUG("unifiedorder:" . json_encode($result));
+		\WxLog::DEBUG("unifiedorder:" . json_encode($result));
 		return $result;
 	}
 	
 	public function NotifyProcess($data, &$msg)
 	{
 		//echo "处理回调";
-		Log::DEBUG("call back:" . json_encode($data));
+		\WxLog::DEBUG("call back:" . json_encode($data));
 		
 		if(!array_key_exists("openid", $data) ||
 			!array_key_exists("product_id", $data))
@@ -67,6 +63,6 @@ class NativeNotifyCallBack extends WxPayNotify
 	}
 }
 
-Log::DEBUG("begin notify!");
+\WxLog::DEBUG("begin notify!");
 $notify = new NativeNotifyCallBack();
 $notify->Handle(true);

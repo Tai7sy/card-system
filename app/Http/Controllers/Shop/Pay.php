@@ -49,13 +49,13 @@ class Pay extends Controller
             // \Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step1');
             (new PayApi)->goPay($payway, $order_no, $order_name, $order_name, $pay_money);
             // \Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step2');
-            return self::renderResult($request, [
+            return self::renderResultPage($request, [
                 'success' => false,
                 'title' => '请稍后',
                 'msg' => '支付方式加载中，请稍后'
             ]);
         } catch (\Exception $e) {
-            return self::renderResult($request, ['msg' => $e->getMessage()]);
+            return self::renderResultPage($request, ['msg' => $e->getMessage()]);
         }
     }
 
@@ -66,18 +66,24 @@ class Pay extends Controller
      */
     function buy(Request $request)
     {
+        $customer = $request->input('customer');
+        if (strlen($customer) !== 32) {
+            return self::renderResultPage($request, [
+                'msg' => '提交超时，请刷新购买页面并重新提交<br><br>
+当前网址: ' . $request->getQueryString() . '
+提交内容: ' . var_export($customer) . ', 提交长度:' . strlen($customer) . '<br>
+若您刷新后仍然出现此问题. 请加网站客服反馈'
+            ]);
+        }
+
         if ((int)System::_get('vcode_shop_buy') === 1) {
             $ret = Geetest\API::verify($request->input('geetest_challenge'),
                 $request->input('geetest_validate'),
                 $request->input('geetest_seccode'));
             if (!$ret) {
-                return self::renderResult($request, ['msg' => '系统无法接受您的验证结果，请刷新页面后重试。']);
+                return self::renderResultPage($request, ['msg' => '滑动验证超时，请返回页面重试。']);
             }
         }
-
-        $customer = Cookie::get('customer');
-        if (strlen($customer) !== 32)
-            return self::renderResult($request, ['msg' => '请返回页面重新下单']);
 
         $category_id = (int)$request->input('category_id');
         $product_id = (int)$request->input('product_id');
@@ -86,9 +92,9 @@ class Pay extends Controller
         $email = $request->input('email');
         $pay_id = (int)$request->input('pay_id');
         if (!$category_id || !$product_id)
-            return self::renderResult($request, ['msg' => '请选择商品']);
+            return self::renderResultPage($request, ['msg' => '请选择商品']);
         if (strlen($email) < 1)
-            return self::renderResult($request, ['msg' => '请输入邮箱']);
+            return self::renderResultPage($request, ['msg' => '请输入邮箱']);
 
         /* @var \App\Category $category */
         $category = Category::findOrFail($category_id);
@@ -108,7 +114,7 @@ class Pay extends Controller
                     ->groupBy('product_id');
             }])->first();
         if ($product == null || $product->user == null)
-            return self::renderResult($request, ['msg' => '该商品未找到，请重新选择']);
+            return self::renderResultPage($request, ['msg' => '该商品未找到，请重新选择']);
 
         if ($product->password_open) {
             if ($product->password !== $request->input('product_password')) {
@@ -117,20 +123,20 @@ class Pay extends Controller
         }
 
         if ($count < $product->buy_min)
-            return self::renderResult($request, ['msg' => '该商品最少购买' . $product->buy_min . '件，请重新选择']);
+            return self::renderResultPage($request, ['msg' => '该商品最少购买' . $product->buy_min . '件，请重新选择']);
 
         if ($count > $product->buy_max)
-            return self::renderResult($request, ['msg' => '该商品限购' . $product->buy_max . '件，请重新选择']);
+            return self::renderResultPage($request, ['msg' => '该商品限购' . $product->buy_max . '件，请重新选择']);
 
 
         $product->setAttribute('count', count($product->cards) ? $product->cards[0]->count : 0);
 
         if ($product->count < $count)
-            return self::renderResult($request, ['msg' => '该商品库存不足']);
+            return self::renderResultPage($request, ['msg' => '该商品库存不足']);
 
         $pay = \App\Pay::find($pay_id);
         if ($pay == null || !$pay->enabled) {
-            return self::renderResult($request, ['msg' => '支付方式未找到，请重新选择']);
+            return self::renderResultPage($request, ['msg' => '支付方式未找到，请重新选择']);
         }
 
         // 计算商品应付价格
@@ -223,7 +229,7 @@ class Pay extends Controller
     {
         $order = \App\Order::whereOrderNo($order_no)->first();
         if ($order == null) {
-            return self::renderResult($request, ['msg' => '订单未找到，请重试']);
+            return self::renderResultPage($request, ['msg' => '订单未找到，请重试']);
         }
 
         if ($order->status !== \App\Order::STATUS_UNPAY) {
@@ -234,7 +240,7 @@ class Pay extends Controller
         $payway = $order->pay;
         if (!$payway) {
             \Log::error($logTag . ' cannot find Pay');
-            return $this->renderResult($request, ['msg' => '支付方式未找到']);
+            return $this->renderResultPage($request, ['msg' => '支付方式未找到']);
         }
         $logTag .= ',' . $payway->driver;
 
@@ -246,14 +252,14 @@ class Pay extends Controller
             $this->payApi = PayApi::getDriver($payway->id, $payway->driver);
         } catch (\Exception $e) {
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
-            return $this->renderResult($request, ['msg' => '支付驱动未找到']);
+            return $this->renderResultPage($request, ['msg' => '支付驱动未找到']);
         }
         // 如果已经支付成功, 直接返回
         if ($this->payApi->verify($config, function ($order_no, $amount, $trade_no) use ($request) {
             try {
-                $this->shipOrder($request, $order_no, $amount, $trade_no, FALSE);
+                $this->shipOrder($request, $order_no, $amount, $trade_no);
             } catch (\Exception $e) {
-                $this->renderResult($request, [
+                $this->renderResultPage($request, [
                     'success' => false,
                     'msg' => $e->getMessage()
                 ]);
@@ -271,13 +277,13 @@ class Pay extends Controller
                     ->groupBy('product_id');
             }])->first();
         if ($product == null) {
-            return self::renderResult($request, ['msg' => '该商品已下架']);
+            return self::renderResultPage($request, ['msg' => '该商品已下架']);
         }
 
         $product->setAttribute('count', count($product->cards) ? $product->cards[0]->count : 0);
 
         if ($product->count < $order->count) {
-            return self::renderResult($request, ['msg' => '该商品库存不足']);
+            return self::renderResultPage($request, ['msg' => '该商品库存不足']);
         }
 
         $order_name = $order_no;  // 商品名改成单号
@@ -296,10 +302,10 @@ class Pay extends Controller
     {
         $order = \App\Order::whereOrderNo($order_no)->with('product')->first();
         if ($order == null) {
-            return self::renderResult($request, ['msg' => '订单未找到，请重试']);
+            return self::renderResultPage($request, ['msg' => '订单未找到，请重试']);
         }
         if ($order->product_id !== \App\Product::ID_API && $order->product == null) {
-            return self::renderResult($request, ['msg' => '商品未找到，请重试']);
+            return self::renderResultPage($request, ['msg' => '商品未找到，请重试']);
         }
         return view('pay/' . $pay_file, [
             'pay_id' => $order->pay_id,
@@ -335,7 +341,7 @@ class Pay extends Controller
         \Log::debug($logTag);
         $payway = \App\Pay::where('id', $pay_id)->first();
         if (!$payway) {
-            return $this->renderResult($request, [
+            return $this->renderResultPage($request, [
                 'success' => 0,
                 'msg' => '支付方式错误'
             ]);
@@ -348,7 +354,7 @@ class Pay extends Controller
             if ($order && ($order->status === \App\Order::STATUS_PAID || $order->status === \App\Order::STATUS_SUCCESS)) {
                 \Log::notice($logTag . ' already success' . "\n\n");
                 if ($request->ajax()) {
-                    return self::renderResult($request, [
+                    return self::renderResultPage($request, [
                         'success' => 1,
                         'data' => '/pay/result/' . $out_trade_no
                     ], [
@@ -365,7 +371,7 @@ class Pay extends Controller
             $this->payApi = PayApi::getDriver($payway->id, $payway->driver);
         } catch (\Exception $e) {
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
-            return $this->renderResult($request, [
+            return $this->renderResultPage($request, [
                 'success' => 0,
                 'msg' => '支付驱动未找到'
             ]);
@@ -385,7 +391,7 @@ class Pay extends Controller
             $out_trade_no = $order_no;
             try {
                 \Log::debug($logTag . " shipOrder start, order_no: $order_no, amount: $amount, trade_no: $trade_no");
-                $this->shipOrder($request, $order_no, $amount, $trade_no, FALSE);
+                $this->shipOrder($request, $order_no, $amount, $trade_no);
                 \Log::debug($logTag . ' shipOrder end, order_no: ' . $order_no);
             } catch (\Exception $e) {
                 \Log::error($logTag . ' shipOrder Exception: ' . $e->getMessage());
@@ -393,7 +399,7 @@ class Pay extends Controller
         })) {
             \Log::debug($logTag . ' verify finished: 1' . "\n\n");
             if ($request->ajax()) {
-                return self::renderResult($request, [
+                return self::renderResultPage($request, [
                     'success' => 1,
                     'data' => '/pay/result/' . $out_trade_no  // (order_no)
                 ]);
@@ -402,7 +408,7 @@ class Pay extends Controller
             }
         } else {
             \Log::debug($logTag . ' verify finished: 0' . "\n\n");
-            return $this->renderResult($request, [
+            return $this->renderResultPage($request, [
                 'success' => 0,
                 'msg' => '支付验证失败，您可以稍后查看支付状态。'
             ]);
@@ -442,7 +448,7 @@ class Pay extends Controller
         $ret = $this->payApi->verify($config, function ($order_no, $amount, $trade_no) use ($request, $logTag) {
             try {
                 \Log::debug($logTag . " shipOrder start, order_no: $order_no, amount: $amount, trade_no: $trade_no");
-                $this->shipOrder($request, $order_no, $amount, $trade_no, FALSE);
+                $this->shipOrder($request, $order_no, $amount, $trade_no);
                 \Log::debug($logTag . ' shipOrder end, order_no: ' . $order_no);
             } catch (\Exception $e) {
                 \Log::error($logTag . ' shipOrder Exception: ' . $e->getMessage());
@@ -463,7 +469,7 @@ class Pay extends Controller
     {
         $order = \App\Order::whereOrderNo($order_no)->first();
         if ($order == null) {
-            return self::renderResult($request, ['msg' => '订单未找到，请重试']);
+            return self::renderResultPage($request, ['msg' => '订单未找到，请重试']);
         }
 
         if ($order->status === \App\Order::STATUS_PAID) {
@@ -473,7 +479,7 @@ class Pay extends Controller
             if ($qq) {
                 $msg .= '<br><a href="http://wpa.qq.com/msgrd?v=3&uin=' . $qq . '&site=qq&menu=yes" target="_blank">商家客服QQ:' . $qq . '</a>';
             }
-            return self::renderResult($request, [
+            return self::renderResultPage($request, [
                 'success' => false,
                 'title' => '订单已支付',
                 'msg' => $msg
@@ -482,11 +488,10 @@ class Pay extends Controller
             ]);
         } elseif ($order->status === \App\Order::STATUS_SUCCESS) {
             // 说明已经 notify 过了, 订单已经成功, 直接取出card 渲染页面
-            // 这里不会抛出异常($order->paid 时仅渲染页面)
-            return $this->shipOrder($request, $order->order_no, $order->paid, 0, TRUE);
+            return self::showOrderResult($request, $order);
         }
 
-        return self::renderResult($request, [
+        return self::renderResultPage($request, [
             'success' => false,
             'msg' => $order->remark ? '失败原因:<br>' . $order->remark : '订单支付失败，请重试'
         ], [
@@ -502,7 +507,7 @@ class Pay extends Controller
      * @param array $append
      * @return mixed
      */
-    function renderResult(Request $request, $result, $append = [])
+    function renderResultPage(Request $request, $result, $append = [])
     {
         if ($request->ajax()) {
             if (@$result['success']) {
@@ -525,11 +530,10 @@ class Pay extends Controller
      * @param string $order_no 本站订单号
      * @param int $amount 单位/分. 支付金额
      * @param string $trade_no 支付通道内订单号
-     * @param bool $need_render 是否渲染页面
      * @return bool|\Illuminate\Http\JsonResponse
      * @throws \Throwable
      */
-    function shipOrder($request, $order_no, $amount, $trade_no, $need_render = true)
+    function shipOrder($request, $order_no, $amount, $trade_no)
     {
 
 
@@ -551,24 +555,22 @@ class Pay extends Controller
             throw new \Exception($order->remark);
         }
 
-        $cards = [];
-        $card_msg = '订单#' . $order_no . '&nbsp;已支付，卡号列表：';
-        $cards_txt = '';
+        /** @var \App\Product $product */
         $product = null;
-        $first_process = $order->status === \App\Order::STATUS_UNPAY; //未处理过此订单
-        $need_mail = $first_process && System::_getInt('mail_send_order') === 1 && filter_var($order->email, FILTER_VALIDATE_EMAIL);
 
-        if ($first_process) {
+        if ($order->status === \App\Order::STATUS_UNPAY) {
+            //未处理过此订单
             \Log::debug('shipOrder.first_process:' . $order_no);
             $order_id = $order->id;
             if (FundHelper::orderSuccess($order,
                 /**
+                 * 此函数在 transition里工作
                  * 这个函数做了以下工作
                  * Order -> STATUS_PAID or STATUS_SUCCESS
                  * Product 和 Card -> sold + 1
                  * 返回 STATUS_PAID or STATUS_SUCCESS
                  */
-                function () use ($order_id, $trade_no, &$cards, &$cards_txt) {
+                function () use ($order_id, $trade_no, &$order, &$product) {
                     /** @var \App\Order $order */
                     $order = \App\Order::where('id', $order_id)->lockForUpdate()->firstOrFail();
                     if ($order->status !== \App\Order::STATUS_UNPAY) {
@@ -606,13 +608,12 @@ class Pay extends Controller
                         $order->saveOrFail();
                         $card_ids = [];
                         foreach ($cards as $card) {
-                            $cards_txt .= $card->card . '<br>';
                             $card_ids[] = $card->id;
                         }
                         $order->cards()->attach($card_ids); // 使用了 card_order 这个中间表
                         Card::whereIn('id', $card_ids)->update([
                             'status' => Card::STATUS_SOLD,
-                            'count_sold' => \DB::raw('`count_sold`+1')
+                            'count_sold' => DB::raw('`count_sold`+1')
                         ]);
 
                         return \App\Order::STATUS_SUCCESS;
@@ -620,95 +621,96 @@ class Pay extends Controller
                 })
             ) {
                 // ------------------------------------------------------------------------ 提醒库存 start
-                $product = Product::where('id', $order->product_id)
-                    ->with(['cards' => function (Relation $query) {
-                        $query->whereRaw('`count_all`>`count_sold`')
-                            ->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count`')
-                            ->groupBy('product_id');
-                    }])->first();
-                if ($product) {
-                    // \Log::debug('shipOrder.count_warn step1');
-                    $count = count($product->cards) ? $product->cards[0]->count : 0;
-                    // \Log::debug('shipOrder.count_warn step2, count:' . $count . ', warn:' . $product->count_warn);
-                    $product->setAttribute('count', $count);
-                    if ($product->count_warn > 0 && $count < $product->count_warn) {
-                        try {
-                            // \Log::debug('shipOrder.count_warn step3');
-                            \Mail::to($order->user->email)->Queue(new ProductCountWarn($product, $count));
-                            // \Log::debug('shipOrder.count_warn step4, email:' . $order->user->email);
-                        } catch (\Exception $e) {
-                            // set to mail
-                            \App\Library\LogHelper::setLogFile('mail');
-                            \Log::error('shipOrder.count_warn error, product_id:' . $order->product_id .
-                                ', email:' . $order->user->email . ', Exception:' . $e);
-                            // 还原
-                            \App\Library\LogHelper::setLogFile('card');
-                        }
+                // \Log::debug('shipOrder.count_warn step1, count:' . $count . ', warn:' . $product->count_warn);
+                if ($product->count_warn > 0 && $product->count < $product->count_warn) {
+                    try {
+                        // \Log::debug('shipOrder.count_warn step2');
+                        \Mail::to($order->user->email)->Queue(new ProductCountWarn($product, $product->count));
+                        // \Log::debug('shipOrder.count_warn step3, email:' . $order->user->email);
+                    } catch (\Exception $e) {
+                        // set to mail
+                        \App\Library\LogHelper::setLogFile('mail');
+                        \Log::error('shipOrder.count_warn error, product_id:' . $order->product_id .
+                            ', email:' . $order->user->email . ', Exception:' . $e);
+                        // 还原
+                        \App\Library\LogHelper::setLogFile('card');
                     }
                 }
+
                 // ------------------------------------------------------------------------ 提醒库存 end
             } else {
                 \Log::error('shipOrder.first_process error, order_no:' . $order_no . ',trade_no:' . $trade_no);
                 // orderSuccess 里面写过详细log了
                 throw new \Exception('merchant operate exception!');
             }
-        } elseif ($need_render) {
-            // result/{order_no} 渲染支付结果时进入此分支, 已经notify过(订单已经处理过, 直接渲染页面)
-            $cards = $order->cards;
-            $product = $order->product;
-            foreach ($cards as $card) {
-                $cards_txt .= $card->card . "\r\n";
+
+            // 需要发货到邮箱
+            if (System::_getInt('mail_send_order') === 1 && filter_var($order->email, FILTER_VALIDATE_EMAIL)) {
+                self::showOrderResult($request, $order, true);
             }
         }
+        return FALSE;
+    }
 
-        if ($need_render || $need_mail) {
+    /**
+     * 渲染已经支付的订单结果页面
+     * @param Request $request
+     * @param \App\Order $order
+     * @param bool $renderToEmail
+     * @return mixed
+     * @throws \Throwable
+     */
+    private function showOrderResult($request, $order, $renderToEmail = false)
+    {
+        $cards = [];
+        $order->cards->each(function ($card) use (&$cards) {
+            /** @var \App\Card $card */
+            $cards[] = $card->card;
+        });
 
-            if (count($cards) < $order->count) {
-                // Tip:
-                // 卡密若包含可以重复使用, 则商品限购一件
-                // 即: $order->count === 1
-                if (count($cards)) {
-                    $card_msg = '目前库存不足，您还有' . ($order->count - count($cards)) . '张卡密未发货，请联系商家客服发货<br>已发货卡密见下方：<br>';
-                } else {
-                    $card_msg = '目前库存不足，您购买的' . ($order->count - count($cards)) . '张卡密未发货，请联系商家客服发货<br>';
-                }
-                $qq = $order->user->qq;
-                if ($qq) {
-                    $card_msg .= '<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $qq . '&site=qq&menu=yes" target="_blank">商家客服QQ:' . $qq . '</a><br>';
-                }
+        if (count($cards) < $order->count) {
+            // Tip:
+            // 卡密若包含可以重复使用, 则商品限购一件
+            // 即: $order->count === 1
+            if (count($cards)) {
+                // 应该不会到这个分支, 因为检测到卡密不够不会发货
+                $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，目前库存不足，您还有' . ($order->count - count($cards)) . '张卡密未发货，请联系商家客服发货<br>已发货卡密见下方：<br>';
+            } else {
+                $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，目前库存不足，您购买的' . ($order->count - count($cards)) . '张卡密未发货，请联系商家客服发货<br>';
             }
+            $qq = $order->user->qq;
+            if ($qq) {
+                $card_msg .= '<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $qq . '&site=qq&menu=yes" target="_blank">商家客服QQ:' . $qq . '</a><br>';
+            }
+        } else {
+            $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，卡号列表：';
         }
 
-
-        // $need_mail = $first_process && System::_getInt('mail_send_order') === 1 && filter_var($order->email, FILTER_VALIDATE_EMAIL);
-        if ($need_mail) {
-            $cards_txt_br = str_replace("\r\n", '<br>', $cards_txt);
+        if ($renderToEmail) {
+            $cards_br = join('<br>', $cards);
             try {
-                \Mail::to($order->email)->Queue(new OrderShipped($order, $card_msg, $cards_txt_br));
+                \Mail::to($order->email)->Queue(new OrderShipped($order, $card_msg, $cards_br));
                 $order->email_sent = true;
                 $order->saveOrFail();
             } catch (\Exception $e) {
                 // set to mail
                 \App\Library\LogHelper::setLogFile('mail');
-                \Log::error('shipOrder.need_mail error, order_no:' . $order_no .
-                    ', email:' . $order->email . ', cards:' . $cards_txt_br .
+                \Log::error('shipOrder.need_mail error, order_no:' . $order->order_no .
+                    ', email:' . $order->email . ', cards:' . $cards_br .
                     ', Exception:' . $e->getMessage());
                 // 还原
                 \App\Library\LogHelper::setLogFile('card');
             }
+            return FALSE;
         }
 
-        if ($need_render) {
-            return self::renderResult($request, [
-                'success' => true,
-                'msg' => $card_msg,
-            ], [
-                'card_txt' => $cards_txt,
-                'order' => $order,
-                'product' => $product
-            ]);
-        }
-        return FALSE;
+        return self::renderResultPage($request, [
+            'success' => true,
+            'msg' => $card_msg,
+        ], [
+            'card_txt' => join('&#013;&#010;', $cards),
+            'order' => $order,
+            'product' => $order->product
+        ]);
     }
-
 }
