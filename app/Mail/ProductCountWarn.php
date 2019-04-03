@@ -33,7 +33,7 @@ class ProductCountWarn extends Mailable
      */
     public function build()
     {
-        return $this->subject(config('app.name') . '-库存预警 #' . $this->product->name)
+        return $this->subject('您的商品库存不足-' . config('app.name'))
             ->view('emails.product_count_warn');
     }
 }

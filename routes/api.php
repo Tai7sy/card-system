@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 
 
 Route::post('admin/login', 'Admin\Login@login')->middleware('api');
+Route::post('admin/login/verify', 'Admin\Login@getVerify')->middleware('api');
+
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function () {
 
     Route::post('login/info', 'Admin\Login@info');
@@ -54,7 +56,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
 
     Route::post('product', 'Merchant\Product@get');                       //    ┆
     Route::post('product/sort', 'Merchant\Product@sort');                 //    ┆
-    Route::post('product/category', 'Merchant\Product@category_edit');    //    ┆
+    Route::post('product/category', 'Merchant\Product@category_change');  //    ┆
     Route::post('product/edit', 'Merchant\Product@edit');
     Route::post('product/enable', 'Merchant\Product@enable');             //    ┆
     Route::post('product/delete', 'Merchant\Product@delete');             //    ┆
@@ -96,10 +98,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
     Route::post('web/cache/clear', 'Admin\Dashboard@clearCache');
     // 查看 storage/logs
     Route::get('web/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
-    // 上传收款二维码后查看
-    Route::get('file/{file_id}/{file_name}', 'Merchant\File@renderQRCode');
-    // 导出卡密
-    Route::get('card/export/{file_id}', 'Merchant\Card@export_download');
 });
 
 

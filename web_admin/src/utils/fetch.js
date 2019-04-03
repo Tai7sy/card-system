@@ -11,7 +11,7 @@ window.jQuery = $;
 
 let HOST = '/api/admin/';
 if (process.env.NODE_ENV === 'development') {
-  HOST = 'http://127.0.0.2/api/admin/'
+  HOST = 'http://127.0.0.5/api/admin/'
 }
 window.API_HOST = HOST;
 // 创建axios实例
@@ -27,10 +27,8 @@ const service = axios.create({
 
 // request拦截器
 service.interceptors.request.use(config => {
-  if (store.getters.token) {
-    config.headers['X-XSRF-TOKEN'] = randomString(32); // 假装有 csrf
-    config.headers['X-Requested-With'] = 'XMLHttpRequest';
-  }
+  config.headers['X-XSRF-TOKEN'] = randomString(32); // 假装有 csrf
+  config.headers['X-Requested-With'] = 'XMLHttpRequest';
   return config;
 }, error => {
   // Do something with request error
@@ -51,6 +49,7 @@ service.interceptors.response.use(
         duration: 3000,
         showClose: true
       });
+      return Promise.reject();
     }
     return response.data
   },

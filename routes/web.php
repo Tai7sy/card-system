@@ -49,3 +49,4 @@ Route::get('/admin/{all}', 'HomeController@admin')
 // 店铺地址
 Route::get('/c/{en_category_id}', 'HomeController@shop_category');
 Route::get('/p/{en_product_id}', 'HomeController@shop_product');
+Route::get('/s','HomeController@shop_default');

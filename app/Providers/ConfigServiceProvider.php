@@ -40,8 +40,16 @@ class ConfigServiceProvider extends ServiceProvider
         try {
             config()->set([
                 'app.name' => System::_get('app_name'),
+                'app.title'=> System::_get('app_title'),
+
                 'app.url' => System::_get('app_url'),
                 'app.url_api' => System::_get('app_url_api'),
+
+                'app.logo' => System::_get('logo'),
+                'app.description' => System::_get('description'),
+                'app.keywords' => System::_get('keywords'),
+                'app.company' => System::_get('company'),
+                'app.icp' => System::_get('icp'),
 
                 'services.geetest.id' => System::_get('vcode_geetest_id'),
                 'services.geetest.key' => System::_get('vcode_geetest_key'),

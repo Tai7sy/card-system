@@ -15,12 +15,18 @@ class CORS
      */
     public function handle($request, Closure $next)
     {
+        $response = $next($request);
         if (config('app.debug')) {
-            return $next($request)->header('Access-Control-Allow-Origin', $request->header('Origin'))
-                ->header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, Cookie, X-Requested-With')
-                ->header('Access-Control-Allow-Credentials', 'true');
+            $headers = [
+                'Access-Control-Allow-Origin' => $request->header('Origin'),
+                'Access-Control-Allow-Methods' => 'POST, GET, OPTIONS, PUT, DELETE',
+                'Access-Control-Allow-Headers' => 'Content-Type, Accept, Authorization, Cookie, X-Requested-With, X-XSRF-TOKEN',
+                'Access-Control-Allow-Credentials' => 'true'
+            ];
+            foreach ($headers as $key => $value) {
+                $response->headers->set($key, $value);
+            }
         }
-        return $next($request);
+        return $response;
     }
 }

@@ -35,8 +35,8 @@ class Category extends Controller
 
         $list = $query->withCount('products')->orderBy('sort')->paginate($pageSize, ['*'], 'page', $page);
 
-        foreach ($list->items() as $category){
-            /* @var \App\Category $category*/
+        foreach ($list->items() as $category) {
+            /* @var \App\Category $category */
             $category->setAppends(['url']);
         }
         return Response::success($list);
@@ -44,10 +44,12 @@ class Category extends Controller
 
     function sort(Request $request)
     {
-        $id = (int)$request->post('id', -1);
-        if (!$id) return Response::forbidden();
+        $this->validate($request, [
+            'id' => 'required|integer'
+        ]);
         /* @var \App\Category $category */
-        $category = $this->authQuery($request, \App\Category::class)->findOrFail($id);
+        $category = $this->authQuery($request, \App\Category::class)
+            ->findOrFail($request->post('id'));
         $category->sort = (int)$request->post('sort', 1000);
         $category->save();
         return Response::success();
@@ -60,12 +62,13 @@ class Category extends Controller
      */
     function edit(Request $request)
     {
-        $id = (int)$request->post('id');
+        $this->validate($request, [
+            'name' => 'required|string|max:128'
+        ]);
         $name = $request->post('name');
         $enabled = (int)$request->post('enabled');
         $sort = $request->post('sort');
         $sort = $sort === NULL ? 1000 : (int)$sort;
-
 
         if (System::_getInt('filter_words_open') === 1) {
             $words = explode('|', System::_get('filter_words'));
@@ -79,8 +82,11 @@ class Category extends Controller
         $password = $request->post('password');
         $password_open = $request->post('password_open') === 'true';
 
-        $category = $this->authQuery($request, \App\Category::class)->find($id);
-        if (!$category) {
+        if ((int)$request->post('id')) {
+            /** @var \App\Category $category */
+            $category = $this->authQuery($request, \App\Category::class)
+                ->findOrFail($request->post('id'));
+        } else {
             $category = new \App\Category;
             $category->user_id = $this->getUserIdOrFail($request);
         }

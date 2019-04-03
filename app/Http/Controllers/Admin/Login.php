@@ -3,21 +3,39 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Library\Helper;
-use Auth;
+use App\Library\Geetest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Library\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class Login extends Controller
 {
+    function getVerify()
+    {
+        $verify = [
+            'driver' => 'geetest',
+            'geetest' => Geetest\API::get()
+        ];
+        return Response::success($verify);
+    }
 
     public function login(Request $request)
     {
+        if ((int)System::_get('vcode_login') === 1) {
+            $ret = Geetest\API::verify($request->input('geetest_challenge'),
+                $request->input('geetest_validate'),
+                $request->input('geetest_seccode'));
+            if (!$ret) {
+                return self::renderResult($request, ['msg' => '滑动验证超时，请返回页面重试。']);
+            }
+        }
+
         $remember = $request->input('remember') == 'true';
         if (!Auth::attempt([
-                'email' => $request->input('email'),
-                'password' => $request->input('password')], $remember)
+            'email' => $request->input('email'),
+            'password' => $request->input('password')], $remember)
         ) {
             return Response::fail('邮箱或密码错误, 请检查');
         } else {

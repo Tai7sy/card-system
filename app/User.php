@@ -22,7 +22,7 @@ class User extends Authenticatable
         'password', 'remember_token'
     ];
 
-    protected $appends = ['m_balance'];
+    protected $appends = ['m_balance', 'role'];
 
     protected $casts = [
         'theme_config' => 'array'
@@ -31,8 +31,13 @@ class User extends Authenticatable
     const ID_CUSTOMER = -1;
 
     // 商户库存显示类型
-    const inventory_real = 1;
     const inventory_range = 0;
+    const inventory_real = 1;
+
+    /** 卖家承担 */
+    const FEE_TYPE_MERCHANT = 0;
+    /** 买家承担 */
+    const FEE_TYPE_CUSTOMER = 1;
 
     const STATUS_OK = 0;
     const STATUS_FROZEN = 1;
@@ -41,6 +46,10 @@ class User extends Authenticatable
     function getMBalanceAttribute()
     {
         return $this->m_all - $this->m_paid - $this->m_frozen;
+    }
+
+    function getRoleAttribute(){
+        return 'admin';
     }
 
     function getMBalanceWithoutTodayAttribute()
@@ -53,10 +62,11 @@ class User extends Authenticatable
     /**
      * @return ShopTheme
      */
-    function getShopThemeAttribute(){
-        if($this->theme_config){
+    function getShopThemeAttribute()
+    {
+        if ($this->theme_config) {
             $ret = \App\ShopTheme::whereName($this->theme_config['theme'])->first();
-            if($ret)  return $ret;
+            if ($ret) return $ret;
         }
         return \App\ShopTheme::defaultTheme();
     }

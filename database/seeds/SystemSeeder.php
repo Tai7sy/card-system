@@ -12,7 +12,8 @@ class SystemSeeder extends Seeder
     public function run()
     {
         $sets = [
-            'app_name' => '发卡系统',
+            'app_name' => 'XX小店',
+            'app_title' => '自动发卡, 自动发货',
             'app_url' => 'http://www.example.com',
             'app_url_api' => 'http://www.example.com',
 

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 class CreateLogsTable extends Migration
 {
@@ -18,12 +19,8 @@ class CreateLogsTable extends Migration
             $table->integer('user_id');
             $table->string('ip');
             $table->integer('action')->default(\App\Log::ACTION_LOGIN);
-            $table->timestamp('created_at');
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
         });
-
-
-        DB::unprepared('ALTER TABLE `logs` CHANGE COLUMN `created_at` `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP;');
-
     }
 
     /**

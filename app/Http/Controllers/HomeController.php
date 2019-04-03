@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\Library\Helper;
 use App\Pay;
 use App\Product;
 use App\System;
@@ -28,11 +29,12 @@ class HomeController extends Controller
     {
         $config = [
             'url' => config('app.url'),//支付域名
-            'company' => System::_get('company'),
+            'company' => config('app.company'),
             'name' => config('app.name'),
-            'logo' => System::_get('logo')
+            'logo' => config('app.logo')
         ];
         $config['shop'] = [
+            'name' => config('app.name'),
             'qq' => System::_get('shop_qq'),
             'ann' => System::_get('shop_ann'),
             'ann_pop' => System::_get('shop_ann_pop'),
@@ -46,7 +48,7 @@ class HomeController extends Controller
             $config['product'] = $product;
             $name = $product->name . ' - ' . $config['name'];
             $description = $product->description;
-            if(@$description[0] === '{'){
+            if (@$description[0] === '{') {
                 $matches = [];
                 preg_match_all('/"insert":"(.+?)"/', $description, $matches);
                 $description = str_replace('\n', ' ', @join(' ', $matches[1]));
@@ -72,7 +74,7 @@ class HomeController extends Controller
 
             $name = $config['name'];
             $description = $config['shop']['ann'];
-            if(@$description[0] === '{'){
+            if (@$description[0] === '{') {
                 $matches = [];
                 preg_match_all('/"insert":"(.+?)"/', $description, $matches);
                 $description = str_replace('\n', ' ', @join(' ', $matches[1]));
@@ -85,7 +87,12 @@ class HomeController extends Controller
             'buy' => (int)System::_get('vcode_shop_buy'),
             'search' => (int)System::_get('vcode_shop_search')
         ];
-        if ($config['vcode']['driver'] === 'geetest') {
+        if ($config['vcode']['driver'] === 'geetest' &&
+            (
+                $config['vcode'] ||
+                $config['search']
+            )
+        ) {
             $config['vcode']['geetest'] = Geetest\API::get();
         }
 
@@ -99,18 +106,25 @@ class HomeController extends Controller
         $customer = Cookie::get('customer');
         $cookie = Cookie::make('customer',
             strlen($customer) !== 32 ? md5(str_random(16)) : $customer,
-            43200, null, null, false,false); // 30 days
+            43200, null, null, false, false); // 30 days
 
 
-        $user_theme = $user->shop_theme ?
-            \App\ShopTheme::whereName($user->shop_theme['theme'])->firstOrFail() :
-            \App\ShopTheme::defaultTheme();
-        $config['theme'] = $user->shop_theme && isset($user->shop_theme[$user_theme->name]) ?
-            $user->shop_theme[$user_theme->name] :
-            \App\ShopTheme::defaultTheme()->config;
+        /* @var $shop_theme \App\ShopTheme */
+        $shop_theme = null;
+        if (isset($_GET['theme'])) {
+            $shop_theme = \App\ShopTheme::whereName($_GET['theme'])->first();
+        }
+        if (!$shop_theme) {
+            $shop_theme = \App\ShopTheme::defaultTheme();
+        }
 
-        return response()->view('shop_theme.' . $user_theme . '.index', [
+        $config['theme'] = $user->theme_config && isset($user->theme_config[$shop_theme->name]) ?
+            $user->theme_config[$shop_theme->name] :
+            $shop_theme->config;
+
+        return response()->view('shop_theme.' . $shop_theme->name . '.index', [
             'name' => $name,
+            'title' => config('app.title'),
             'keywords' => preg_replace('/[、，；。！？]/', ', ', $name),
             'description' => $description,
             'js_tj' => System::_get('js_tj'),
@@ -124,11 +138,18 @@ class HomeController extends Controller
     {
         $this->checkIsInMaintain();
 
+        // TODO 这里订单查询有问题, 需要重写
         return view('message', [
             'title' => '404 NotFound',
             'message' => '该链接不存在<br>
-<a style="font-size: 18px" href="/#/record">查询订单</a>'
+<a style="font-size: 18px" href="/s/#/record">查询订单</a>'
         ]);
+    }
+
+    public function shop_default(Request $request)
+    {
+        $tab = $request->get('tab', '');
+        return response()->redirectTo('/?theme=Material#/record?tab=' . $tab);
     }
 
 
@@ -136,7 +157,7 @@ class HomeController extends Controller
     {
         $this->checkIsInMaintain();
 
-        $category = Category::whereId(Helper::id_decode($en_category_id,Helper::ID_TYPE_CATEGORY))->with('user')->first();
+        $category = Category::whereId(Helper::id_decode($en_category_id, Helper::ID_TYPE_CATEGORY))->with('user')->first();
         if (!$category && is_numeric($category)) {
             // Warning
             // 2019-01-01 之后的用户将无法使用 id 的形式, 转变为 en_id
@@ -156,7 +177,7 @@ class HomeController extends Controller
     {
         $this->checkIsInMaintain();
 
-        $product = Product::whereId(Helper::id_decode($en_product_id,Helper::ID_TYPE_PRODUCT))
+        $product = Product::whereId(Helper::id_decode($en_product_id, Helper::ID_TYPE_PRODUCT))
             ->with(['user', 'category', 'cards' => function (Relation $query) {
                 $query->whereRaw('`count_all`>`count_sold`')
                     ->selectRaw('`product_id`,SUM(`count_all`-`count_sold`) as `count`')
@@ -190,8 +211,24 @@ class HomeController extends Controller
             ]);
         }
         $product->category->setVisible(['id', 'name', 'password_open']);
-        $product->setAttribute('count', count($product->cards) ? $product->cards[0]->count : 0);
-        $product->setVisible(['id', 'name', 'description', 'count', 'buy_min', 'buy_max',
+        $count = count($product->cards) ? $product->cards[0]->count : 0;
+        if ($product->user->shop_inventory == \App\User::inventory_range) {
+            if ($count <= 0) {
+                $count2 = '不足';
+            } elseif ($count <= 10) {
+                $count2 = '少量';
+            } elseif ($count <= 20) {
+                $count2 = '一般';
+            } else {
+                $count2 = '大量';
+            }
+            $product->setAttribute('count2', $count2);
+        } else {
+            $product->setAttribute('count2', $count); // 页面展示的数量
+        }
+        $product->setAttribute('count', $count); // 真正的数量
+
+        $product->setVisible(['id', 'name', 'description', 'count', 'count2', 'buy_min', 'buy_max',
             'support_coupon', 'password_open', 'price', 'price_whole']);
         return $this->_shop_render($product->user, $product->category, $product);
     }
@@ -213,7 +250,7 @@ class HomeController extends Controller
 
         $config['vcode'] = [
             'driver' => System::_get('vcode_driver'),
-            'login' => System::_get('vcode_login'),
+            'login' => (int)System::_get('vcode_login'),
         ];
         if ($config['vcode']['driver'] === 'geetest') {
             $config['vcode']['geetest'] = Geetest\API::get();

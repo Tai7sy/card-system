@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 class CreateFilesTable extends Migration
 {
@@ -19,11 +20,8 @@ class CreateFilesTable extends Migration
             $table->string('driver');
             $table->string('path');
             $table->string('url');
-            $table->timestamp('created_at');
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
         });
-
-        DB::unprepared('ALTER TABLE `files` CHANGE COLUMN `created_at` `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP;');
-
     }
 
     /**

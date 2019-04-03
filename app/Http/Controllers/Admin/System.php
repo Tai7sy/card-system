@@ -22,7 +22,7 @@ class System extends Controller
     {
         foreach ($names as $name) {
             if ($request->has($name))
-                \App\System::_set($name, intval($request->post($name) * 100));
+                \App\System::_set($name, (int)round($request->post($name) * 100));
         }
     }
 
@@ -49,6 +49,7 @@ class System extends Controller
     {
         $strConfig = [
             'app_name',
+            'app_title',
             'app_url',
             'app_url_api',
             'keywords',
@@ -109,6 +110,12 @@ class System extends Controller
                 $e->config = [
                     'list_type' => $request->post('shop_theme_material_list_type'),
                     'background' => $request->post('shop_theme_material_background')
+                ];
+                $e->saveOrFail();
+            }
+            if ($e->name === 'Classic') {
+                $e->config = [
+                    'list_type' => $request->post('shop_theme_classic_list_type')
                 ];
                 $e->saveOrFail();
             }

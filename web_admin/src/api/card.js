@@ -22,14 +22,6 @@ export function getList (params) {
   });
 }
 
-export function exportList (params) {
-  return fetch({
-    url: 'card/export',
-    method: 'post',
-    data: params
-  });
-}
-
 export function add (params) {
   return fetch({
     url: 'card/add',

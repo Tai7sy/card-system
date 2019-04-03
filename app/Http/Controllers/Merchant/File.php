@@ -124,14 +124,4 @@ class File extends Controller
         header('Content-Type: ' . mimetype_from_filename($relative_path));
         die($fileBin);
     }
-
-    function renderQRCode(Request $request, $file_id)
-    {
-        /* @var \App\File $file */
-        $file = \App\File::find($file_id);
-        if ($file == null || !$this->isAdmin() && $file->user_id !== Auth::id()) {
-            return response()->view('message', ['title' => '404', 'message' => '404 NotFound'], 404);
-        }
-        return response()->redirectTo($file->url);
-    }
 }

@@ -66,7 +66,7 @@
       this.verticalCenter();
       window.addEventListener('resize', this.verticalCenter);
 
-      if (this.vcode.geetest && this.vcode.login === 1) {
+      if (this.vcode.geetest && +this.vcode.login === 1) {
         if (this.vcode.geetest.gt !== false) {
           this.renderGeeCaptcha(this.vcode.geetest);
           this.vcode.geetest.gt = false;
@@ -130,6 +130,8 @@
               this.$router.push({ path: '/admin/' });
             }
           });
+        }).catch(() => {
+          // this.handleReInitCapture();
         }).finally(() => {
           this.loading = false;
         });
@@ -137,8 +139,19 @@
       handleReInitCapture () {
         console.log('login - handleReInitCapture');
         this.geetestLoading = true;
+        this.validate = false;
+        // 这里登录失败, 就会重新拉取验证码
         getVerify().then(ret => {
           const data = ret.data;
+          if (!data.geetest) {
+            if (this.vcode.geetest && this.vcode.login === 1) {
+              this.$alert('获取验证码失败，请刷新页面重试', '获取验证码失败');
+            } else {
+              // 如果没有开启登录验证, 登录失败拉取拉不到的
+              this.geetestLoading = true;
+            }
+            return;
+          }
           if (data.driver === 'geetest') {
             this.renderGeeCaptcha(data.geetest);
           } else {
