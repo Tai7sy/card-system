@@ -1,0 +1,2 @@
+<?php
+ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Proxy; use PHPUnit\Framework\TestCase; use Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy; class NativeProxyTest extends TestCase { public function testIsWrapper() { $proxy = new NativeProxy(); $this->assertFalse($proxy->isWrapper()); } public function testGetSaveHandlerName() { $name = ini_get('session.save_handler'); $proxy = new NativeProxy(); $this->assertEquals($name, $proxy->getSaveHandlerName()); } } 

@@ -1,0 +1,11 @@
+<svg width="520px" height="520px" viewBox="0 0 520 520" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>head-bg-circle3</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <ellipse id="path-1" cx="42.4395209" cy="42.5257732" rx="42.4395209" ry="42.5257732"></ellipse>
+    </defs>
+    <g>
+        <circle cx="260" cy="260" r="250" style="stroke: rgba(229, 238, 255, 0.44);fill:none;" stroke-width="1"></circle>
+    </g>
+</svg>

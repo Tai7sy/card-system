@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\Common\Persistence\Event; use Doctrine\Common\EventArgs; use Doctrine\Common\Persistence\ObjectManager; class ManagerEventArgs extends EventArgs { private $objectManager; public function __construct(ObjectManager $objectManager) { $this->objectManager = $objectManager; } public function getObjectManager() { return $this->objectManager; } } 

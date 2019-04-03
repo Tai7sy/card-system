@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class PersistentStatus extends AbstractPlugin { public function getMethod() { return 'persistentStatus'; } public function handle($id) { return $this->filesystem->getAdapter()->persistentStatus($id); } }

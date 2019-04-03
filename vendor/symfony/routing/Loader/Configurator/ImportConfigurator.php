@@ -1,0 +1,2 @@
+<?php
+ namespace Symfony\Component\Routing\Loader\Configurator; use Symfony\Component\Routing\RouteCollection; class ImportConfigurator { use Traits\RouteTrait; private $parent; public function __construct(RouteCollection $parent, RouteCollection $route) { $this->parent = $parent; $this->route = $route; } public function __destruct() { $this->parent->addCollection($this->route); } final public function prefix($prefix) { $this->route->addPrefix($prefix); return $this; } } 

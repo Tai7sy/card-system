@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class PersistentFop extends AbstractPlugin { public function getMethod() { return 'persistentFop'; } public function handle($path = null, $fops = null, $pipline = null, $force = false, $notify_url = null) { return $this->filesystem->getAdapter()->persistentFop($path, $fops, $pipline, $force, $notify_url); } }

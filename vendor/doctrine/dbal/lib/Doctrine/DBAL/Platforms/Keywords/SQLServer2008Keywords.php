@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Platforms\Keywords; class SQLServer2008Keywords extends SQLServer2005Keywords { public function getName() { return 'SQLServer2008'; } protected function getKeywords() { return array_merge(parent::getKeywords(), array( 'MERGE' )); } } 

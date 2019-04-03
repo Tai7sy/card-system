@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Database\Console\Migrations; use Illuminate\Console\Command; class BaseCommand extends Command { protected function getMigrationPaths() { if ($this->input->hasOption('path') && $this->option('path')) { return collect($this->option('path'))->map(function ($path) { return $this->laravel->basePath().'/'.$path; })->all(); } return array_merge( [$this->getMigrationPath()], $this->migrator->paths() ); } protected function getMigrationPath() { return $this->laravel->databasePath().DIRECTORY_SEPARATOR.'migrations'; } } 

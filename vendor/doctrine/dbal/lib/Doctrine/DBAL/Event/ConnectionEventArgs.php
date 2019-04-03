@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Event; use Doctrine\Common\EventArgs; use Doctrine\DBAL\Connection; class ConnectionEventArgs extends EventArgs { private $_connection; public function __construct(Connection $connection) { $this->_connection = $connection; } public function getConnection() { return $this->_connection; } public function getDriver() { return $this->_connection->getDriver(); } public function getDatabasePlatform() { return $this->_connection->getDatabasePlatform(); } public function getSchemaManager() { return $this->_connection->getSchemaManager(); } } 

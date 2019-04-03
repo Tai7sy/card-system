@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class KeyMigrate extends Command { public function getId() { return 'MIGRATE'; } protected function filterArguments(array $arguments) { if (is_array(end($arguments))) { foreach (array_pop($arguments) as $modifier => $value) { $modifier = strtoupper($modifier); if ($modifier === 'COPY' && $value == true) { $arguments[] = $modifier; } if ($modifier === 'REPLACE' && $value == true) { $arguments[] = $modifier; } } } return $arguments; } } 

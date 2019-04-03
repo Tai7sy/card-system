@@ -1,0 +1,2 @@
+<?php
+ namespace Predis; use Predis\Command\CommandInterface; interface ClientContextInterface { public function executeCommand(CommandInterface $command); public function __call($method, $arguments); public function execute($callable = null); } 

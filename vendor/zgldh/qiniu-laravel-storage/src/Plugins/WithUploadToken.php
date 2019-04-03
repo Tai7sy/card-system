@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class WithUploadToken extends AbstractPlugin { public function getMethod() { return 'withUploadToken'; } public function handle($token) { $this->filesystem->getAdapter()->withUploadToken($token); } }

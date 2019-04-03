@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Http\Resources; use Illuminate\Support\Collection; class MergeValue { public $data; public function __construct($data) { $this->data = $data instanceof Collection ? $data->all() : $data; } } 

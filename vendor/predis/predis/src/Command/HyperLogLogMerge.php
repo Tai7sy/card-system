@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class HyperLogLogMerge extends Command { public function getId() { return 'PFMERGE'; } protected function filterArguments(array $arguments) { return self::normalizeArguments($arguments); } } 

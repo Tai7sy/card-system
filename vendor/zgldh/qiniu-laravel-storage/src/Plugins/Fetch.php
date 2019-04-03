@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class Fetch extends AbstractPlugin { public function getMethod() { return 'fetch'; } public function handle($url, $key) { return $this->filesystem->getAdapter()->fetch($url, $key); } } 

@@ -1,0 +1,2 @@
+<?php
+ return array( 'year' => ':count жыл', 'y' => ':count жыл', 'month' => ':count ай', 'm' => ':count ай', 'week' => ':count апта', 'w' => ':count апта', 'day' => ':count күн', 'd' => ':count күн', 'hour' => ':count сағат', 'h' => ':count сағат', 'minute' => ':count минут', 'min' => ':count минут', 'second' => ':count секунд', 's' => ':count секунд', 'ago' => ':time бұрын', 'from_now' => ':time кейін', 'after' => ':time кейін', 'before' => ':time бұрын', ); 

@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Platforms; class SQLAnywhere11Platform extends SQLAnywherePlatform { public function getRegexpExpression() { return 'REGEXP'; } protected function getReservedKeywordsClass() { return 'Doctrine\DBAL\Platforms\Keywords\SQLAnywhere11Keywords'; } } 

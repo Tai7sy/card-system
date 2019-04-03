@@ -1,0 +1,2 @@
+<?php
+ namespace OSS\Model; class UploadInfo { public function __construct($key, $uploadId, $initiated) { $this->key = $key; $this->uploadId = $uploadId; $this->initiated = $initiated; } public function getKey() { return $this->key; } public function getUploadId() { return $this->uploadId; } public function getInitiated() { return $this->initiated; } private $key = ""; private $uploadId = ""; private $initiated = ""; }

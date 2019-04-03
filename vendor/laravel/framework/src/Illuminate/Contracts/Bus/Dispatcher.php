@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Contracts\Bus; interface Dispatcher { public function dispatch($command); public function dispatchNow($command, $handler = null); public function pipeThrough(array $pipes); } 

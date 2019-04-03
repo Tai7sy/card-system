@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class GeospatialGeoAdd extends Command { public function getId() { return 'GEOADD'; } protected function filterArguments(array $arguments) { if (count($arguments) === 2 && is_array($arguments[1])) { foreach (array_pop($arguments) as $item) { $arguments = array_merge($arguments, $item); } } return $arguments; } } 

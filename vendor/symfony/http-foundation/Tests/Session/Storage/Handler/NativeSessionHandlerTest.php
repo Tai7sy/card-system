@@ -1,0 +1,2 @@
+<?php
+ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler; use PHPUnit\Framework\TestCase; use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler; class NativeSessionHandlerTest extends TestCase { public function testConstruct() { $handler = new NativeSessionHandler(); $this->assertInstanceOf('SessionHandler', $handler); $this->assertTrue($handler instanceof NativeSessionHandler); } } 

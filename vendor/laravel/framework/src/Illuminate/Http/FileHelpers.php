@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Http; use Illuminate\Support\Str; trait FileHelpers { protected $hashName = null; public function path() { return $this->getRealPath(); } public function extension() { return $this->guessExtension(); } public function clientExtension() { return $this->guessClientExtension(); } public function hashName($path = null) { if ($path) { $path = rtrim($path, '/').'/'; } $hash = $this->hashName ?: $this->hashName = Str::random(40); return $path.$hash.'.'.$this->guessExtension(); } } 

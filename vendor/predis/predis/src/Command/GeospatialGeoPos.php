@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class GeospatialGeoPos extends Command { public function getId() { return 'GEOPOS'; } protected function filterArguments(array $arguments) { if (count($arguments) === 2 && is_array($arguments[1])) { $members = array_pop($arguments); $arguments = array_merge($arguments, $members); } return $arguments; } } 

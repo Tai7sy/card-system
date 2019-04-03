@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Platforms\Keywords; class SQLServer2005Keywords extends SQLServerKeywords { public function getName() { return 'SQLServer2005'; } protected function getKeywords() { return array_merge(array_diff(parent::getKeywords(), array('DUMMY')), array( 'EXTERNAL', 'PIVOT', 'REVERT', 'SECURITYAUDIT', 'TABLESAMPLE', 'UNPIVOT' )); } } 

@@ -1,0 +1,1 @@
+webpackJsonp([23],{VK0A:function(e,t,r){"use strict";var n,l,s;Object.defineProperty(t,"__esModule",{value:!0}),n={components:{orderList:r("EdSP").default}},l={render:function(){var e=this,t=e.$createElement,r=e._self._c||t;return r("order-list",{attrs:{recentDay:7}})},staticRenderFns:[]},s=r("VU/8")(n,l,!1,null,null,null),t.default=s.exports}});

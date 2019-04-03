@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class ServerBackgroundSave extends Command { public function getId() { return 'BGSAVE'; } public function parseResponse($data) { return $data === 'Background saving started' ? true : $data; } } 

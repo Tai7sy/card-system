@@ -1,0 +1,2 @@
+<?php
+namespace App\Http\Middleware; use Closure; use Illuminate\Support\Facades\Auth; class RedirectIfAuthenticated { public function handle($spf631e6, Closure $spc52ea7, $sp4c37f3 = null) { if (Auth::guard($sp4c37f3)->check()) { return redirect('/home'); } return $spc52ea7($spf631e6); } }

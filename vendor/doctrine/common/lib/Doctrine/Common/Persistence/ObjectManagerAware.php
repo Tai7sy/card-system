@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\Common\Persistence; use Doctrine\Common\Persistence\Mapping\ClassMetadata; interface ObjectManagerAware { public function injectObjectManager(ObjectManager $objectManager, ClassMetadata $classMetadata); } 

@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Foundation\Bus; trait Dispatchable { public static function dispatch() { return new PendingDispatch(new static(...func_get_args())); } public static function withChain($chain) { return new PendingChain(get_called_class(), $chain); } } 

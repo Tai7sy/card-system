@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Driver\DrizzlePDOMySql; class Connection extends \Doctrine\DBAL\Driver\PDOConnection { public function quote($value, $type = \PDO::PARAM_STR) { if (\PDO::PARAM_BOOL === $type) { if ($value) { return 'true'; } else { return 'false'; } } return parent::quote($value, $type); } } 

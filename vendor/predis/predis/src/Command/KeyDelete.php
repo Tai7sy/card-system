@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class KeyDelete extends Command { public function getId() { return 'DEL'; } protected function filterArguments(array $arguments) { return self::normalizeArguments($arguments); } } 

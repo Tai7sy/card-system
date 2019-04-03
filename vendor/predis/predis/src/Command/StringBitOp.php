@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class StringBitOp extends Command { public function getId() { return 'BITOP'; } protected function filterArguments(array $arguments) { if (count($arguments) === 3 && is_array($arguments[2])) { list($operation, $destination) = $arguments; $arguments = $arguments[2]; array_unshift($arguments, $operation, $destination); } return $arguments; } } 

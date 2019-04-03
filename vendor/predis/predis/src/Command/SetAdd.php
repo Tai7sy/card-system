@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class SetAdd extends Command { public function getId() { return 'SADD'; } protected function filterArguments(array $arguments) { return self::normalizeVariadic($arguments); } } 

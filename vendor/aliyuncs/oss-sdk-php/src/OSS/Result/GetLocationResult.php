@@ -1,0 +1,2 @@
+<?php
+namespace OSS\Result; use OSS\Core\OssException; class GetLocationResult extends Result { protected function parseDataFromResponse() { $content = $this->rawResponse->body; if (empty($content)) { throw new OssException("body is null"); } $xml = simplexml_load_string($content); return $xml; } }

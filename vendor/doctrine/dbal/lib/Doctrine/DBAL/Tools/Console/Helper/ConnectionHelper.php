@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Tools\Console\Helper; use Symfony\Component\Console\Helper\Helper; use Doctrine\DBAL\Connection; class ConnectionHelper extends Helper { protected $_connection; public function __construct(Connection $connection) { $this->_connection = $connection; } public function getConnection() { return $this->_connection; } public function getName() { return 'connection'; } } 

@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Logging; class LoggerChain implements SQLLogger { private $loggers = array(); public function addLogger(SQLLogger $logger) { $this->loggers[] = $logger; } public function startQuery($sql, array $params = null, array $types = null) { foreach ($this->loggers as $logger) { $logger->startQuery($sql, $params, $types); } } public function stopQuery() { foreach ($this->loggers as $logger) { $logger->stopQuery(); } } } 

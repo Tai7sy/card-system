@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Driver; abstract class AbstractDriverException extends \Exception implements DriverException { private $errorCode; private $sqlState; public function __construct($message, $sqlState = null, $errorCode = null) { parent::__construct($message); $this->errorCode = $errorCode; $this->sqlState = $sqlState; } public function getErrorCode() { return $this->errorCode; } public function getSQLState() { return $this->sqlState; } } 

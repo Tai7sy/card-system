@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class ImagePreviewUrl extends AbstractPlugin { public function getMethod() { return 'imagePreviewUrl'; } public function handle($path = null, $ops = null) { return $this->filesystem->getAdapter()->imagePreviewUrl($path, $ops); } }

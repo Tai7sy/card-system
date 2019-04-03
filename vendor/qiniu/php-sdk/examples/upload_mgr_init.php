@@ -1,0 +1,2 @@
+<?php
+require_once __DIR__ . '/../autoload.php'; use Qiniu\Auth; use Qiniu\Storage\UploadManager; $accessKey = 'Access_Key'; $secretKey = 'Secret_Key'; $auth = new Auth($accessKey, $secretKey); $bucket = 'Bucket_Name'; $token = $auth->uploadToken($bucket); $uploadMgr = new UploadManager(); 

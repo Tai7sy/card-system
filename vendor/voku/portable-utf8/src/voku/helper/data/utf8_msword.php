@@ -1,0 +1,2 @@
+<?php
+ static $data = [ "\xc2\xab" => '"', "\xc2\xbb" => '"', "\xe2\x80\x98" => "'", "\xe2\x80\x99" => "'", "\xe2\x80\x9a" => "'", "\xe2\x80\x9b" => "'", "\xe2\x80\x9c" => '"', "\xe2\x80\x9d" => '"', "\xe2\x80\x9e" => '"', "\xe2\x80\x9f" => '"', "\xe2\x80\xb9" => "'", "\xe2\x80\xba" => "'", "\xe2\x80\x93" => '-', "\xe2\x80\x94" => '-', "\xe2\x80\xa6" => '...' ]; $result =& $data; unset($data); return $result; 

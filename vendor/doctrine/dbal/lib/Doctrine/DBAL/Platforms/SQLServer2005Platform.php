@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Platforms; class SQLServer2005Platform extends SQLServerPlatform { public function supportsLimitOffset() { return true; } public function getClobTypeDeclarationSQL(array $field) { return 'VARCHAR(MAX)'; } protected function getReservedKeywordsClass() { return 'Doctrine\DBAL\Platforms\Keywords\SQLServer2005Keywords'; } } 

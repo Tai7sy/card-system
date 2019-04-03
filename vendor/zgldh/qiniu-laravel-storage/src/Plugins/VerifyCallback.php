@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class VerifyCallback extends AbstractPlugin { public function getMethod() { return 'verifyCallback'; } public function handle($contentType = null, $originAuthorization = null, $url = null, $body = null) { return $this->filesystem->getAdapter()->verifyCallback($contentType, $originAuthorization, $url, $body); } } 

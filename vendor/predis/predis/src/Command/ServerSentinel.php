@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class ServerSentinel extends Command { public function getId() { return 'SENTINEL'; } public function parseResponse($data) { switch (strtolower($this->getArgument(0))) { case 'masters': case 'slaves': return self::processMastersOrSlaves($data); default: return $data; } } protected static function processMastersOrSlaves(array $servers) { foreach ($servers as $idx => $node) { $processed = array(); $count = count($node); for ($i = 0; $i < $count; ++$i) { $processed[$node[$i]] = $node[++$i]; } $servers[$idx] = $processed; } return $servers; } } 

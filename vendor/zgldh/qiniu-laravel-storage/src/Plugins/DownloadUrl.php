@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class DownloadUrl extends AbstractPlugin { public function getMethod() { return 'downloadUrl'; } public function handle($path = null, $domainType = 'default') { $adapter = $this->filesystem->getAdapter(); return $adapter->downloadUrl($path, $domainType); } }

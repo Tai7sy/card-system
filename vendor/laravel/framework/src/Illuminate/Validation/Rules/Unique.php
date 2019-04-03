@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Validation\Rules; class Unique { use DatabaseRule; protected $ignore; protected $idColumn = 'id'; public function ignore($id, $idColumn = 'id') { $this->ignore = $id; $this->idColumn = $idColumn; return $this; } public function __toString() { return rtrim(sprintf('unique:%s,%s,%s,%s,%s', $this->table, $this->column, $this->ignore ? '"'.$this->ignore.'"' : 'NULL', $this->idColumn, $this->formatWheres() ), ','); } } 

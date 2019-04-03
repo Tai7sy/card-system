@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Sharding; interface ShardManager { function selectGlobal(); function selectShard($distributionValue); function getCurrentDistributionValue(); function getShards(); function queryAll($sql, array $params, array $types); } 

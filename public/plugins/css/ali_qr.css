@@ -1,0 +1,56 @@
+@charset "UTF-8";html{font-size:62.5%;font-family:'helvetica neue',tahoma,arial,'hiragino sans gb','microsoft yahei',Simsun,sans-serif}
+blockquote,body,button,code,dd,div,dl,dt,fieldset,form,h1,h2,h3,h4,h5,h6,hr,input,legend,li,ol,p,pre,td,textarea,th,ul{margin:0;padding:0}
+body{line-height:1.333;font-size:12px}
+h1,h2,h3,h4,h5,h6{font-size:100%;font-family:arial,'hiragino sans gb','microsoft yahei',Simsun,sans-serif}
+button,input,select,textarea{font-size:12px;font-weight:400}
+button,input[type=button],input[type=submit],select{cursor:pointer}
+table{border-collapse:collapse;border-spacing:0}
+address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:400}
+li{list-style:none}
+caption,th{text-align:left}
+q:after,q:before{content:''}
+abbr,acronym{border:0;font-variant:normal}
+sup{vertical-align:text-top}
+sub{vertical-align:text-bottom}
+a img,fieldset,iframe,img{border:0 none}
+img{-ms-interpolation-mode:bicubic}
+textarea{overflow-y:auto}
+legend{color:#000}
+a:link,a:visited{text-decoration:none}
+hr{height:0}
+label{cursor:pointer}
+.clearfix:after{content:"\200B";display:block;height:0;clear:both}
+a{color:#328CE5}
+a:hover{color:#2b8ae8;text-decoration:none}
+a.hit{color:#C06C6C}
+a:focus{outline:0}
+.hit{color:#8DC27E}
+.txt_auxiliary{color:#A2A2A2}
+.clear:after,.clear:before{content:"";display:table}
+.clear:after{clear:both}
+.body,body{background:#f7f7f7;height:100%}
+.mod-title{height:60px;line-height:60px;text-align:center;border-bottom:1px solid #ddd;background:#fff}
+.mod-title .ico-wechat{display:inline-block;width:41px;height: 41px;background: url(../images/ali_qr.png) 0 -111px no-repeat;vertical-align:middle;margin-right:7px;}
+.mod-title .text{font-size:20px;color:#333;font-weight:400;vertical-align:middle}
+.mod-ct{max-width:610px;margin:15px auto 0;background:#fff url(../images/wave.png) top center repeat-x;text-align:center;color:#333;border:1px solid #e5e5e5;border-top:none}
+.mod-ct .order{font-size:20px;padding-top:30px}
+.mod-ct .amount{font-size:48px;margin-top:20px}
+.mod-ct .qr-image{margin-top:30px}
+.mod-ct .qr-image img{width:230px;height:230px}
+.mod-ct .detail{margin-top:36px}
+.mod-ct .detail .arrow .ico-arrow{display:inline-block;width:20px;height:11px;background:url(../images/ali_qr.png) -25px -100px no-repeat}
+.mod-ct .detail .detail-ct{display:none;font-size:14px;text-align:right;line-height:28px;margin:0 15%;padding: 16px 0}
+.mod-ct .detail .detail-ct dt{float:left}
+.mod-ct .detail-open{border-top:1px solid #e5e5e5}
+.mod-ct .detail .arrow{padding:6px 34px;border:1px solid #e5e5e5}
+.mod-ct .detail .arrow .ico-arrow{display:inline-block;width:20px;height:11px;background:url(../images/ali_qr.png) -25px -100px no-repeat}
+.mod-ct .detail-open .arrow .ico-arrow{display:inline-block;width:20px;height:11px;background:url(../images/ali_qr.png) 0 -100px no-repeat}
+.mod-ct .detail-open .detail-ct{display:block}
+.mod-ct .tip{margin-top:40px;border-top:1px dashed #e5e5e5;padding:30px 0;position:relative}
+.mod-ct .tip .ico-scan{display:inline-block;width:56px;height:55px;background:url(../images/ali_qr.png) 0 0 no-repeat;vertical-align:middle}
+.mod-ct .tip .tip-text{display:inline-block;vertical-align:middle;text-align:left;margin-left:23px;font-size:16px;line-height:28px}
+.mod-ct .tip .dec{display:inline-block;width:22px;height:45px;background:url(../images/ali_qr.png) 0 -55px no-repeat;position:absolute;top:-23px}
+.mod-ct .tip .dec-left{background-position:0 -55px;left:-1px}
+.mod-ct .tip .dec-right{background-position:-25px -55px;right:-1px}
+.foot{text-align:center;margin:30px auto;color:#888;font-size:12px;line-height:20px;font-family:simsun,serif}
+.foot .link{color:#0071ce}

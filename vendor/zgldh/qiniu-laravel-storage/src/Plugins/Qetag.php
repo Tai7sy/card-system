@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class Qetag extends AbstractPlugin { public function getMethod() { return 'qetag'; } public function handle($path = null) { return $this->filesystem->getAdapter()->getLastQetag(); } } 

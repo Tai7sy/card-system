@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Auth\Events; class Failed { public $user; public $credentials; public function __construct($user, $credentials) { $this->user = $user; $this->credentials = $credentials; } } 

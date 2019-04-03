@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Platforms\Keywords; class PostgreSQL92Keywords extends PostgreSQL91Keywords { public function getName() { return 'PostgreSQL92'; } protected function getKeywords() { return array_merge(parent::getKeywords(), array( 'COLLATION', )); } } 

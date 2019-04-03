@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Console\Scheduling; use Illuminate\Contracts\Cache\Repository as Cache; class CacheMutex implements Mutex { public $cache; public function __construct(Cache $cache) { $this->cache = $cache; } public function create(Event $event) { return $this->cache->add( $event->mutexName(), true, $event->expiresAt ); } public function exists(Event $event) { return $this->cache->has($event->mutexName()); } public function forget(Event $event) { $this->cache->forget($event->mutexName()); } } 

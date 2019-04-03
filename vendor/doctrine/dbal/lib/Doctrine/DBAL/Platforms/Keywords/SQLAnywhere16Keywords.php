@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Platforms\Keywords; class SQLAnywhere16Keywords extends SQLAnywhere12Keywords { public function getName() { return 'SQLAnywhere16'; } protected function getKeywords() { return array_merge( parent::getKeywords(), array( 'ARRAY', 'JSON', 'ROW', 'ROWTYPE', 'UNNEST', 'VARRAY' ) ); } } 

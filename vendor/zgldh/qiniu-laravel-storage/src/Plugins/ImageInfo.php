@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class ImageInfo extends AbstractPlugin { public function getMethod() { return 'imageInfo'; } public function handle($path = null) { return $this->filesystem->getAdapter()->imageInfo($path); } }

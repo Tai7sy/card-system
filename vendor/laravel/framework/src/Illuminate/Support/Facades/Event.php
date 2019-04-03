@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Support\Facades; use Illuminate\Database\Eloquent\Model; use Illuminate\Support\Testing\Fakes\EventFake; class Event extends Facade { public static function fake($eventsToFake = []) { static::swap($fake = new EventFake(static::getFacadeRoot(), $eventsToFake)); Model::setEventDispatcher($fake); } protected static function getFacadeAccessor() { return 'events'; } } 

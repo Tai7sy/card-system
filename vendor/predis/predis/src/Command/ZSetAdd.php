@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class ZSetAdd extends Command { public function getId() { return 'ZADD'; } protected function filterArguments(array $arguments) { if (is_array(end($arguments))) { foreach (array_pop($arguments) as $member => $score) { $arguments[] = $score; $arguments[] = $member; } } return $arguments; } } 

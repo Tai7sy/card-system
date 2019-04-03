@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\Common\Annotations; interface Reader { function getClassAnnotations(\ReflectionClass $class); function getClassAnnotation(\ReflectionClass $class, $annotationName); function getMethodAnnotations(\ReflectionMethod $method); function getMethodAnnotation(\ReflectionMethod $method, $annotationName); function getPropertyAnnotations(\ReflectionProperty $property); function getPropertyAnnotation(\ReflectionProperty $property, $annotationName); } 

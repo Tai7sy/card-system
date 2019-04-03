@@ -1,0 +1,2 @@
+<?php
+ require __DIR__.'/shared.php'; $client = new Predis\Client($single_server); $responses = $client->pipeline(function ($pipe) { $pipe->flushdb(); $pipe->incrby('counter', 10); $pipe->incrby('counter', 30); $pipe->exists('counter'); $pipe->get('counter'); $pipe->mget('does_not_exist', 'counter'); }); var_export($responses); 

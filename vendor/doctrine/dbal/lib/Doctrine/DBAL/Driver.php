@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL; interface Driver { public function connect(array $params, $username = null, $password = null, array $driverOptions = array()); public function getDatabasePlatform(); public function getSchemaManager(Connection $conn); public function getName(); public function getDatabase(Connection $conn); } 

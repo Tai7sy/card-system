@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class PrivateDownloadUrl extends AbstractPlugin { public function getMethod() { return 'privateDownloadUrl'; } public function handle($path = null, $settings = 'default') { $adapter = $this->filesystem->getAdapter(); return $adapter->privateDownloadUrl($path, $settings); } }

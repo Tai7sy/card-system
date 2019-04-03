@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\Common\Persistence\Mapping\Driver; interface FileLocator { public function findMappingFile($className); public function getAllClassNames($globalBasename); public function fileExists($className); public function getPaths(); public function getFileExtension(); } 

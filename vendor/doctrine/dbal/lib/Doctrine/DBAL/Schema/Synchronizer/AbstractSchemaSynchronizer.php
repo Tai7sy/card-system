@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Schema\Synchronizer; use Doctrine\DBAL\Connection; abstract class AbstractSchemaSynchronizer implements SchemaSynchronizer { protected $conn; public function __construct(Connection $conn) { $this->conn = $conn; } protected function processSqlSafely(array $sql) { foreach ($sql as $s) { try { $this->conn->exec($s); } catch (\Exception $e) { } } } protected function processSql(array $sql) { foreach ($sql as $s) { $this->conn->exec($s); } } } 

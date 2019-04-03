@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class HyperLogLogCount extends Command { public function getId() { return 'PFCOUNT'; } protected function filterArguments(array $arguments) { return self::normalizeArguments($arguments); } } 

@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Types; use Doctrine\DBAL\Platforms\AbstractPlatform; class BigIntType extends Type { public function getName() { return Type::BIGINT; } public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform) { return $platform->getBigIntTypeDeclarationSQL($fieldDeclaration); } public function getBindingType() { return \PDO::PARAM_STR; } public function convertToPHPValue($value, AbstractPlatform $platform) { return (null === $value) ? null : (string) $value; } } 

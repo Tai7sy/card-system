@@ -1,0 +1,2 @@
+<?php
+ require __DIR__.'/shared.php'; function zpop($client, $key) { $element = null; $options = array( 'cas' => true, 'watch' => $key, 'retry' => 3, ); $client->transaction($options, function ($tx) use ($key, &$element) { @list($element) = $tx->zrange($key, 0, 0); if (isset($element)) { $tx->multi(); $tx->zrem($key, $element); } }); return $element; } $client = new Predis\Client($single_server); $zpopped = zpop($client, 'zset'); echo isset($zpopped) ? "ZPOPed $zpopped" : 'Nothing to ZPOP!', PHP_EOL; 

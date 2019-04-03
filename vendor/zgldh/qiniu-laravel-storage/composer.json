@@ -1,0 +1,43 @@
+{
+  "name": "abcsun/qiniu-laravel",
+  "type": "library",
+  "description": "Qiniu Resource (Cloud) Storage SDK for Laravel 5",
+  "keywords": [
+    "qiniu",
+    "storage",
+    "sdk",
+    "cloud",
+    "laravel"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "zgldh",
+      "email": "zgldh@hotmail.com",
+      "role": "Original Developer"
+    },
+    {
+      "name": "abcsun",
+      "email": "chenglongsun_nj@163.com",
+      "role": "Developer",
+      "homepage": "http://github.com/abcsun"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.3",
+    "qiniu/php-sdk": "^7.2",
+    "league/flysystem": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "zgldh\\QiniuStorage\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "zgldh\\QiniuStorage\\QiniuFilesystemServiceProvider"
+      ]
+    }
+  }
+}

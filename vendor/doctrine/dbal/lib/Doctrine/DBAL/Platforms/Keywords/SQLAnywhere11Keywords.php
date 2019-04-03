@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Platforms\Keywords; class SQLAnywhere11Keywords extends SQLAnywhereKeywords { public function getName() { return 'SQLAnywhere11'; } protected function getKeywords() { return array_merge( array_diff( parent::getKeywords(), array('IQ') ), array( 'MERGE', 'OPENSTRING' ) ); } } 

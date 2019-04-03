@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Exception; use Doctrine\DBAL\DBALException; class InvalidArgumentException extends DBALException { public static function fromEmptyCriteria() { return new self('Empty criteria was used, expected non-empty criteria'); } } 

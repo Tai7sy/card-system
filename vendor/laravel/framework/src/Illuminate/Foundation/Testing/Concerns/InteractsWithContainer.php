@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Foundation\Testing\Concerns; trait InteractsWithContainer { protected function swap($abstract, $instance) { return $this->instance($abstract, $instance); } protected function instance($abstract, $instance) { $this->app->instance($abstract, $instance); return $instance; } } 

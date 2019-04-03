@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Auth\Events; use Illuminate\Queue\SerializesModels; class Login { use SerializesModels; public $user; public $remember; public function __construct($user, $remember) { $this->user = $user; $this->remember = $remember; } } 

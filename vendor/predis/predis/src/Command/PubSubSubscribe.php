@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class PubSubSubscribe extends Command { public function getId() { return 'SUBSCRIBE'; } protected function filterArguments(array $arguments) { return self::normalizeArguments($arguments); } } 

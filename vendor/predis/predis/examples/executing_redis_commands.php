@@ -1,0 +1,2 @@
+<?php
+ require __DIR__.'/shared.php'; $client = new Predis\Client($single_server); $client->set('library', 'predis'); $response = $client->get('library'); var_export($response); echo PHP_EOL; $mkv = array( 'uid:0001' => '1st user', 'uid:0002' => '2nd user', 'uid:0003' => '3rd user', ); $client->mset($mkv); $response = $client->mget(array_keys($mkv)); var_export($response); echo PHP_EOL; $response = $client->executeRaw(array( 'MGET', 'uid:0001', 'uid:0002', 'uid:0003', )); var_export($response); echo PHP_EOL; 

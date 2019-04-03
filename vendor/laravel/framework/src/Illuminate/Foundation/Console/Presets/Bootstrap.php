@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Foundation\Console\Presets; class Bootstrap extends Preset { public static function install() { static::updatePackages(); static::updateSass(); static::removeNodeModules(); } protected static function updatePackageArray(array $packages) { return [ 'bootstrap-sass' => '^3.3.7', 'jquery' => '^3.1.1', ] + $packages; } protected static function updateSass() { copy(__DIR__.'/bootstrap-stubs/_variables.scss', resource_path('assets/sass/_variables.scss')); copy(__DIR__.'/bootstrap-stubs/app.scss', resource_path('assets/sass/app.scss')); } } 

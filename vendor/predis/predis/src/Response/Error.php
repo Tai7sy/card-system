@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Response; class Error implements ErrorInterface { private $message; public function __construct($message) { $this->message = $message; } public function getMessage() { return $this->message; } public function getErrorType() { list($errorType) = explode(' ', $this->getMessage(), 2); return $errorType; } public function __toString() { return $this->getMessage(); } } 

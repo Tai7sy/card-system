@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Types; use Doctrine\DBAL\Platforms\AbstractPlatform; class TextType extends Type { public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform) { return $platform->getClobTypeDeclarationSQL($fieldDeclaration); } public function convertToPHPValue($value, AbstractPlatform $platform) { return (is_resource($value)) ? stream_get_contents($value) : $value; } public function getName() { return Type::TEXT; } } 

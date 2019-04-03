@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class ListPushTail extends Command { public function getId() { return 'RPUSH'; } protected function filterArguments(array $arguments) { return self::normalizeVariadic($arguments); } } 

@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Types; use Doctrine\DBAL\Platforms\AbstractPlatform; class GuidType extends StringType { public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform) { return $platform->getGuidTypeDeclarationSQL($fieldDeclaration); } public function getName() { return Type::GUID; } public function requiresSQLCommentHint(AbstractPlatform $platform) { return !$platform->hasNativeGuidType(); } } 

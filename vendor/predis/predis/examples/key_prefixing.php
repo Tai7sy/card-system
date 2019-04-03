@@ -1,0 +1,2 @@
+<?php
+ require __DIR__.'/shared.php'; $client = new Predis\Client($single_server, array('prefix' => 'nrk:')); $client->mset(array('foo' => 'bar', 'lol' => 'wut')); var_export($client->mget('foo', 'lol')); var_export($client->keys('*')); 

@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Driver; interface ResultStatement extends \Traversable { public function closeCursor(); public function columnCount(); public function setFetchMode($fetchMode, $arg2 = null, $arg3 = null); public function fetch($fetchMode = null); public function fetchAll($fetchMode = null); public function fetchColumn($columnIndex = 0); } 

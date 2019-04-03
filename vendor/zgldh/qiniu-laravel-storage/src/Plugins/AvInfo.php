@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class AvInfo extends AbstractPlugin { public function getMethod() { return 'avInfo'; } public function handle($path = null) { return $this->filesystem->getAdapter()->avInfo($path); } } 

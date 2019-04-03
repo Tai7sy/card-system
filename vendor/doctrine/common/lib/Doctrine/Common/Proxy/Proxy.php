@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\Common\Proxy; use Closure; use Doctrine\Common\Persistence\Proxy as BaseProxy; interface Proxy extends BaseProxy { public function __setInitialized($initialized); public function __setInitializer(Closure $initializer = null); public function __getInitializer(); public function __setCloner(Closure $cloner = null); public function __getCloner(); public function __getLazyProperties(); } 

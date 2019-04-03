@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Sharding\ShardChoser; use Doctrine\DBAL\Sharding\PoolingShardConnection; class MultiTenantShardChoser implements ShardChoser { public function pickShard($distributionValue, PoolingShardConnection $conn) { return $distributionValue; } } 

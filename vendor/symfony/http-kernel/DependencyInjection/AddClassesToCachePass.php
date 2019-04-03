@@ -1,0 +1,2 @@
+<?php
+ namespace Symfony\Component\HttpKernel\DependencyInjection; @trigger_error('The '.__NAMESPACE__.'\AddClassesToCachePass class is deprecated since Symfony 3.3 and will be removed in 4.0.', E_USER_DEPRECATED); class AddClassesToCachePass extends AddAnnotatedClassesToCachePass { } 

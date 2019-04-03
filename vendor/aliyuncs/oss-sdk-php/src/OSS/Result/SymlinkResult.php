@@ -1,0 +1,2 @@
+<?php
+ namespace OSS\Result; use OSS\Core\OssException; use OSS\OssClient; class SymlinkResult extends Result { protected function parseDataFromResponse() { $this->rawResponse->header[OssClient::OSS_SYMLINK_TARGET] = rawurldecode($this->rawResponse->header[OssClient::OSS_SYMLINK_TARGET]); return $this->rawResponse->header; } } 

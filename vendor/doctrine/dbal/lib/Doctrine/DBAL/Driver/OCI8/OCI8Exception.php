@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Driver\OCI8; use Doctrine\DBAL\Driver\AbstractDriverException; class OCI8Exception extends AbstractDriverException { public static function fromErrorInfo($error) { return new self($error['message'], null, $error['code']); } } 

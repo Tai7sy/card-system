@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Profile; class RedisUnstable extends RedisVersion320 { public function getVersion() { return '3.2'; } public function getSupportedCommands() { return array_merge(parent::getSupportedCommands(), array( )); } } 

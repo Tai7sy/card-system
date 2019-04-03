@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Types; use Doctrine\DBAL\Platforms\AbstractPlatform; class StringType extends Type { public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform) { return $platform->getVarcharTypeDeclarationSQL($fieldDeclaration); } public function getDefaultLength(AbstractPlatform $platform) { return $platform->getVarcharDefaultLength(); } public function getName() { return Type::STRING; } } 

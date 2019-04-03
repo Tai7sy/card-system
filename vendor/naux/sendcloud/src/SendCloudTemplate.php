@@ -1,0 +1,2 @@
+<?php
+ namespace Naux\Mail; class SendCloudTemplate { private $name; public function __construct($name, array $bind_data) { $this->name = $name; $this->bind_data = $bind_data; } private $bind_data; public function getName() { return $this->name; } public function getBindData() { $data = []; foreach ($this->bind_data as $key => $value) { $data["%$key%"] = [$value]; } return $data; } } 

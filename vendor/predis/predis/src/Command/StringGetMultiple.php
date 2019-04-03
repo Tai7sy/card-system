@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class StringGetMultiple extends Command { public function getId() { return 'MGET'; } protected function filterArguments(array $arguments) { return self::normalizeArguments($arguments); } } 

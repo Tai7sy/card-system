@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Auth; use Exception; class AuthenticationException extends Exception { protected $guards; public function __construct($message = 'Unauthenticated.', array $guards = []) { parent::__construct($message); $this->guards = $guards; } public function guards() { return $this->guards; } } 

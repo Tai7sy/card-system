@@ -1,0 +1,2 @@
+<?php
+ namespace Doctrine\DBAL\Schema; class View extends AbstractAsset { private $_sql; public function __construct($name, $sql) { $this->_setName($name); $this->_sql = $sql; } public function getSql() { return $this->_sql; } } 

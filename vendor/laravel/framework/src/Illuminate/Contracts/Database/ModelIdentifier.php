@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Contracts\Database; class ModelIdentifier { public $class; public $id; public $connection; public function __construct($class, $id, $connection) { $this->id = $id; $this->class = $class; $this->connection = $connection; } } 

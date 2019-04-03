@@ -1,0 +1,2 @@
+<?php
+ namespace Illuminate\Http\Testing; class FileFactory { public function create($name, $kilobytes = 0) { return tap(new File($name, tmpfile()), function ($file) use ($kilobytes) { $file->sizeToReport = $kilobytes * 1024; }); } public function image($name, $width = 10, $height = 10) { return new File($name, $this->generateImage($width, $height)); } protected function generateImage($width, $height) { return tap(tmpfile(), function ($temp) use ($width, $height) { ob_start(); imagepng(imagecreatetruecolor($width, $height)); fwrite($temp, ob_get_clean()); }); } } 

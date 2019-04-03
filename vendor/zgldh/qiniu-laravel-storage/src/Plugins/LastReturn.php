@@ -1,0 +1,2 @@
+<?php
+ namespace zgldh\QiniuStorage\Plugins; use League\Flysystem\Plugin\AbstractPlugin; class LastReturn extends AbstractPlugin { public function getMethod() { return 'lastReturn'; } public function handle($path = null) { return $this->filesystem->getAdapter()->getLastReturn(); } } 

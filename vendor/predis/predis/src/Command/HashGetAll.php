@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class HashGetAll extends Command { public function getId() { return 'HGETALL'; } public function parseResponse($data) { $result = array(); for ($i = 0; $i < count($data); ++$i) { $result[$data[$i]] = $data[++$i]; } return $result; } } 

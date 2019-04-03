@@ -1,0 +1,2 @@
+<?php
+ namespace Predis\Command; class ListPopFirstBlocking extends Command { public function getId() { return 'BLPOP'; } protected function filterArguments(array $arguments) { if (count($arguments) === 2 && is_array($arguments[0])) { list($arguments, $timeout) = $arguments; array_push($arguments, $timeout); } return $arguments; } } 
