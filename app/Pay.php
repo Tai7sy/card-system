@@ -1,0 +1,2 @@
+<?php
+namespace App; use Illuminate\Database\Eloquent\Model; class Pay extends Model { protected $guarded = array(); const ENABLED_DISABLED = 0; const ENABLED_PC = 1; const ENABLED_MOBILE = 2; const ENABLED_ALL = 3; }

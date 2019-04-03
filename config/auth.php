@@ -1,0 +1,2 @@
+<?php
+return array('defaults' => array('guard' => 'web', 'passwords' => 'users'), 'guards' => array('web' => array('driver' => 'session', 'provider' => 'users'), 'api' => array('driver' => 'token', 'provider' => 'users')), 'providers' => array('users' => array('driver' => 'eloquent', 'model' => App\User::class)), 'passwords' => array('users' => array('provider' => 'users', 'table' => 'password_resets', 'expire' => 60)));

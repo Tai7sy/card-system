@@ -1,0 +1,2 @@
+<?php
+use Illuminate\Support\Facades\Schema; use Illuminate\Database\Schema\Blueprint; use Illuminate\Database\Migrations\Migration; class CreateShopTemplatesTable extends Migration { public function up() { Schema::create('shop_templates', function (Blueprint $spd19505) { $spd19505->increments('id'); $spd19505->string('name'); $spd19505->string('description')->nullable(); $spd19505->boolean('enabled')->default(true); }); } public function down() { Schema::dropIfExists('shop_templates'); } }
