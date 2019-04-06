@@ -112,7 +112,8 @@
                 goPage(app_url, app_package);
             });
             setTimeout(function () {
-                goPage(app_url, app_package);
+                // 好像有点问题, 加了限制 2019年4月6日 19:07:29
+                // goPage(app_url, app_package);
             }, 100);
         } else {
             $('#open-app-container').hide();
