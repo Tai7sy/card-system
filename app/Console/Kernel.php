@@ -32,11 +32,13 @@ class Kernel extends ConsoleKernel
     {
         try {
             DB::connection()->getPdo();
-            if (DB::table('migrations')->count() === 0) {
-                die(" * No migration table, please install your website first.\r\n");
-            }
-            if (!Schema::hasTable('systems')) {
-                die(" * No system table, please install your website first.\r\n");
+            if (Schema::hasTable('migrations')) {
+                // 有安装表, 已经安装过?
+                if (!Schema::hasTable('systems')) {
+                    die(" * No system table, please install your website first.\r\n");
+                }
+            } else {
+                return;
             }
         } catch (\Exception $e) {
             if (config('database.connections.mysql.host') === '数据库地址') {

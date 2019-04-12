@@ -207,8 +207,8 @@ class HomeController extends Controller
             ]);
         }
         $product->category->setVisible(['id', 'name', 'password_open']);
-        $count = count($product->cards) ? $product->cards[0]->count : 0;
-        if ($product->user->shop_inventory == \App\User::inventory_range) {
+        $count = $product->count;
+        if (System::_getInt('shop_inventory') == \App\User::inventory_range) {
             if ($count <= 0) {
                 $count2 = '不足';
             } elseif ($count <= 10) {

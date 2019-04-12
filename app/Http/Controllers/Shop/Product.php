@@ -27,8 +27,8 @@ class Product extends Controller
             ->orderBy('sort')
             ->get();
         foreach ($products as $product) {
-            $count = count($product->cards) ? intval($product->cards[0]->count) : 0;
-            if ($category->user->shop_inventory == \App\User::inventory_range) {
+            $count = $product->count;
+            if (System::_getInt('shop_inventory') == \App\User::inventory_range) {
                 if ($count <= 0) {
                     $count2 = '不足';
                 } elseif ($count <= 10) {
