@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bb9ca7f75d6f11779191cae690a56137",
+    "content-hash": "c97229b498242940ff8487d7729e94d8",
     "packages": [
         {
             "name": "aliyuncs/oss-sdk-php",
@@ -4712,6 +4712,50 @@
                 "utf8"
             ],
             "time": "2018-10-19T20:36:08+00:00"
+        },
+        {
+            "name": "wi1dcard/alipay-sdk",
+            "version": "v1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wi1dcard/alipay-sdk-php.git",
+                "reference": "9a7fedd0fa3a24c7945137b36640904cb93e7972"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wi1dcard/alipay-sdk-php/zipball/9a7fedd0fa3a24c7945137b36640904cb93e7972",
+                "reference": "9a7fedd0fa3a24c7945137b36640904cb93e7972",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://dl.laravel-china.org/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "ext-openssl": "*",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=4.8",
+                "vlucas/phpdotenv": "^2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Alipay\\": "aop/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "wi1dcard",
+                    "email": "wi1dcard@qq.com"
+                }
+            ],
+            "description": "支付宝（蚂蚁金服）开放平台第三方 PHP SDK，基于官方 3.3.1 版本。",
+            "time": "2019-03-04T06:07:06+00:00"
         },
         {
             "name": "zgldh/qiniu-laravel-storage",

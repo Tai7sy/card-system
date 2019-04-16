@@ -28,7 +28,7 @@ class Product extends Controller
             ->get();
         foreach ($products as $product) {
             $count = $product->count;
-            if (System::_getInt('shop_inventory') == \App\User::inventory_range) {
+            if (\App\System::_getInt('shop_inventory') == \App\User::inventory_range) {
                 if ($count <= 0) {
                     $count2 = '不足';
                 } elseif ($count <= 10) {

@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 
 class Pay extends Controller
 {
@@ -301,7 +302,8 @@ class Pay extends Controller
         }
         return view('pay/' . $pay_file, [
             'pay_id' => $order->pay_id,
-            'name' => $order->product_id === \App\Product::ID_API ? $order->api_out_no : $order->product->name,
+            'name' => $order->product->name . ' x ' . $order->count . '件',
+            'amount' => $order->paid,
             'qrcode' => $request->get('url'),
             'id' => $order_no
         ]);
