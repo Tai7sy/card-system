@@ -43,7 +43,7 @@ class Api implements ApiInterface
 
         $payway = strtolower($config['payway']);
 
-        $api->goPay($payway, $out_trade_no, 0, $amount_cent, '', $this->url_return, $this->url_notify);
+        $api->goPay($payway, $subject, $out_trade_no, 0, $amount_cent, '', $this->url_return, $this->url_notify);
     }
 
     function verify($config, $successCallback)
