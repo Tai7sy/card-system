@@ -571,7 +571,7 @@ $(function () {
 
         if (config.categories.length === 1) {
             categories.val(config.categories[0].id);
-            getProducts(config.categories[0].id);
+            // getProducts(config.categories[0].id);  // 一个分类时, 商品预加载
             if(config.categories[0].password_open === false){
                 categories.prop('disabled', true);
             }

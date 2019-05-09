@@ -57,6 +57,14 @@ class HomeController extends Controller
             // 如果是分类连接
             $config['categories'] = [$category];
             $config['product'] = null;
+            $products = Product::where('category_id', $category->id)
+                ->where('enabled', 1)
+                ->orderBy('sort')
+                ->get();
+            foreach ($products as $product) {
+                $product->setForShop();
+            };
+            $config['products'] = $products->toArray();
             $name = $category->name . ' - ' . $config['name'];
             $description = $category->name;
         } else {
@@ -207,25 +215,7 @@ class HomeController extends Controller
             ]);
         }
         $product->category->setVisible(['id', 'name', 'password_open']);
-        $count = $product->count;
-        if (System::_getInt('shop_inventory') == \App\User::inventory_range) {
-            if ($count <= 0) {
-                $count2 = '不足';
-            } elseif ($count <= 10) {
-                $count2 = '少量';
-            } elseif ($count <= 20) {
-                $count2 = '一般';
-            } else {
-                $count2 = '大量';
-            }
-            $product->setAttribute('count2', $count2);
-        } else {
-            $product->setAttribute('count2', $count); // 页面展示的数量
-        }
-        $product->setAttribute('count', $count); // 真正的数量
-
-        $product->setVisible(['id', 'name', 'description', 'count', 'count2', 'buy_min', 'buy_max',
-            'support_coupon', 'password_open', 'price', 'price_whole']);
+        $product->setForShop();
         return $this->_shop_render($product->user, $product->category, $product);
     }
 

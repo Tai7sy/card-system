@@ -27,24 +27,8 @@ class Product extends Controller
             ->orderBy('sort')
             ->get();
         foreach ($products as $product) {
-            $count = $product->count;
-            if (\App\System::_getInt('shop_inventory') == \App\User::inventory_range) {
-                if ($count <= 0) {
-                    $count2 = '不足';
-                } elseif ($count <= 10) {
-                    $count2 = '少量';
-                } elseif ($count <= 20) {
-                    $count2 = '一般';
-                } else {
-                    $count2 = '大量';
-                }
-                $product->setAttribute('count2', $count2);
-            }else{
-                $product->setAttribute('count2', $count); // 页面展示的数量
-            }
-            $product->setAttribute('count', $count); // 真正的数量
-            $product->setVisible(['id', 'name', 'description', 'count', 'count2', 'buy_min', 'buy_max',
-                'support_coupon', 'password_open', 'price', 'price_whole']);
+            /** @var \App\Product $product */
+            $product->setForShop();
         }
         return Response::success($products);
     }
