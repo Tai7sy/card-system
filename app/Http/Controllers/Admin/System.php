@@ -6,6 +6,7 @@ use App\Library\Helper;
 use App\Library\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
 
 class System extends Controller
 {
@@ -264,9 +265,9 @@ class System extends Controller
         ]);
         $to = $request->post('to');
         try {
-            $ret = \Mail::to($to)->send(new \App\Mail\Test);
+            $ret = Mail::to($to)->send(new \App\Mail\Test);
             return Response::success($ret);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \App\Library\LogHelper::setLogFile('mail');
             \Log::error('Mail Test Exception:' . $e->getMessage());
             return Response::fail($e->getMessage(), $e);

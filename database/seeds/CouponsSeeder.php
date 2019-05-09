@@ -24,7 +24,7 @@ class CouponsSeeder extends Seeder
                 'count_used' => 0,
                 'count_all' => 10,
                 'remark' => '系统生成',
-                'expire_at' => (new \Carbon\Carbon)->addDay(30)
+                'expire_at' => (new \Carbon\Carbon)->addDays(-30)
             ]
         ]);
     }

@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class Pay extends Controller
 {
@@ -95,15 +96,7 @@ class Pay extends Controller
         if (!$category_id || !$product_id)
             return self::renderResultPage($request, ['msg' => '请选择商品']);
         if (strlen($email) < 1)
-            return self::renderResultPage($request, ['msg' => '请输入邮箱']);
-
-        /* @var \App\Category $category */
-        $category = Category::findOrFail($category_id);
-        if ($category->password_open) {
-            if ($category->password !== $request->input('category_password')) {
-                return Response::fail('分类密码输入错误');
-            }
-        }
+            return self::renderResultPage($request, ['msg' => '请输入联系方式']);
 
         /* @var \App\Category $category */
         $product = Product::where('id', $product_id)
@@ -115,7 +108,14 @@ class Pay extends Controller
 
         if ($product->password_open) {
             if ($product->password !== $request->input('product_password')) {
-                return Response::fail('分类密码输入错误');
+                return self::renderResultPage($request, ['msg' => '商品密码输入错误']);
+            }
+        } else {
+            // 如果商品设置了密码, 那么不校验分类密码也OK
+            if ($category->password_open) {
+                if ($category->password !== $request->input('category_password')) {
+                    return self::renderResultPage($request, ['msg' => '分类密码输入错误']);
+                }
             }
         }
 
@@ -124,9 +124,6 @@ class Pay extends Controller
 
         if ($count > $product->buy_max)
             return self::renderResultPage($request, ['msg' => '该商品限购' . $product->buy_max . '件，请重新选择']);
-
-
-        $product->setAttribute('count', count($product->cards) ? $product->cards[0]->count : 0);
 
         if ($product->count < $count)
             return self::renderResultPage($request, ['msg' => '该商品库存不足']);
@@ -151,6 +148,7 @@ class Pay extends Controller
         $price = $count * $per_price;
         // 计算商品 使用优惠券后的价格 ( 实际支付 )
         $pay_money = $price;
+        $discount_fee = 0;
         $used_coupon = null;
         if ($product->support_coupon && strlen($coupon) > 0) {
             $coupons = \App\Coupon::where('user_id', $product->user_id)
@@ -163,17 +161,19 @@ class Pay extends Controller
                         ($c->product_id === -1 || $c->product_id === $product_id))) {
 
                     if ($c->discount_type === \App\Coupon::DISCOUNT_TYPE_AMOUNT && $pay_money > $c->discount_val) {
+                        // 必须大于支付金额
                         $used_coupon = $c;
-                        $pay_money = $pay_money - $c->discount_val;
+                        $discount_fee = $c->discount_val;
                         break;
                     }
                     if ($c->discount_type === \App\Coupon::DISCOUNT_TYPE_PERCENT) {
                         $used_coupon = $c;
-                        $pay_money = $pay_money - intval($pay_money * $c->discount_val / 100);
+                        $discount_fee = (int)round($pay_money * $c->discount_val / 100);
                         break;
                     }
                 }
             }
+            $pay_money -= $discount_fee;
         }
 
         if ($used_coupon) {
@@ -201,7 +201,7 @@ class Pay extends Controller
             'email_sent' => false,
             'cost' => $count * $product->cost, // 商户成本
             'price' => $price, // 应售价格
-            'discount' => $price - $pay_money, // 优惠金额
+            'discount' => $discount_fee, // 优惠金额
             'paid' => $pay_money, //实际支付金额
             'pay_id' => $pay->id,
             'fee' => $system_fee,
@@ -264,6 +264,11 @@ class Pay extends Controller
         })) {
             \Log::notice($logTag . ' already success' . "\n\n");
             return redirect('/pay/result/' . $order_no);
+        }
+
+        // 超过 5 分钟就不准重新进入页面了, 但是已经在页面的是不影响支付的
+        if($order->created_at < Carbon::now()->addMinutes(-5)){
+            return $this->renderResultPage($request, ['msg' => '当前订单长时间未支付已作废, 请重新下单']);
         }
 
         $product = Product::where('id', $order->product_id)
@@ -621,7 +626,7 @@ class Pay extends Controller
                         // \Log::debug('shipOrder.count_warn step2');
                         \Mail::to($order->user->email)->Queue(new ProductCountWarn($product, $product->count));
                         // \Log::debug('shipOrder.count_warn step3, email:' . $order->user->email);
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         // set to mail
                         \App\Library\LogHelper::setLogFile('mail');
                         \Log::error('shipOrder.count_warn error, product_id:' . $order->product_id .
@@ -683,10 +688,10 @@ class Pay extends Controller
         if ($renderToEmail) {
             $cards_br = join('<br>', $cards);
             try {
-                \Mail::to($order->email)->Queue(new OrderShipped($order, $card_msg, $cards_br));
+                Mail::to($order->email)->Queue(new OrderShipped($order, $card_msg, $cards_br));
                 $order->email_sent = true;
                 $order->saveOrFail();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // set to mail
                 \App\Library\LogHelper::setLogFile('mail');
                 \Log::error('shipOrder.need_mail error, order_no:' . $order->order_no .
