@@ -185,9 +185,9 @@ class Order extends Controller
             return Response::fail('订单不是待发货状态, 无法发货');
         }
         $errMsg = null;
-        $cardsTxt = '';
+        $card_arr = [];
         if (FundHelper::orderSuccess($order,
-            function () use (&$order, &$errMsg, &$cardsTxt) {
+            function () use (&$order, &$errMsg, &$card_arr) {
                 /** @var \App\Order $order */
                 $order = \App\Order::where('id', $order->id)->lockForUpdate()->firstOrFail();
 
@@ -206,24 +206,17 @@ class Order extends Controller
                 } else {
                     $order->status = \App\Order::STATUS_SUCCESS;
                     $order->saveOrFail();
+
                     $card_ids = [];
-                    $card_arr = [];
                     foreach ($cards as $card) {
-                        $cardsTxt .= $card->card . '<br>';
                         $card_ids[] = $card->id;
-                        $card_arr[] = [
-                            'card' => $card->card
-                        ];
+                        $card_arr[] = $card->card;
                     }
                     $order->cards()->attach($card_ids); // 使用了 card_order 这个中间表
                     \App\Card::whereIn('id', $card_ids)->update([
                         'status' => \App\Card::STATUS_SOLD,
                         'count_sold' => DB::raw('`count_sold`+1')
                     ]);
-
-                    $order->addHidden(['system_fee']);
-                    $order = $order->toArray();
-                    $order['cards'] = $card_arr;
 
                     return \App\Order::STATUS_SUCCESS;
                 }
@@ -233,24 +226,30 @@ class Order extends Controller
                 return Response::fail($errMsg);
             } else {
                 if (filter_var($order->email, FILTER_VALIDATE_EMAIL)) {
+                    $cards_br = join('<br>', $card_arr);
                     try {
                         Mail::to($order->email)->Queue(
                             new OrderShipped($order,
                                 '订单#' . $order->order_no . '&nbsp;已支付，卡号列表：',
-                                $cardsTxt));
+                                $cards_br));
                         $order->email_sent = true;
                         $order->saveOrFail();
                     } catch (\Throwable $e) {
                         // set to mail
                         \App\Library\LogHelper::setLogFile('mail');
                         \Log::error('Order.ship error, order_no:' . $order->order_no .
-                            ', email:' . $order->email . ', cards:' . $cardsTxt .
+                            ', email:' . $order->email . ', cards:' . $cards_br .
                             ', Exception:' . $e->getMessage());
 
                         // 还原
                         \App\Library\LogHelper::setLogFile('card');
                     }
                 }
+                $order->addHidden(['system_fee']);
+                $order = $order->toArray();
+                $order['cards'] = array_map(function ($item) {
+                    return ['card' => $item];
+                }, $card_arr);
                 return Response::success($order);
             }
         } else {
