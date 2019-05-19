@@ -13,8 +13,9 @@ class Product extends Model
     const ID_API = -1001;
 
 
-    function getUrlAttribute(){
-        return config('app.url') . '/p/' . Helper::id_encode($this->id,Helper::ID_TYPE_PRODUCT);
+    function getUrlAttribute()
+    {
+        return config('app.url') . '/p/' . Helper::id_encode($this->id, Helper::ID_TYPE_PRODUCT);
     }
 
     function getCountAttribute()
@@ -65,11 +66,19 @@ class Product extends Model
 
     /**
      * 设置一些属性, 为了商铺页面做准备
+     * @param User $user 传递一个user 复用, 不然每次都要获取
      */
-    function setForShop(){
+    function setForShop($user = null)
+    {
         $product = $this;
         $count = $product->count;
-        if ($product->user->shop_inventory == User::inventory_range) {
+
+        //$inventory = $product->inventory;
+        //if ($inventory == User::INVENTORY_AUTO) {
+        $inventory = System::_getInt('shop_inventory');
+        //}
+
+        if ($inventory == User::INVENTORY_RANGE) {
             if ($count <= 0) {
                 $count2 = '不足';
             } elseif ($count <= 10) {

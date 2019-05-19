@@ -106,15 +106,18 @@ class Pay extends Controller
         if ($product == null || $product->user == null)
             return self::renderResultPage($request, ['msg' => '该商品未找到，请重新选择']);
 
+        // 如果商品设置了密码, 那么不校验分类密码
         if ($product->password_open) {
             if ($product->password !== $request->input('product_password')) {
                 return self::renderResultPage($request, ['msg' => '商品密码输入错误']);
             }
         } else {
-            // 如果商品设置了密码, 那么不校验分类密码也OK
             if ($category->password_open) {
                 if ($category->password !== $request->input('category_password')) {
-                    return self::renderResultPage($request, ['msg' => '分类密码输入错误']);
+                    // 检查下是否从商品链接过来的(商品链接会把分类临时密码写进去)
+                    if ($category->getTmpPassword() !== $request->input('category_password')) {
+                        return self::renderResultPage($request, ['msg' => '分类密码输入错误']);
+                    }
                 }
             }
         }
@@ -474,9 +477,9 @@ class Pay extends Controller
         if ($order->status === \App\Order::STATUS_PAID) {
             // 处于已支付 (不是 SUCCESS) , 说明没货了
             $qq = $order->user->qq;
-            $msg = '商家库存不足，因此卡密没有自动发货，请联系商家客服发货';
+            $msg = '商家库存不足，因此没有自动发货，请联系商家客服发货';
             if ($qq) {
-                $msg .= '<br><a href="http://wpa.qq.com/msgrd?v=3&uin=' . $qq . '&site=qq&menu=yes" target="_blank">商家客服QQ:' . $qq . '</a>';
+                $msg .= '<br><a href="http://wpa.qq.com/msgrd?v=3&uin=' . $qq . '&site=qq&menu=yes" target="_blank">客服QQ:' . $qq . '</a>';
             }
             return self::renderResultPage($request, [
                 'success' => false,
@@ -673,16 +676,16 @@ class Pay extends Controller
             // 即: $order->count === 1
             if (count($cards)) {
                 // 应该不会到这个分支, 因为检测到卡密不够不会发货
-                $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，目前库存不足，您还有' . ($order->count - count($cards)) . '张卡密未发货，请联系商家客服发货<br>已发货卡密见下方：<br>';
+                $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，目前库存不足，您还有' . ($order->count - count($cards)) . '件未发货，请联系商家客服发货<br>已发货商品见下方：<br>';
             } else {
-                $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，目前库存不足，您购买的' . ($order->count - count($cards)) . '张卡密未发货，请联系商家客服发货<br>';
+                $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，目前库存不足，您购买的' . ($order->count - count($cards)) . '件未发货，请联系商家客服发货<br>';
             }
             $qq = $order->user->qq;
             if ($qq) {
                 $card_msg .= '<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $qq . '&site=qq&menu=yes" target="_blank">商家客服QQ:' . $qq . '</a><br>';
             }
         } else {
-            $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，卡号列表：';
+            $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，您购买的内容如下：';
         }
 
         if ($renderToEmail) {

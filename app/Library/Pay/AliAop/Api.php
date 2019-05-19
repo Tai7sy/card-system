@@ -126,7 +126,11 @@ class Api implements ApiInterface
                     'out_trade_no' => $out_trade_no, // 商户网站唯一订单号
                 ],
             ]);
-            $result = $this->aop($config)->execute($request)->getData();
+            try {
+                $result = $this->aop($config)->execute($request)->getData();
+            } catch (\Throwable $e) {
+                return false;
+            }
             if ($result['trade_status'] === 'TRADE_SUCCESS') {
                 $trade_no = $result['trade_no'];//支付宝交易号
                 $total_fee = (int)round($result['total_amount'] * 100);

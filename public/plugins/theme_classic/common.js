@@ -1,10 +1,6 @@
 var currentCategory = null;
 var currentProduct = null;
 var currentCouponInfo = null;
-var buyParam = {
-    category_password: '',
-    product_password: ''
-};
 var codeValidate = null;
 var shopType = 'shop';
 if (config.product && config.product.id > 0) {
@@ -77,6 +73,9 @@ function renderQuill(delta, checkEmpty) {
 }
 
 function selectCategory(id) {
+    if (id <= 0) {
+        currentCategory = null;
+    }
     var categories = $('#categories');
     if (config.theme.list_type === 'button') {
         categories.children().removeClass('checked');
@@ -87,6 +86,9 @@ function selectCategory(id) {
 }
 
 function selectProduct(id) {
+    if (id <= 0) {
+        currentProduct = null;
+    }
     var products = $('#products');
     if (config.theme.list_type === 'button') {
         products.children().removeClass('checked');
@@ -118,7 +120,6 @@ function getProducts(category_id) {
     if (category_id < 1) return;
 
     selectProduct(-1);
-    currentProduct = null;
     if (config.theme.list_type === 'dropdown') {
         $('#products > option:first-child').text('加载中...');
     }
@@ -130,6 +131,32 @@ function getProducts(category_id) {
         }
     }
 
+    function showProductsHtml(products) {
+        clearProductInfo();
+        var children = [];
+        products.forEach(function (e) {
+            var tmp = document.createElement(config.theme.list_type === 'button' ? 'div' : 'option');
+            if (config.theme.list_type === 'button') {
+                tmp.setAttribute('class', 'button-select-item');
+                tmp.setAttribute('data-id', e.id);
+                tmp.setAttribute('onclick', 'productsChange(' + e.id + ');');
+            }
+            tmp.setAttribute('value', e.id);
+            tmp.innerText = e.name;
+            children.push(tmp)
+        });
+        if (config.theme.list_type === 'button') {
+            $('#products').html(children);
+        } else {
+            $('#products').html('<option value="-1">请选择商品</option>').append(children);
+        }
+    }
+
+    if (currentCategory.products) {
+        showProductsHtml(currentCategory.products);
+        return;
+    }
+
     var queryData = {
         category_id: category_id
     };
@@ -137,29 +164,13 @@ function getProducts(category_id) {
     var next = function () {
         $.post('/api/shop/product', queryData).success(function (res) {
             if (currentCategory.id !== +category_id) {
+                // 如果在请求过程中已经选择了另一个分类, 则返回
                 return;
             }
-            config.products = res.data;
-            clearProductInfo();
-            var children = [];
-            res.data.forEach(function (e) {
-                var tmp = document.createElement(config.theme.list_type === 'button' ? 'div' : 'option');
-                if (config.theme.list_type === 'button') {
-                    tmp.setAttribute('class', 'button-select-item');
-                    tmp.setAttribute('data-id', e.id);
-                    tmp.setAttribute('onclick', 'productsChange(' + e.id + ');');
-                }
-                tmp.setAttribute('value', e.id);
-                tmp.innerText = e.name;
-                children.push(tmp)
-            });
-            if (config.theme.list_type === 'button') {
-                $('#products').html(children);
-            } else {
-                $('#products').html('<option value="-1">请选择商品</option>').append(children);
-            }
+            currentCategory.password = queryData.password;
+            currentCategory.products = res.data;
+            showProductsHtml(currentCategory.products);
 
-            buyParam.category_password = queryData.password;
         }).error(function () {
             if (config.theme.list_type === 'button') {
                 $('#products').html('');
@@ -167,7 +178,6 @@ function getProducts(category_id) {
                 $('#products').html('<option value="-1">请选择商品</option>');
             }
             selectCategory(-1);
-            currentCategory = null;
         });
     };
 
@@ -176,7 +186,6 @@ function getProducts(category_id) {
             if (!password || !password.length) {
                 showToast('warn', '请输入分类密码');
                 selectCategory(-1);
-                currentCategory = null;
                 if (config.theme.list_type === 'button') {
                     $('#products').html('');
                 } else {
@@ -192,11 +201,11 @@ function getProducts(category_id) {
     }
 }
 
-
+// 选择产品时, 显示详细信息
 function showProductInfo(product) {
     clearProductInfo();
 
-    var next = function () {
+    function renderInfoToHtml() {
         $('#price').text((product.price / 100).toFixed(2));
         $('#invent').html('库存: ' + product.count2);
         $('#description').html(renderQuill(product.description)).show();
@@ -225,28 +234,26 @@ function showProductInfo(product) {
         calcTotalPrice();
     };
 
-    if (product.password_open) {
+
+    if (product.password_open && !product.password) {
         passwordDialog('请输入商品密码', function (password) {
             if (!password || !password.length) {
                 showToast('warn', '请输入商品密码');
                 selectProduct(-1);
-                currentProduct = null;
                 return;
             }
             $.post('/api/shop/product/password', {
                 product_id: product.id,
                 password: password
             }).success(function () {
-                buyParam.category_password = password;
-                next();
+                product.password = password;
+                renderInfoToHtml();
             }).error(function () {
                 selectProduct(-1);
-                currentProduct = null;
             });
         });
     } else {
-        buyParam.product_password = undefined;
-        next();
+        renderInfoToHtml();
     }
 }
 
@@ -412,28 +419,9 @@ function getPayway() {
 }
 
 function order(type) {
-    if (!currentCategory) {
-        showToast('error', '请选择商品分类');
-        $('#categories').focus();
-        return false; // 阻止冒泡
-    }
-
-    if (!currentProduct) {
-        showToast('error', '请选择商品');
-        $('#products').focus();
-        return false;
-    }
+    // assert(currentCategory !== null);
+    // assert(currentProduct !== null);
     var contact = $('#contact').val();
-    if (!contact || contact.length < 6) {
-        msg({
-            type: 'error',
-            content: '联系方式长度至少为6位',
-            then: function () {
-                $('#contact').focus();
-            }
-        });
-        return;
-    }
 
     if (!calcTotalPrice()) {
         return;
@@ -446,10 +434,10 @@ function order(type) {
     }
 
     var orderUrl = window.config.url + '/api/shop/buy?category_id=' + currentCategory.id + '&product_id=' + currentProduct.id;
-    if (buyParam.category_password)
-        orderUrl += '&category_password=' + encodeURIComponent(buyParam.category_password);
-    if (buyParam.product_password)
-        orderUrl += '&product_password=' + encodeURIComponent(buyParam.product_password);
+    if (currentCategory.password)
+        orderUrl += '&category_password=' + encodeURIComponent(currentCategory.password);
+    if (currentProduct.password)
+        orderUrl += '&product_password=' + encodeURIComponent(currentProduct.password);
     orderUrl += '&count=' + $('#quantity').val() +
         '&coupon=' + encodeURIComponent($('#coupon').val()) +
         '&email=' + encodeURIComponent(contact) +
@@ -492,7 +480,9 @@ function checkOrder() {
             type: 'error',
             content: '联系方式长度至少为6位',
             then: function () {
-                $('#contact').focus();
+                setTimeout(function () {
+                    $('#contact').focus();
+                }, 500);
             }
         });
         return false;
@@ -502,8 +492,6 @@ function checkOrder() {
 }
 
 $(function () {
-    buyParam.product_password = getParameterByName('p');
-
     $('#ann>.container').html(renderQuill(config.shop.ann));
     if (config.shop.ann_pop) {
         var ann_pop = renderQuill(config.shop.ann_pop, true);
@@ -515,9 +503,9 @@ $(function () {
         }
     }
 
-    var categories = $('#categories');
-    var products = $('#products');
-    var categoriesElement = [];
+    var categoriesElm = $('#categories');
+    var productsElm = $('#products');
+    var categoryElms = [];
     config.categories.forEach(function (e) {
         var tmp = document.createElement(config.theme.list_type === 'button' ? 'div' : 'option');
         if (config.theme.list_type === 'button') {
@@ -531,23 +519,23 @@ $(function () {
         }
         tmp.setAttribute('value', e.id);
         tmp.innerText = e.name;
-        categoriesElement.push(tmp)
+        categoryElms.push(tmp)
     });
 
     if (config.theme.list_type === 'button') {
         window.categoriesChange = function (id) {
-            categories.children().removeClass('checked');
-            categories.children('[data-id=' + id + ']').addClass('checked');
+            categoriesElm.children().removeClass('checked');
+            categoriesElm.children('[data-id=' + id + ']').addClass('checked');
             getProducts(id);
         };
         window.productsChange = function (id) {
-            products.children().removeClass('checked');
-            products.children('[data-id=' + id + ']').addClass('checked');
+            productsElm.children().removeClass('checked');
+            productsElm.children('[data-id=' + id + ']').addClass('checked');
 
             clearProductInfo();
-            for (var i = 0; i < config.products.length; i++) {
-                if (config.products[i].id === +id) {
-                    showProductInfo(config.products[i]);
+            for (var i = 0; i < currentCategory.products.length; i++) {
+                if (currentCategory.products[i].id === +id) {
+                    showProductInfo(currentCategory.products[i]);
                     break;
                 }
             }
@@ -561,34 +549,35 @@ $(function () {
         tmp.setAttribute('value', config.product.id);
         tmp.innerText = config.product.name;
 
-        categories.html(categoriesElement).prop('disabled', true);
+        categoriesElm.html(categoryElms).prop('disabled', true);
         currentCategory = config.categories[0];
-        products.html(tmp).prop('disabled', true);
+        productsElm.html(tmp).prop('disabled', true);
 
+        config.product.password = getParameterByName('p');
         showProductInfo(config.product);
     } else {
-        categories.append(categoriesElement);
+        categoriesElm.append(categoryElms);
 
         if (config.categories.length === 1) {
-            categories.val(config.categories[0].id);
+            categoriesElm.val(config.categories[0].id);
             // getProducts(config.categories[0].id);  // 一个分类时, 商品预加载
-            if(config.categories[0].password_open === false){
-                categories.prop('disabled', true);
+            if (config.categories[0].password_open === false) {
+                categoriesElm.prop('disabled', true);
             }
         }
 
         if (config.theme.list_type === 'button') {
         } else {
-            categories.change(function () {
+            categoriesElm.change(function () {
                 currentCategory = null;
                 clearProductInfo();
                 getProducts($(this).val())
             });
-            products.change(function () {
+            productsElm.change(function () {
                 clearProductInfo();
-                for (var i = 0; i < config.products.length; i++) {
-                    if (config.products[i].id === +$(this).val()) {
-                        showProductInfo(config.products[i]);
+                for (var i = 0; i < currentCategory.products.length; i++) {
+                    if (currentCategory.products[i].id === +$(this).val()) {
+                        showProductInfo(currentCategory.products[i]);
                         break;
                     }
                 }

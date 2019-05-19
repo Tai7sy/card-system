@@ -73,7 +73,7 @@ function passwordDialog(title, then) {
     swal({
         type: 'info',
         title: title,
-        input: 'password',
+        input: 'text',
         inputAttributes: {
             autocapitalize: 'off',
             autocorrect: 'off'

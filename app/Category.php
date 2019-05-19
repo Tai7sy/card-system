@@ -24,5 +24,27 @@ class Category extends Model
         return $this->belongsTo(User::class);
     }
 
+    function getTmpPassword()
+    {
+        return md5('$wGgMd45Jgi@dBDR' . $this->password . '1#DS2%!VLqJolmMD');
+    }
 
+    /**
+     * 将商品数组添加到分类的 products 属性中
+     * @return \App\Product[]
+     */
+    function getProductsForShop()
+    {
+        /** @var \App\Product[] $products */
+        $products = Product::where('category_id', $this->id)
+            ->where('enabled', 1)
+            ->orderBy('sort')
+            ->get();
+        foreach ($products as $product) {
+            $product->setForShop($this->user);
+        };
+        $this->addVisible(['products']);
+        $this->setAttribute('products', $products);
+        return $products;
+    }
 }

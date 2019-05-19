@@ -21,7 +21,13 @@ class File extends Controller
      */
     public static function uploadImg($file, $user_id, $folder, $return_file = false)
     {
-        if (!$file || !in_array(strtolower($file->extension()), ['jpg', 'jpeg', 'png', 'gif'])) {
+        try {
+            $ext = $file->extension();
+        } catch (\Throwable $e) {
+            return Response::fail($e->getMessage()); // 这里可能扩展没安装, 给出提示
+        }
+
+        if (!$file || !in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif'])) {
             return Response::fail('图片错误, 系统支持jpg/png/gif格式');
         }
 

@@ -43,7 +43,14 @@ class HomeController extends Controller
 
 
         if ($product) {
-            // 如果是产品连接
+            // 如果是产品连接 (那么一定有分类)
+            $category->setVisible(['id', 'name', 'password_open']);
+            if ($category->password_open) {
+                $category->setAttribute('password', $category->getTmpPassword());
+                $category->addVisible(['password']);
+            }
+            $product->setForShop($user);
+
             $config['categories'] = [$category];
             $config['product'] = $product;
             $name = $product->name . ' - ' . $config['name'];
@@ -55,16 +62,10 @@ class HomeController extends Controller
             }
         } elseif ($category) {
             // 如果是分类连接
+            $category->setVisible(['id', 'name', 'password_open']);
+
             $config['categories'] = [$category];
             $config['product'] = null;
-            $products = Product::where('category_id', $category->id)
-                ->where('enabled', 1)
-                ->orderBy('sort')
-                ->get();
-            foreach ($products as $product) {
-                $product->setForShop();
-            };
-            $config['products'] = $products->toArray();
             $name = $category->name . ' - ' . $config['name'];
             $description = $category->name;
         } else {
@@ -134,6 +135,29 @@ class HomeController extends Controller
             $config['theme']['background'] = Helper::b1_rand_background();
         }
 
+        if ($product === null) {
+            // 不是商品链接
+            if (@$config['theme']['list_type'] === 'list') {
+                foreach ($config['categories'] as $tmp) {
+                    /** @var \App\Category $tmp */
+                    if (!$tmp->password_open) {
+                        // 将当前分类的商品放在 products 属性中
+                        $tmp->getProductsForShop();
+                    }
+                }
+            } else {
+                if (count($config['categories']) === 1) {
+                    // 如果只有一个分类 直接返回商品列表
+                    /** @var \App\Category $tmp */
+                    $tmp = $config['categories'][0];
+                    if (!$tmp->password_open) {
+                        // 将当前分类的商品放在 products 属性中
+                        $tmp->getProductsForShop();
+                    }
+                }
+            }
+        }
+
         return response()->view('shop_theme.' . $shop_theme->name . '.index', [
             'name' => $name,
             'title' => config('app.title'),
@@ -181,7 +205,6 @@ class HomeController extends Controller
             return $this->_shop_404();
         }
 
-        $category->setVisible(['id', 'name', 'password_open']);
         return $this->_shop_render($category->user, $category);
     }
 
@@ -205,8 +228,8 @@ class HomeController extends Controller
 
         if ($product->password_open && $product->password !== $request->input('p')) {
             return view('message', [
-                'title' => '出错',
-                'message' => ($request->has('p') ? '密码错误' : '请输入密码') . '<br>
+                'title' => '当前商品需要密码',
+                'message' => ($request->has('p') ? '密码错误，请重新输入' : '请输入密码') . '<br>
 <div style="font-size: 14px">
 <input id="password" type="password" style="display: block; margin: 8px 0 8px 0">
 <button onclick="location.href=location.href.split(\'?\')[0]+\'?p=\'+encodeURI(document.getElementById(\'password\').value)">确认</button>
@@ -214,8 +237,6 @@ class HomeController extends Controller
 '
             ]);
         }
-        $product->category->setVisible(['id', 'name', 'password_open']);
-        $product->setForShop();
         return $this->_shop_render($product->user, $product->category, $product);
     }
 

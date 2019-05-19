@@ -48,9 +48,7 @@ class Order extends Controller
 
 
         // 这里不要显示商品名称
-        $list = $query->with(['card_orders.card' => function (Relation $query) {
-            $query->select(['id', 'card']);
-        }])->orderBy('id', 'DESC')
+        $list = $query->orderBy('id', 'DESC')
             ->get(['id', 'created_at', 'order_no', 'email', 'status', 'count', 'paid']);
 
 
