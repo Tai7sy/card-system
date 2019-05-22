@@ -99,7 +99,7 @@ class Handler extends ExceptionHandler
         if (config('app.debug')) {
             return parent::render($request, $e);
         } else {
-            return $this->msg($request, '未知错误，请联系客服', 500);
+            return $this->msg($request, '未知错误，请查看错误日志（storage/logs）', 500);
         }
     }
 }
