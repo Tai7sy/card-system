@@ -82,8 +82,8 @@
                        filter-placement="bottom">
         <template slot-scope="scope">
           <a @click="handleEnable(scope.row)" style="cursor: pointer">
-            <el-tag :type="paywayEnabled.getEnabled(scope.row.enabled).type" close-transition>
-              {{paywayEnabled.getEnabled(scope.row.enabled).name}}
+            <el-tag :type="PAYWAY_ENABLED.getEnabled(scope.row.enabled).type" close-transition>
+              {{PAYWAY_ENABLED.getEnabled(scope.row.enabled).name}}
             </el-tag>
           </a>
         </template>
@@ -93,14 +93,14 @@
       <el-table-column label="操作" width="75" fixed="right">
         <template slot-scope="scope">
           <a class="icon-btn" @click="handleEdit(scope.row)" style="font-size: 14px">
-            <icon name="pencil"/>
+            <icon name="light/pencil"/>
           </a>
-          <!--a v-if="scope.row.enabled !== paywayEnabled.DISABLED.id"
+          <!--a v-if="scope.row.enabled !== PAYWAY_ENABLED.DISABLED.id"
              class="icon-btn" @click="handleDisable(scope.row)">禁用</a>
-          <a v-if="scope.row.enabled === paywayEnabled.DISABLED.id"
+          <a v-if="scope.row.enabled === PAYWAY_ENABLED.DISABLED.id"
              class="icon-btn" @click="handleEnable(scope.row)">启用</a-->
           <a class="icon-btn" @click="handleDelete(scope.row)">
-            <icon name="trash-o"/>
+            <icon name="light/trash-alt"/>
           </a>
           <a class="icon-btn" @click="handleSeeLink(scope.row)" style="font-size: 14px">
             <icon name="link"/>
@@ -120,11 +120,11 @@
 <script>
   import NProgress from 'nprogress'; // Progress 进度条
   import {
-    paywayEnabled, getList, deletePayway,
+    PAYWAY_ENABLED, getList, deletePayway,
     enable as enablePayway,
     sort as sortPayway,
     fee_system, fee
-  } from 'api/pay'
+  } from '~/api/pay'
   import paywayEdit from './_edit.vue'
   import paywayEnable from './_enable.vue'
   import paywayEditComment from './_edit_comment'
@@ -136,7 +136,7 @@
     data () {
       return {
         loading: false,
-        paywayEnabled,
+        PAYWAY_ENABLED,
         search: {
           type: 'id',
           value: ''
@@ -147,12 +147,12 @@
         checkedIds: '',
         enabledFilter: (() => {
           const filtered = [];
-          for (const key in paywayEnabled) {
-            if (paywayEnabled.hasOwnProperty(key) && typeof paywayEnabled[key] === 'object') {
+          for (const key in PAYWAY_ENABLED) {
+            if (PAYWAY_ENABLED.hasOwnProperty(key) && typeof PAYWAY_ENABLED[key] === 'object') {
               filtered.push({
-                text: paywayEnabled[key].name,
-                value: paywayEnabled[key].id,
-                type: paywayEnabled[key].type
+                text: PAYWAY_ENABLED[key].name,
+                value: PAYWAY_ENABLED[key].id,
+                type: PAYWAY_ENABLED[key].type
               })
             }
           }
@@ -266,7 +266,7 @@
       handleDisable (row) {
         this.$confirm('禁用选中支付方式? ', '提示', { type: 'warning' }).then(() => {
           this.loading = true;
-          enablePayway(row.id, paywayEnabled.DISABLED.id).then(() => {
+          enablePayway(row.id, PAYWAY_ENABLED.DISABLED.id).then(() => {
             this.$notify({ title: '操作成功', message: '选中支付方式已禁用', type: 'info' });
             this.getList();
           }).catch(() => {

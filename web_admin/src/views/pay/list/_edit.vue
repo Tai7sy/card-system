@@ -23,8 +23,8 @@
 
       <el-form-item label="启用">
         <el-checkbox-group v-model="enableIn">
-          <el-checkbox :label="paywayEnabled.PC.id">电脑端</el-checkbox>
-          <el-checkbox :label="paywayEnabled.MOBILE.id">手机端</el-checkbox>
+          <el-checkbox :label="PAYWAY_ENABLED.PC.id">电脑端</el-checkbox>
+          <el-checkbox :label="PAYWAY_ENABLED.MOBILE.id">手机端</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
 
@@ -72,7 +72,7 @@
 
 
 <script>
-  import { paywayEnabled, edit } from 'api/pay'
+  import { PAYWAY_ENABLED, edit } from '~/api/pay'
 
   export default {
     props: {
@@ -99,11 +99,11 @@
       if (this.act === 'edit') {
         actLabel = '编辑';
         Object.assign(initData, this.info);
-        if (this.info.enabled & paywayEnabled.PC.id) {
-          enableIn.push(paywayEnabled.PC.id);
+        if (this.info.enabled & PAYWAY_ENABLED.PC.id) {
+          enableIn.push(PAYWAY_ENABLED.PC.id);
         }
-        if (this.info.enabled & paywayEnabled.MOBILE.id) {
-          enableIn.push(paywayEnabled.MOBILE.id);
+        if (this.info.enabled & PAYWAY_ENABLED.MOBILE.id) {
+          enableIn.push(PAYWAY_ENABLED.MOBILE.id);
         }
       } else {
         actLabel = '添加';
@@ -112,7 +112,7 @@
         loading: false,
         visible: true,
         actLabel,
-        paywayEnabled,
+        PAYWAY_ENABLED,
         formRules: {
           name: [
             { required: true, message: '请输入名称', trigger: 'blur' }

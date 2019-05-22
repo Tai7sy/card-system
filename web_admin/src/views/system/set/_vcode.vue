@@ -59,7 +59,7 @@
 
 <script>
   import NProgress from 'nprogress';
-  import { vcode } from 'api/system';
+  import { vcode } from '~admin/api/system';
 
   export default {
     components: {},

@@ -131,7 +131,7 @@
 
 <script>
   import NProgress from 'nprogress';
-  import { storage } from 'api/system';
+  import { storage } from '~admin/api/system';
 
   export default {
     components: {},

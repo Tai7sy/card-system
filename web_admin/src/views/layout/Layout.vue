@@ -2,21 +2,25 @@
   <div class="app-wrapper" :class="{hideSidebar:!sidebarOpen,showSidebar:sidebarOpen}">
     <sidebar ref="side-bar" class="sidebar-container" id="sidebar-container" @transitionend="resizeHandler"/>
     <!--:style="{overflow:sidebarOpen?'auto':'initial'}"-->
+
     <div class="main-container">
       <div :style="{width:mainWidth}">
-        <navbar ref="nav-bar"></navbar>
-        <app-main></app-main>
+        <navbar ref="nav-bar"/>
+        <app-main/>
       </div>
     </div>
+    <lic/>
   </div>
 </template>
 
 <script>
-  import { Navbar, Sidebar, AppMain } from '../../views/layout';
+  import { AppMain, Navbar, Sidebar } from '.';
+  import Lic from "@/views/about/lic";
 
   export default {
     name: 'layout',
     components: {
+      Lic,
       Navbar,
       Sidebar,
       AppMain
@@ -45,6 +49,7 @@
     },
     methods: {
       resizeHandler (e) {
+        // console.log(e);
         if (!e || (e.type !== 'resize' && e.propertyName !== 'width')) return;
         this.reCalcMainWidth();
         window.bus.$emit('app-resize');
@@ -61,7 +66,7 @@
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-  @import "../../styles/mixin.scss";
+  @import "../../../../web_common/styles/mixin.scss";
 
   .app-wrapper {
     @include clearfix;

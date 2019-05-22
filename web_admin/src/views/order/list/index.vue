@@ -93,8 +93,8 @@
                        :filtered-value="statusFilterValue"
                        filter-placement="bottom">
         <template slot-scope="scope">
-          <el-tag :type="orderStatus.get(scope.row.status).type" close-transition>
-            {{orderStatus.get(scope.row.status).name}}
+          <el-tag :type="ORDER_STATUS.get(scope.row.status).type" close-transition>
+            {{ORDER_STATUS.get(scope.row.status).name}}
           </el-tag>
         </template>
       </el-table-column>
@@ -221,15 +221,15 @@
             查看
           </a>
           <a class="icon-btn" @click="handleFreeze(scope.row)" style="font-size: 14px"
-             v-if="_project === 'admin' && scope.row.status===orderStatus.SUCCESS.id">
+             v-if="_project === 'admin' && scope.row.status===ORDER_STATUS.SUCCESS.id">
             冻结
           </a>
           <a class="icon-btn" @click="handleUnfreeze(scope.row)" style="font-size: 14px"
-             v-if="_project === 'admin' && scope.row.status===orderStatus.FROZEN.id">
+             v-if="_project === 'admin' && scope.row.status===ORDER_STATUS.FROZEN.id">
             解冻
           </a>
           <a class="icon-btn" @click="handleSetPaid(scope.row)" style="font-size: 14px"
-             v-if="_project === 'admin' && scope.row.status===orderStatus.UN_PAY.id">
+             v-if="_project === 'admin' && scope.row.status===ORDER_STATUS.UN_PAY.id">
             补单
           </a>
         </template>
@@ -279,9 +279,9 @@
 
 <script>
   import NProgress from 'nprogress'; // Progress 进度条
-  import { editRemark, freeze, getList as getOrderList, orderStatus, setPaid, unfreeze } from 'api/order'
-  import { getList as getCategoryList } from 'api/category'
-  import { getList as getProductList } from 'api/product'
+  import { editRemark, freeze, getList as getOrderList, ORDER_STATUS, setPaid, unfreeze } from '~/api/order'
+  import { getList as getCategoryList } from '~/api/category'
+  import { getList as getProductList } from '~/api/product'
   import orderInfo from '../_info'
 
   const API_ORDER_ID = -1001;
@@ -307,7 +307,7 @@
       return {
         isMobile: this.$store.state.app.isMobile,
         loading: false,
-        orderStatus,
+        ORDER_STATUS,
         API_ORDER_ID,
         search: {
           type: 'order_no',
@@ -337,12 +337,12 @@
         checkedIds: '',
         statusFilter: (() => {
           const filtered = [];
-          for (const key in orderStatus) {
-            if (orderStatus.hasOwnProperty(key) && typeof orderStatus[key] === 'object') {
+          for (const key in ORDER_STATUS) {
+            if (ORDER_STATUS.hasOwnProperty(key) && typeof ORDER_STATUS[key] === 'object') {
               filtered.push({
-                text: orderStatus[key].name,
-                value: orderStatus[key].id,
-                type: orderStatus[key].type
+                text: ORDER_STATUS[key].name,
+                value: ORDER_STATUS[key].id,
+                type: ORDER_STATUS[key].type
               })
             }
           }
@@ -495,7 +495,7 @@
         if (val) {
           this.where.showUnSend = 0;
           this.statusFilterValue.splice(0, this.statusFilterValue.length);
-          this.statusFilterValue.push(orderStatus.UN_PAY.id);
+          this.statusFilterValue.push(ORDER_STATUS.UN_PAY.id);
         } else {
           this.handleShowWithoutUnpay();
         }
@@ -506,7 +506,7 @@
         if (val) {
           this.where.showUnPay = 0;
           this.statusFilterValue.splice(0, this.statusFilterValue.length);
-          this.statusFilterValue.push(orderStatus.PAID.id);
+          this.statusFilterValue.push(ORDER_STATUS.PAID.id);
         } else {
           this.handleShowWithoutUnpay();
         }
@@ -515,10 +515,10 @@
       },
       handleShowWithoutUnpay () {
         this.statusFilterValue.splice(0, this.statusFilterValue.length, ...[
-          orderStatus.FROZEN.id,
-          orderStatus.SUCCESS.id,
-          orderStatus.PAID.id,
-          orderStatus.REFUND.id
+          ORDER_STATUS.FROZEN.id,
+          ORDER_STATUS.SUCCESS.id,
+          ORDER_STATUS.PAID.id,
+          ORDER_STATUS.REFUND.id
         ]);
         // 后端默认就是除去 unpaid 这里不加了
         this.where.status = '';
@@ -594,7 +594,7 @@
               return this.$msgbox({ title: '操作失败', message: '冻结订单失败, 内部错误', type: 'error' });
             }
             this.$notify({ title: '操作完成', message: row.order_no + ' 已冻结', type: 'info' });
-            row.status = orderStatus.FROZEN.id;
+            row.status = ORDER_STATUS.FROZEN.id;
           }).catch(() => {
             this.loading = false;
           });

@@ -88,7 +88,7 @@
 
 <script>
   import NProgress from 'nprogress';
-  import { email, emailTest } from 'api/system';
+  import { email, emailTest } from '~admin/api/system';
 
   export default {
     components: {},

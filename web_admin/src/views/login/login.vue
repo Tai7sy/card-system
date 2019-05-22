@@ -25,7 +25,7 @@
 </template>
 
 <script>
-  import { validateEmail } from '../../utils/validate';
+  import { validateEmail } from '~/utils/validate';
   import { getVerify } from '@/api/login'
   // import NProgress from 'nprogress'
   export default {

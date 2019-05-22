@@ -50,7 +50,7 @@
 
 <script>
   import NProgress from 'nprogress';
-  import { theme } from 'api/system';
+  import { theme } from '~admin/api/system';
 
   export default {
     components: {},

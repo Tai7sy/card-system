@@ -27,8 +27,8 @@
 </template>
 
 <script>
-  import NProgress from 'nprogress'; // Progress 进度条
-  import { changePass } from 'api/login'
+  import NProgress from 'nprogress'
+  import { changePass } from '@/api/login'
 
   export default {
     data () {

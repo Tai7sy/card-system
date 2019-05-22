@@ -4,8 +4,8 @@
 
       <el-form-item label="启用">
         <el-checkbox-group v-model="enableIn">
-          <el-checkbox :label="paywayEnabled.PC.id">电脑端</el-checkbox>
-          <el-checkbox :label="paywayEnabled.MOBILE.id">手机端</el-checkbox>
+          <el-checkbox :label="PAYWAY_ENABLED.PC.id">电脑端</el-checkbox>
+          <el-checkbox :label="PAYWAY_ENABLED.MOBILE.id">手机端</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
 
@@ -19,7 +19,7 @@
 
 
 <script>
-  import { paywayEnabled, enable } from 'api/pay'
+  import { PAYWAY_ENABLED, enable } from '~/api/pay'
 
   export default {
     props: {
@@ -27,16 +27,16 @@
     },
     data () {
       const enableIn = [];
-      if (this.info.enabled & paywayEnabled.PC.id) {
-        enableIn.push(paywayEnabled.PC.id);
+      if (this.info.enabled & PAYWAY_ENABLED.PC.id) {
+        enableIn.push(PAYWAY_ENABLED.PC.id);
       }
-      if (this.info.enabled & paywayEnabled.MOBILE.id) {
-        enableIn.push(paywayEnabled.MOBILE.id);
+      if (this.info.enabled & PAYWAY_ENABLED.MOBILE.id) {
+        enableIn.push(PAYWAY_ENABLED.MOBILE.id);
       }
       return {
         loading: false,
         visible: true,
-        paywayEnabled,
+        PAYWAY_ENABLED,
         enableIn
       }
     },

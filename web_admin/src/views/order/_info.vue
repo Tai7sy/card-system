@@ -11,7 +11,7 @@
             {{orderInfo.pay?orderInfo.pay.name:'未知#'+orderInfo.pay_id}}
             <a style="text-decoration:underline;cursor: pointer;color:#409EFF"
                :onclick="`bus.$emit('${from}:show:pay')`"
-               v-if="orderInfo.status > orderStatus.UN_PAY.id">查看</a>
+               v-if="orderInfo.status > ORDER_STATUS.UN_PAY.id">查看</a>
           </td>
         </tr>
         <tr>
@@ -38,8 +38,8 @@
         <tr>
           <td style="text-align: right">订单状态</td>
           <td>
-            <span :class="'el-tag el-tag--' + orderStatus.get(orderInfo.status).type">
-              {{orderStatus.get(orderInfo.status).name}}
+            <span :class="'el-tag el-tag--' + ORDER_STATUS.get(orderInfo.status).type">
+              {{ORDER_STATUS.get(orderInfo.status).name}}
             </span>&nbsp;
             <div style="display: inline" v-if="!isApiOrder">
               <span :class="isShipped(orderInfo) ?'green-text':'amber-text'">
@@ -47,7 +47,7 @@
               </span>
               <a style="text-decoration:underline;cursor: pointer;color:#409EFF"
                  :onclick="`bus.$emit('${from}:send:card')`"
-                 v-if="!isShipped(orderInfo) && orderInfo.status !== orderStatus.UN_PAY.id">发货</a>
+                 v-if="!isShipped(orderInfo) && orderInfo.status !== ORDER_STATUS.UN_PAY.id">发货</a>
               <a style="text-decoration:underline;cursor: pointer;color:#409EFF"
                  :onclick="`bus.$emit('${from}:show:card')`"
                  v-if="isShipped(orderInfo)">查看</a>
@@ -61,7 +61,7 @@
           <td style="max-width: 280px;word-wrap: break-word;line-height: 1.4;">{{orderInfo.remark}}</td>
           <td style="text-align: right">详细信息</td>
           <td style="max-width: 280px;word-wrap: break-word;line-height: 1;">
-            <span v-if="orderInfo.status===orderStatus.FROZEN.id">
+            <span v-if="orderInfo.status===ORDER_STATUS.FROZEN.id">
               冻结原因: {{orderInfo.frozen_reason || '无'}}
             </span>
           </td>
@@ -73,7 +73,7 @@
 </template>
 
 <script>
-  import { notify, orderStatus, ship } from 'api/order'
+  import { notify, ORDER_STATUS, ship } from '~/api/order'
 
   export default {
     props: {
@@ -84,7 +84,7 @@
     data () {
       return {
         loading: false,
-        orderStatus,
+        ORDER_STATUS,
         orderVisible: false,
         orderInfo: null,
         cardInfo: null,
@@ -120,7 +120,7 @@
       window.bus.$on(this.from + ':show:pay', this._on_show_pay);
       this._on_send_card = () => {
         if (this.orderInfo) {
-          this.$confirm('当前订单状态为<' + orderStatus.get(this.orderInfo.status).name + '>, 是否确认发货?').then(() => {
+          this.$confirm('当前订单状态为<' + ORDER_STATUS.get(this.orderInfo.status).name + '>, 是否确认发货?').then(() => {
             this.loading = true;
             ship(this.orderInfo.id).then(res => {
               this.loading = false;
@@ -165,7 +165,7 @@
         this.orderVisible = true;
       },
       isShipped (info) {
-        if (info.status === orderStatus.SUCCESS.id) {
+        if (info.status === ORDER_STATUS.SUCCESS.id) {
           // if (info.card_orders && info.card_orders.length)
           return true;
         } else {

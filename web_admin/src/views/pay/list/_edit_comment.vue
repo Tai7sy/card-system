@@ -18,7 +18,7 @@
 
 
 <script>
-  import { edit_comment } from 'api/pay'
+  import { edit_comment } from '~/api/pay'
 
   export default {
     props: {

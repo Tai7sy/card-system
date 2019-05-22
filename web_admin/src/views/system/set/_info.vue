@@ -87,8 +87,8 @@
 
 <script>
   import NProgress from 'nprogress'; // Progress 进度条
-  import { info } from '@/api/system'
-  import QuillEditor from '@/components/QuillEditor/index';
+  import { info } from '~admin/api/system'
+  import QuillEditor from '~/components/QuillEditor';
 
   export default {
     components: { QuillEditor },

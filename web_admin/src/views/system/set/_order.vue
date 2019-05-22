@@ -38,7 +38,7 @@
 
 <script>
   import NProgress from 'nprogress';
-  import { order, orderClean } from '@/api/system';
+  import { order, orderClean } from '~admin/api/system';
 
   export default {
     components: {},
