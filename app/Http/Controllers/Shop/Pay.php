@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class Pay extends Controller
@@ -576,7 +577,7 @@ class Pay extends Controller
                     /** @var \App\Order $order */
                     $order = \App\Order::where('id', $order_id)->lockForUpdate()->firstOrFail();
                     if ($order->status !== \App\Order::STATUS_UNPAY) {
-                        \Log::debug('shipOrder.first_process:' . $order->order_no . ' already processed!');
+                        \Log::debug('shipOrder.first_process:' . $order->order_no . ' already processed! #2');
                         return -999;
                     }
                     /** @var \App\Product $product */
@@ -650,6 +651,8 @@ class Pay extends Controller
             if (System::_getInt('mail_send_order') === 1 && filter_var($order->email, FILTER_VALIDATE_EMAIL)) {
                 self::showOrderResult($request, $order, true);
             }
+        }else{
+            Log::debug('Shop.Pay.shipOrder: .order_no:' . $order->order_no . ' already processed! #1');
         }
         return FALSE;
     }

@@ -29,8 +29,8 @@ Route::get('/pay/{order_no}', 'Shop\Pay@pay');
 
 
 // 支付返回 out_trade_no可选, 设置了会检验是否已经发货(Alipay Aliwap)
-Route::get('/pay/return/{pay_id}/{out_trade_no}', 'Shop\Pay@payReturn');
-Route::get('/pay/return/{pay_id}', 'Shop\Pay@payReturn');
+Route::any('/pay/return/{pay_id}/{out_trade_no}', 'Shop\Pay@payReturn');
+Route::any('/pay/return/{pay_id}', 'Shop\Pay@payReturn');
 // 支付异步通知
 Route::any('/pay/notify/{pay_id}', 'Shop\Pay@payNotify');
 
