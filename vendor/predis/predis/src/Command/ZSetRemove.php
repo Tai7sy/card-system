@@ -1,2 +1,0 @@
-<?php
- namespace Predis\Command; class ZSetRemove extends Command { public function getId() { return 'ZREM'; } protected function filterArguments(array $arguments) { return self::normalizeVariadic($arguments); } } 

@@ -1,2 +1,0 @@
-<?php
- namespace Doctrine\DBAL\Event\Listeners; use Doctrine\DBAL\Event\ConnectionEventArgs; use Doctrine\DBAL\Events; use Doctrine\Common\EventSubscriber; class SQLSessionInit implements EventSubscriber { protected $sql; public function __construct($sql) { $this->sql = $sql; } public function postConnect(ConnectionEventArgs $args) { $conn = $args->getConnection(); $conn->exec($this->sql); } public function getSubscribedEvents() { return array(Events::postConnect); } } 

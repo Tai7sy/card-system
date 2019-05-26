@@ -1,2 +1,0 @@
-<?php
- namespace Illuminate\Notifications\Events; class NotificationFailed { public $notifiable; public $notification; public $channel; public $data = []; public function __construct($notifiable, $notification, $channel, $data = []) { $this->data = $data; $this->channel = $channel; $this->notifiable = $notifiable; $this->notification = $notification; } } 

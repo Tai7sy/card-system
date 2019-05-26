@@ -1,2 +1,0 @@
-<?php
- namespace Illuminate\Foundation\Testing\Concerns; use Illuminate\Contracts\Console\Kernel; trait InteractsWithConsole { public function artisan($command, $parameters = []) { return $this->app[Kernel::class]->call($command, $parameters); } } 

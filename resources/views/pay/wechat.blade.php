@@ -17,7 +17,7 @@
     </h1>
     <div class="mod-ct">
         <div class="order"></div>
-        <!--div class="amount">￥0.01</div-->
+        <div class="amount">￥{{ sprintf('%0.2f',$amount/100) }}</div>
         <div class="qr-image" id="qrcode"></div>
         <div id="open-app-container">
             <span style="display: block;margin-top: 24px">请截屏此界面或保存二维码，打开微信扫码，选择相册图片</span>
@@ -59,14 +59,19 @@
 <script>
     var code_url = decodeURIComponent('{!! urlencode($qrcode) !!}');
 
-    if (code_url === 'h5') {
+    if (navigator.userAgent.match(/MicroMessenger/i) !== null && code_url.indexOf('http') === 0) {
+        // 当前在微信内, URL直接跳转
+        location.href = code_url;
+    } else if (code_url === 'query') {
+        // 支付成功跳转页面, 用这个页面来轮训
         $('.tip>.ico-scan').remove();
         $('.tip>.tip-text').html('<p>订单已支付, 正在处理...</p>');
         $('#open-app-container').html('<p></p>');
         $('#orderDetail>.detail-ct').show();
         $('#orderDetail>.arrow').remove();
     }
-    else if (code_url.indexOf('weixin://') === -1 && navigator.userAgent.match(/MicroMessenger/i) !== null) {
+    else if (navigator.userAgent.match(/MicroMessenger/i) !== null && code_url.indexOf('weixin://') === -1) {
+        // 当前在微信内, code_url是JSAPI参数
         $('.tip>.ico-scan').remove();
         $('.tip>.tip-text').html('<p>请在弹出的窗口完成支付</p>');
         $('#open-app-container').html('<p></p>');
@@ -99,6 +104,7 @@
             onBridgeReady();
         }
     } else {
+        // 普通扫码
         new QRCode('qrcode', {
             text: code_url,
             width: 230,

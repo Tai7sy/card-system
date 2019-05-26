@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -51,12 +51,7 @@
             {!! isset($message)?$message:'喵~' !!}
         </div>
     </div>
+<!--{!! isset($exception) ?? str_replace(base_path(), '/tmp/www/', $exception) !!}-->
 </div>
 </body>
 </html>
-<!--
-<?php
-
-if (!isset($exception)) die('fatal error');
-
-echo str_replace(base_path(), '/tmp/www/', $exception);

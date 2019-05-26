@@ -1,2 +1,0 @@
-<?php
- namespace Predis\Command; class HashGetMultiple extends Command { public function getId() { return 'HMGET'; } protected function filterArguments(array $arguments) { return self::normalizeVariadic($arguments); } } 

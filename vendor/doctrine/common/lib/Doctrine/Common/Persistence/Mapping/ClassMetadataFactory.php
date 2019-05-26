@@ -1,2 +1,0 @@
-<?php
- namespace Doctrine\Common\Persistence\Mapping; interface ClassMetadataFactory { public function getAllMetadata(); public function getMetadataFor($className); public function hasMetadataFor($className); public function setMetadataFor($className, $class); public function isTransient($className); } 

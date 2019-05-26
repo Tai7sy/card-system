@@ -1,2 +1,0 @@
-<?php
- namespace Predis\Command; class ServerBackgroundRewriteAOF extends Command { public function getId() { return 'BGREWRITEAOF'; } public function parseResponse($data) { return $data == 'Background append only file rewriting started'; } } 

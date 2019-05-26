@@ -1,2 +1,0 @@
-<?php
- namespace Predis\Command; class ServerSlaveOf extends Command { public function getId() { return 'SLAVEOF'; } protected function filterArguments(array $arguments) { if (count($arguments) === 0 || $arguments[0] === 'NO ONE') { return array('NO', 'ONE'); } return $arguments; } } 

@@ -1,2 +1,0 @@
-<?php
- namespace Predis\Pipeline; use Predis\Connection\ConnectionInterface; class FireAndForget extends Pipeline { protected function executePipeline(ConnectionInterface $connection, \SplQueue $commands) { while (!$commands->isEmpty()) { $connection->writeRequest($commands->dequeue()); } $connection->disconnect(); return array(); } } 

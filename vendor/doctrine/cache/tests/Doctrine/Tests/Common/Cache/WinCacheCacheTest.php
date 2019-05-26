@@ -1,2 +1,0 @@
-<?php
- namespace Doctrine\Tests\Common\Cache; use Doctrine\Common\Cache\WincacheCache; class WincacheCacheTest extends CacheTest { protected function _getCacheDriver() { return new WincacheCache(); } }

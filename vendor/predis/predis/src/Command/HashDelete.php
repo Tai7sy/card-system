@@ -1,2 +1,0 @@
-<?php
- namespace Predis\Command; class HashDelete extends Command { public function getId() { return 'HDEL'; } protected function filterArguments(array $arguments) { return self::normalizeVariadic($arguments); } } 

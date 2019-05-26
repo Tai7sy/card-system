@@ -1,2 +1,0 @@
-<?php
- namespace Symfony\Component\HttpKernel\DependencyInjection; class ServicesResetter { private $resettableServices; private $resetMethods; public function __construct(\Traversable $resettableServices, array $resetMethods) { $this->resettableServices = $resettableServices; $this->resetMethods = $resetMethods; } public function reset() { foreach ($this->resettableServices as $id => $service) { $service->{$this->resetMethods[$id]}(); } } } 

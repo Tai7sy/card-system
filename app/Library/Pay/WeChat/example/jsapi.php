@@ -1,5 +1,5 @@
 <?php
-ini_set('date.timezone', 'Asia/Shanghai'); require_once '../lib/WxPay.Api.php'; require_once 'WxPay.JsApiPay.php'; require_once 'log.php'; $spe4c4f6 = new CLogFileHandler('../logs/' . date('Y-m-d') . '.log'); $sp63838a = Log::Init($spe4c4f6, 15); function printf_info($spbda5b4) { foreach ($spbda5b4 as $spc37b44 => $sp12919e) { echo "<font color='#00ff55;'>{$spc37b44}</font> : {$sp12919e} <br/>"; } } $spdb16f7 = new JsApiPay(); $sp576cde = $spdb16f7->GetOpenid(); $sp317e70 = new WxPayUnifiedOrder(); $sp317e70->SetBody('test'); $sp317e70->SetAttach('test'); $sp317e70->SetOut_trade_no(WxPayConfig::MCHID . date('YmdHis')); $sp317e70->SetTotal_fee('1'); $sp317e70->SetTime_start(date('YmdHis')); $sp317e70->SetTime_expire(date('YmdHis', time() + 600)); $sp317e70->SetGoods_tag('test'); $sp317e70->SetNotify_url('http://paysdk.weixin.qq.com/example/notify.php'); $sp317e70->SetTrade_type('JSAPI'); $sp317e70->SetOpenid($sp576cde); $sp09599a = WxPayApi::unifiedOrder($sp317e70); echo '<font color="#f00"><b>统一下单支付单信息</b></font><br/>'; printf_info($sp09599a); $spd91e5f = $spdb16f7->GetJsApiParameters($sp09599a); $sp555091 = $spdb16f7->GetEditAddressParameters(); ?>
+ini_set('date.timezone', 'Asia/Shanghai'); require_once '../lib/WxPay.Api.php'; require_once 'WxPay.JsApiPay.php'; require_once '../WxLog.php'; function printf_info($sp69c4ce) { foreach ($sp69c4ce as $sp1e4b49 => $sp39a65f) { echo "<font color='#00ff55;'>{$sp1e4b49}</font> : {$sp39a65f} <br/>"; } } $spc24b62 = new JsApiPay(); $sp23551f = $spc24b62->GetOpenid(); $sp5bf110 = new WxPayUnifiedOrder(); $sp5bf110->SetBody('test'); $sp5bf110->SetAttach('test'); $sp5bf110->SetOut_trade_no(WxPayConfig::MCHID . date('YmdHis')); $sp5bf110->SetTotal_fee('1'); $sp5bf110->SetTime_start(date('YmdHis')); $sp5bf110->SetTime_expire(date('YmdHis', time() + 600)); $sp5bf110->SetGoods_tag('test'); $sp5bf110->SetNotify_url('http://paysdk.weixin.qq.com/example/notify.php'); $sp5bf110->SetTrade_type('JSAPI'); $sp5bf110->SetOpenid($sp23551f); $sp61541f = WxPayApi::unifiedOrder($sp5bf110); echo '<font color="#f00"><b>统一下单支付单信息</b></font><br/>'; printf_info($sp61541f); $sp76137e = $spc24b62->GetJsApiParameters($sp61541f); $sp7ac487 = $spc24b62->GetEditAddressParameters(); ?>
 
 <html>
 <head>
@@ -12,7 +12,7 @@ ini_set('date.timezone', 'Asia/Shanghai'); require_once '../lib/WxPay.Api.php'; 
 	{
 		WeixinJSBridge.invoke(
 			'getBrandWCPayRequest',
-			<?php  echo $spd91e5f; ?>
+			<?php  echo $sp76137e; ?>
 ,
 			function(res){
 				WeixinJSBridge.log(res.err_msg);
@@ -41,7 +41,7 @@ ini_set('date.timezone', 'Asia/Shanghai'); require_once '../lib/WxPay.Api.php'; 
 	{
 		WeixinJSBridge.invoke(
 			'editAddress',
-			<?php  echo $sp555091; ?>
+			<?php  echo $sp7ac487; ?>
 ,
 			function(res){
 				var value1 = res.proviceFirstStageName;

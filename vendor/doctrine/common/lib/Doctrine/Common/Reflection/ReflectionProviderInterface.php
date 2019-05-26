@@ -1,2 +1,0 @@
-<?php
- namespace Doctrine\Common\Reflection; interface ReflectionProviderInterface { public function getReflectionClass(); public function getReflectionMethod($name); public function getReflectionProperty($name); } 

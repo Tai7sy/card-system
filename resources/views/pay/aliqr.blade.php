@@ -10,6 +10,9 @@
     <script type="text/javascript" src="//ossweb-img.qq.com/images/js/jquery/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="/plugins/js/qrcode.min.js"></script>
     <script type="text/javascript" src="/plugins/js/steal_alipay.js?v=1.1"></script>
+    <style type="text/css">
+        .modal{display:none;position:fixed;z-index:1;padding-top:100px;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:#000;background-color:rgba(0,0,0,0.4)}.modal-content{background-color:#fefefe;margin:auto;padding:20px;border:1px solid #888;width:80%;max-width: 320px;}.close{color:#aaa;float:right;font-size:28px;font-weight:bold}.close:hover,.close:focus{color:#000;text-decoration:none;cursor:pointer}
+    </style>
 </head>
 <body>
 <div class="body">
@@ -18,7 +21,7 @@
     </h1>
     <div class="mod-ct">
         <div class="order"></div>
-        <!--div class="amount">￥0.01</div-->
+        <div class="amount">￥{{ sprintf('%0.2f',$amount/100) }}</div>
         <div class="qr-image" id="qrcode"></div>
 
         <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 24px" id="open-app">点击打开支付宝</a>
@@ -41,8 +44,9 @@
             <div class="ico-scan"></div>
             <div class="tip-text">
                 <p>请使用支付宝扫一扫</p>
-                <p>扫描二维码完成支付</p>
+                <p style="color: red">先扫红包更省钱</p>
             </div>
+            <img src="http://ww1.sinaimg.cn/large/8a01d75dly1g0oojbxoqsj20fs0notar.jpg" style="max-width: 70%; margin-top: 24px"/>
         </div>
         <div class="tip-text">
         </div>
@@ -52,12 +56,21 @@
             <p><?php echo SYS_NAME ?>, 有疑问请联系客服</p>
         </div>
     </div>
+    <!-- Modal Dialog -->
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close" id="dialog-close">&times;</span>
+            <img src="http://ww1.sinaimg.cn/large/8a01d75dly1g0oojbxoqsj20fs0notar.jpg" style="max-width: 100%"/>
+        </div>
+
+    </div>
 </div>
 
 <script>
     var code_url = decodeURIComponent('{!! urlencode($qrcode) !!}');
 
-    var qrcode = new QRCode("qrcode", {
+    new QRCode("qrcode", {
         text: code_url,
         width: 230,
         height: 230,
@@ -105,12 +118,21 @@
             goPage(app_url, app_package);
         });
         setTimeout(function () {
-            goPage(app_url, app_package);
+            // 好像有点问题, 加了限制 2019年4月3日 13:42:34
+            // goPage(app_url, app_package);
         }, 100);
     } else {
         $('#open-app').hide();
     }
 
+    var dialog = $('#myModal');
+    dialog.show();
+    $('#dialog-close').click(function () {
+        dialog.hide();
+    });
+    $(window).click(function () {
+        dialog.hide();
+    });
 </script>
 </body>
 </html>

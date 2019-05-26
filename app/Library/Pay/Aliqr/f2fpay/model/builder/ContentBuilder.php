@@ -1,2 +1,0 @@
-<?php
-class ContentBuilder { private $appAuthToken; private $notifyUrl; public function setAppAuthToken($sp3efb2d) { $this->appAuthToken = $sp3efb2d; } public function setNotifyUrl($sp9f2e2a) { $this->notifyUrl = $sp9f2e2a; } public function getAppAuthToken() { return $this->appAuthToken; } public function getNotifyUrl() { return $this->notifyUrl; } }
