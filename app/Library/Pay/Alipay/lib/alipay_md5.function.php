@@ -1,2 +1,0 @@
-<?php
-function md5Sign($sp804038, $spc37b44) { $sp804038 = $sp804038 . $spc37b44; return md5($sp804038); } function md5Verify($sp804038, $spa0f4ca, $spc37b44) { $sp804038 = $sp804038 . $spc37b44; $sp5056d0 = md5($sp804038); if ($sp5056d0 == $spa0f4ca) { return true; } else { return false; } }

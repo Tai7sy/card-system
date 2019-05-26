@@ -1,5 +1,5 @@
 <?php
-require_once '../lib/WxPay.Api.php'; if (isset($_REQUEST['bill_date']) && $_REQUEST['bill_date'] != '') { $spa5cbf9 = $_REQUEST['bill_date']; $spac5a01 = $_REQUEST['bill_type']; $sp317e70 = new WxPayDownloadBill(); $sp317e70->SetBill_date($spa5cbf9); $sp317e70->SetBill_type($spac5a01); $sp90b6b6 = WxPayApi::downloadBill($sp317e70); echo $sp90b6b6; die(0); } ?>
+require_once '../lib/WxPay.Api.php'; if (isset($_REQUEST['bill_date']) && $_REQUEST['bill_date'] != '') { $sp17d6ff = $_REQUEST['bill_date']; $spb485a3 = $_REQUEST['bill_type']; $sp5bf110 = new WxPayDownloadBill(); $sp5bf110->SetBill_date($sp17d6ff); $sp5bf110->SetBill_type($spb485a3); $sp6aa048 = WxPayApi::downloadBill($sp5bf110); echo $sp6aa048; die(0); } ?>
 <html>
 <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8"/>

@@ -18,7 +18,7 @@
     </h1>
     <div class="mod-ct">
         <div class="order"></div>
-        <!--div class="amount">￥0.01</div-->
+        <div class="amount">￥{{ sprintf('%0.2f',$amount/100) }}</div>
         <div class="qr-image" id="qrcode"></div>
         <div id="open-app-container">
             <span style="display: block;margin-top: 24px">请截屏此界面或保存二维码，打开手机QQ扫码，选择相册图片</span>
@@ -112,7 +112,8 @@
                 goPage(app_url, app_package);
             });
             setTimeout(function () {
-                goPage(app_url, app_package);
+                // 好像有点问题, 加了限制 2019年4月6日 19:07:29
+                // goPage(app_url, app_package);
             }, 100);
         } else {
             $('#open-app-container').hide();

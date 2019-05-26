@@ -1,2 +1,0 @@
-<?php
-$sp6e4d76['partner'] = '2088421538865921'; $sp6e4d76['seller_id'] = $sp6e4d76['partner']; $sp6e4d76['key'] = 'afrcvn5nzugzful4cto4wme3cj0i5x27'; $sp6e4d76['sign_type'] = strtoupper('MD5'); $sp6e4d76['input_charset'] = strtolower('utf-8'); $sp6e4d76['cacert'] = getcwd() . '\\cacert.pem'; $sp6e4d76['transport'] = 'https'; $sp6e4d76['payment_type'] = '1'; $sp6e4d76['service'] = 'alipay.wap.create.direct.pay.by.user';
