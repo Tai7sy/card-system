@@ -138,8 +138,10 @@ class Order extends Controller
 
     function info(Request $request)
     {
-        $id = (int)$request->post('id');
-        if (!$id) return Response::forbidden();
+        $this->validate($request, [
+            'id' => 'required|integer'
+        ]);
+        $id = $request->post('id');
 
         /* @var \App\Order $order */
         $order = $this->authQuery($request, \App\Order::class)
@@ -156,8 +158,11 @@ class Order extends Controller
 
     function remark(Request $request)
     {
-        $id = (int)$request->post('id');
-        if (!$id) return Response::forbidden();
+        $this->validate($request, [
+            'id' => 'required|integer',
+            'remark' => 'required|string'
+        ]);
+        $id = $request->post('id');
 
         /* @var \App\Order $order */
         $order = $this->authQuery($request, \App\Order::class)->findOrFail($id);
@@ -186,7 +191,7 @@ class Order extends Controller
         }
         $errMsg = null;
         $card_arr = [];
-        if (FundHelper::orderSuccess($order,
+        if (FundHelper::orderSuccess($order->id,
             function () use (&$order, &$errMsg, &$card_arr) {
                 /** @var \App\Order $order */
                 $order = \App\Order::where('id', $order->id)->lockForUpdate()->firstOrFail();
@@ -218,44 +223,39 @@ class Order extends Controller
                         'count_sold' => DB::raw('`count_sold`+1')
                     ]);
 
-                    return \App\Order::STATUS_SUCCESS;
+                    return FundHelper::ACTION_CONTINUE;
                 }
             }
         )) {
-            if ($errMsg) {
-                return Response::fail($errMsg);
-            } else {
-                if (filter_var($order->email, FILTER_VALIDATE_EMAIL)) {
-                    $cards_br = join('<br>', $card_arr);
-                    try {
-                        Mail::to($order->email)->Queue(
-                            new OrderShipped($order,
-                                '订单#' . $order->order_no . '&nbsp;已支付，卡号列表：',
-                                $cards_br));
-                        $order->email_sent = true;
-                        $order->saveOrFail();
-                    } catch (\Throwable $e) {
-                        // set to mail
-                        \App\Library\LogHelper::setLogFile('mail');
-                        \Log::error('Order.ship error, order_no:' . $order->order_no .
-                            ', email:' . $order->email . ', cards:' . $cards_br .
-                            ', Exception:' . $e->getMessage());
+            if (filter_var($order->email, FILTER_VALIDATE_EMAIL)) {
+                $cards_br = join('<br>', $card_arr);
+                try {
+                    Mail::to($order->email)->Queue(
+                        new OrderShipped($order,
+                            '订单#' . $order->order_no . '&nbsp;已支付，卡号列表：',
+                            $cards_br));
+                    $order->email_sent = true;
+                    $order->saveOrFail();
+                } catch (\Throwable $e) {
+                    // set to mail
+                    \App\Library\LogHelper::setLogFile('mail');
+                    \Log::error('Order.ship error, order_no:' . $order->order_no .
+                        ', email:' . $order->email . ', cards:' . $cards_br .
+                        ', Exception:' . $e->getMessage());
 
-                        // 还原
-                        \App\Library\LogHelper::setLogFile('card');
-                    }
+                    // 还原
+                    \App\Library\LogHelper::setLogFile('card');
                 }
-                $order->addHidden(['system_fee']);
-                $order = $order->toArray();
-                $order['cards'] = array_map(function ($item) {
-                    return ['card' => $item];
-                }, $card_arr);
-                return Response::success($order);
             }
+            $order->addHidden(['system_fee']);
+            $order = $order->toArray();
+            $order['cards'] = array_map(function ($item) {
+                return ['card' => $item];
+            }, $card_arr);
+            return Response::success($order);
         } else {
-            \Log::error('Order.ship error, order_no:' . $order->order_no);
             // orderSuccess 里面写过详细log了
-            return Response::fail($errMsg ? $errMsg : '数据库繁忙, 请联系客服');
+            return Response::fail($errMsg ?? '数据库繁忙, 请联系客服');
         }
     }
 }

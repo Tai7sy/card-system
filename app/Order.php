@@ -19,6 +19,14 @@ class Order extends Model
         'api_info' => 'array',
     ];
 
+    public static function unique_no()
+    {
+        $order_no = date('YmdHis') . str_random(5);
+        while (\App\Order::where('order_no', $order_no)->exists()) {
+            $order_no = date('YmdHis') . str_random(5);
+        }
+        return $order_no;
+    }
 
     function user()
     {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Library\FundHelper;
 use App\Library\Helper;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -15,8 +16,16 @@ class Order extends Controller
 {
     function stat(Request $request)
     {
-        $day = (int)$request->input('day', 7);
-        $profit = $request->post('profit') === 'true';
+        $this->validate($request, [
+            'day' => 'required|integer|between:7,30'
+        ]);
+        $day = (int)$request->input('day');
+        if ($day === 30) {
+            $before = Carbon::now()->addMonths(-1);
+        } else {
+            $before = Carbon::now()->addDays(-$day);
+        }
+
         $query = \App\Order::where(function ($query) {
             /** @var \Illuminate\Database\Eloquent\Builder $query */
             $query->where('status', \App\Order::STATUS_PAID)
@@ -24,16 +33,12 @@ class Order extends Controller
         })->where('paid_at', '>=', Helper::getMysqlDate(-$day + 1))
             ->groupBy('date')->orderBy('date', 'DESC');
 
-        if ($profit) {
-            $query->selectRaw('DATE(`paid_at`) as "date",COUNT(*) as "count",SUM(`fee`-`system_fee`) as "sum"');
-        } else {
-            $query->selectRaw('DATE(`paid_at`) as "date",COUNT(*) as "count",SUM(`paid`) as "sum"');
-        }
+        $query->selectRaw('DATE(`paid_at`) as "date",COUNT(*) as "count",SUM(`paid`) as "paid",SUM(`fee`-`system_fee`) as "profit"');
 
         $list = $query->get()->toArray();
         $ret = [];
         foreach ($list as $item) {
-            $ret[$item['date']] = [(int)$item['count'], (int)$item['sum']];
+            $ret[$item['date']] = [(int)$item['count'], (int)$item['paid'], (int)$item['profit']];
         }
 
         return Response::success($ret);
@@ -41,11 +46,14 @@ class Order extends Controller
 
     public function delete(Request $request)
     {
-        $ids = $request->post('ids', '');
+        $this->validate($request, [
+            'ids' => 'required|string',
+            'income' => 'required|integer',
+            'balance' => 'required|integer',
+        ]);
+        $ids = $request->post('ids');
         $delete_income = (int)$request->post('income');
         $delete_balance = (int)$request->post('balance');
-
-        if (strlen($ids) < 1) return Response::forbidden();
 
         \App\Order::whereIn('id', explode(',', $ids))
             ->chunk(100, function ($orders) use ($delete_income, $delete_balance) {
@@ -70,49 +78,52 @@ class Order extends Controller
 
     function freeze(Request $request)
     {
-        $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
+        $this->validate($request, [
+            'ids' => 'required|string'
+        ]);
 
+        $ids = explode(',', $request->post('ids'));
         $frozen_reason = $request->post('reason');
-
-        $orders = \App\Order::whereIn('id', explode(',', $ids))
-            ->where('status', \App\Order::STATUS_SUCCESS)->get();
 
         $count = 0;
         $success = 0;
-        foreach ($orders as $order) {
-            if (FundHelper::orderFreeze($order, $frozen_reason)) {
+        foreach ($ids as $order_id) {
+            $count++;
+
+            if (FundHelper::orderFreeze($order_id, $frozen_reason)) {
                 $success++;
             }
-            $count++;
         }
         return Response::success([$count, $success]);
     }
 
     function unfreeze(Request $request)
     {
-        $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
+        $this->validate($request, [
+            'ids' => 'required|string'
+        ]);
 
-        $orders = \App\Order::whereIn('id', explode(',', $ids))
-            ->where('status', \App\Order::STATUS_FROZEN)->get();
+        $ids = explode(',', $request->post('ids'));
 
         $count = 0;
         $success = 0;
         $outerStatus = \App\Order::STATUS_FROZEN;
-        foreach ($orders as $order) {
-            if (FundHelper::orderUnfreeze($order, '后台操作', null, $outerStatus)) {
+        foreach ($ids as $order_id) {
+            $count++;
+
+            if (FundHelper::orderUnfreeze($order_id, '后台操作', null, $outerStatus)) {
                 $success++;
             }
-            $count++;
         }
         return Response::success([$count, $success, $outerStatus]);
     }
 
     function set_paid(Request $request)
     {
-        $id = (int)$request->post('id', '');
-        if ($id < 1) return Response::forbidden();
+        $this->validate($request, [
+            'id' => 'required|integer'
+        ]);
+        $id = $request->post('id', '');
 
         $trade_no = $request->post('trade_no', '');
         if (strlen($trade_no) < 1) return Response::forbidden('请输入支付系统内单号');
@@ -140,6 +151,7 @@ class Order extends Controller
             Log::error($logTag . ' shipOrder Exception: ' . $e->getMessage());
         }
 
+        // 发货OK了. 重新获取一下订单状态
         $order = \App\Order::with(['card_orders.card' => function (Relation $query) {
             $query->select(['id', 'card']);
         }])->findOrFail($id);

@@ -9,14 +9,12 @@ if (process.platform === 'win32') {
   // 完全同步于 card/web_admin
   // src/store
   // src/views/layout
-  // TODO copy有问题
-  console.log(`copy /Y ${resolve('../../card/web_admin/src/store')} ${resolve('src/store')}`);
-  exec(`copy /Y ${resolve('../../card/web_admin/src/views/layout')} ${resolve('src/views/layout')}`);
+  exec(`xcopy /I /E /Y ${resolve('../../card/web_admin/src/store')} ${resolve('src/store')}`);
+  exec(`xcopy /I /E /Y ${resolve('../../card/web_admin/src/views/layout')} ${resolve('src/views/layout')}`);
 } else {
   console.error('please config ln -s ...');
   process.exit();
 }
-
 
 module.exports = {
   lintOnSave: false,

@@ -100,6 +100,9 @@ class Pay extends Controller
             return self::renderResultPage($request, ['msg' => '请输入联系方式']);
 
         /* @var \App\Category $category */
+        $category = Category::findOrFail($category_id);
+
+        /* @var \App\Product $product */
         $product = Product::where('id', $product_id)
             ->where('category_id', $category_id)
             ->where('enabled', 1)
@@ -155,6 +158,7 @@ class Pay extends Controller
         $discount_fee = 0;
         $used_coupon = null;
         if ($product->support_coupon && strlen($coupon) > 0) {
+            /** @var \App\Coupon[] $coupons */
             $coupons = \App\Coupon::where('user_id', $product->user_id)
                 ->where('coupon', $coupon)
                 ->where('expire_at', '>', Carbon::now())
@@ -164,8 +168,8 @@ class Pay extends Controller
                     ($c->category_id === $category_id &&
                         ($c->product_id === -1 || $c->product_id === $product_id))) {
 
-                    if ($c->discount_type === \App\Coupon::DISCOUNT_TYPE_AMOUNT && $pay_money > $c->discount_val) {
-                        // 必须大于支付金额
+                    if ($c->discount_type === \App\Coupon::DISCOUNT_TYPE_AMOUNT && $pay_money >= $c->discount_val) {
+                        // (可以大于等于)支付金额
                         $used_coupon = $c;
                         $discount_fee = $c->discount_val;
                         break;
@@ -177,6 +181,9 @@ class Pay extends Controller
                     }
                 }
             }
+            if($used_coupon === null){
+                return self::renderResultPage($request, ['msg' => '优惠券信息错误，请重新输入']);
+            }
             $pay_money -= $discount_fee;
         }
 
@@ -184,16 +191,16 @@ class Pay extends Controller
             $used_coupon->status = \App\Coupon::STATUS_USED;
             $used_coupon->count_used++;
             $used_coupon->save();
+            $remark = '使用优惠券: ' . $used_coupon->coupon;
+        } else {
+            $remark = null;
         }
 
         $system_fee = (int)round($pay_money * $pay->fee_system);  // 系统通道手续费  ( 四舍五入 )
         $merchant_income = $pay_money - $system_fee; // 用户实际支付 - 手续费
         //商户订单号，网站订单系统中唯一订单号
 
-        $order_no = date('YmdHis') . str_random(5);
-        while (\App\Order::whereOrderNo($order_no)->exists()) {
-            $order_no = date('YmdHis') . str_random(5);
-        }
+        $order_no = \App\Order::unique_no();
         \App\Order::insert([
             'user_id' => $product->user_id,
             'order_no' => $order_no,
@@ -212,8 +219,15 @@ class Pay extends Controller
             'system_fee' => $system_fee,
             'income' => $merchant_income,
             'status' => \App\Order::STATUS_UNPAY,
-            'created_at' => Carbon::now()
+            'remark' => $remark,
+            'created_at' => Carbon::now(),
         ]);
+
+        if ($pay_money === 0) {
+            // 支付金额为0, 直接成功
+            $this->shipOrder($request, $order_no, $pay_money, null);
+            return redirect('/pay/result/' . $order_no);
+        }
 
         $order_name = $order_no;  // 商品名改成单号
         return $this->goPay($request, $order_no, $order_name, $pay, $pay_money);
@@ -271,7 +285,7 @@ class Pay extends Controller
         }
 
         // 超过 5 分钟就不准重新进入页面了, 但是已经在页面的是不影响支付的
-        if($order->created_at < Carbon::now()->addMinutes(-5)){
+        if ($order->created_at < Carbon::now()->addMinutes(-5)) {
             return $this->renderResultPage($request, ['msg' => '当前订单长时间未支付已作废, 请重新下单']);
         }
 
@@ -565,21 +579,23 @@ class Pay extends Controller
             //未处理过此订单
             \Log::debug('shipOrder.first_process:' . $order_no);
             $order_id = $order->id;
-            if (FundHelper::orderSuccess($order,
+            if (FundHelper::orderSuccess($order->id,
                 /**
                  * 此函数在 transition里工作
                  * 这个函数做了以下工作
                  * Order -> STATUS_PAID or STATUS_SUCCESS
                  * Product 和 Card -> sold + 1
                  * 返回 STATUS_PAID or STATUS_SUCCESS
+                 * @param \App\Order $locked_order
+                 * @return int 返回 CONTINUE 会加余额等等操作
                  */
-                function () use ($order_id, $trade_no, &$order, &$product) {
-                    /** @var \App\Order $order */
-                    $order = \App\Order::where('id', $order_id)->lockForUpdate()->firstOrFail();
+                function ($locked_order) use ($order_id, $trade_no, &$order, &$product) {
+                    $order = $locked_order;
                     if ($order->status !== \App\Order::STATUS_UNPAY) {
-                        \Log::debug('shipOrder.first_process:' . $order->order_no . ' already processed! #2');
-                        return -999;
+                        \Log::debug('Shop.Pay.shipOrder: .first_process:' . $order->order_no . ' already processed! #2');
+                        return false;
                     }
+
                     /** @var \App\Product $product */
                     $product = $order->product()->lockForUpdate()->firstOrFail();
                     $product->count_sold += $order->count;
@@ -596,7 +612,7 @@ class Pay extends Controller
 
 
                     if (count($cards) !== $order->count) {
-                        \Log::alert('订单:' . $order->order_no .
+                        Log::alert('Shop.Pay.shipOrder: 订单:' . $order->order_no .
                             ', 购买数量:' . $order->count .
                             ', 卡数量:' . count($cards) . ' 卡密不足(已支付 未发货)');
 
@@ -604,11 +620,9 @@ class Pay extends Controller
                         // 已支付 未发货
                         $order->status = \App\Order::STATUS_PAID;
                         $order->saveOrFail();
-                        return \App\Order::STATUS_PAID;
+                        return true;
                         // 这里需要商户到后台手动发货
                     } else {
-                        $order->status = \App\Order::STATUS_SUCCESS;
-                        $order->saveOrFail();
                         $card_ids = [];
                         foreach ($cards as $card) {
                             $card_ids[] = $card->id;
@@ -619,7 +633,10 @@ class Pay extends Controller
                             'count_sold' => DB::raw('`count_sold`+1')
                         ]);
 
-                        return \App\Order::STATUS_SUCCESS;
+                        $order->status = \App\Order::STATUS_SUCCESS;
+                        $order->saveOrFail();
+
+                        return FundHelper::ACTION_CONTINUE;
                     }
                 })
             ) {
@@ -642,8 +659,6 @@ class Pay extends Controller
 
                 // ------------------------------------------------------------------------ 提醒库存 end
             } else {
-                \Log::error('shipOrder.first_process error, order_no:' . $order_no . ',trade_no:' . $trade_no);
-                // orderSuccess 里面写过详细log了
                 throw new \Exception('merchant operate exception!');
             }
 
@@ -651,7 +666,7 @@ class Pay extends Controller
             if (System::_getInt('mail_send_order') === 1 && filter_var($order->email, FILTER_VALIDATE_EMAIL)) {
                 self::showOrderResult($request, $order, true);
             }
-        }else{
+        } else {
             Log::debug('Shop.Pay.shipOrder: .order_no:' . $order->order_no . ' already processed! #1');
         }
         return FALSE;

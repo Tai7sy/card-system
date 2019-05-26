@@ -66,7 +66,7 @@
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-  @import "../../../../web_common/styles/mixin.scss";
+  @import "../../../../../card/web_common/styles/mixin.scss";
 
   .app-wrapper {
     @include clearfix;

@@ -191,8 +191,11 @@ class Coupon extends Controller
 
     function enable(Request $request)
     {
-        $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
+        $this->validate($request, [
+            'ids' => 'required|string',
+            'enabled' => 'required|integer|between:0,1'
+        ]);
+        $ids = $request->post('ids');
         $enabled = (int)$request->post('enabled');
 
         $this->authQuery($request, \App\Coupon::class)
@@ -204,8 +207,10 @@ class Coupon extends Controller
 
     function delete(Request $request)
     {
-        $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
+        $this->validate($request, [
+            'ids' => 'required|string'
+        ]);
+        $ids = $request->post('ids');
 
         $this->authQuery($request, \App\Coupon::class)
             ->whereIn('id', explode(',', $ids))->delete();

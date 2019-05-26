@@ -57,6 +57,7 @@ class Login extends Controller
     {
         $user = Auth::getUser();
         $user->addHidden(['created_at', 'updated_at']);
+        $user->setAttribute('shop_name', \App\System::_get('app_name'));
         return Response::success([
             'token' => 'login',
             'user' => $user->toArray()

@@ -37,7 +37,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
     Route::post('system/order/clean', 'Admin\System@orderClean');
 
     Route::post('pay', 'Admin\Pay@get');
-    Route::post('pay/stat', 'Admin\Pay@stat');
+    Route::get('pay/stat', 'Admin\Pay@stat');
     Route::post('pay/sort', 'Admin\Pay@sort');
     Route::post('pay/fee_system', 'Admin\Pay@fee_system');
     Route::post('pay/fee', 'Admin\Pay@fee');

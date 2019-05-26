@@ -65,6 +65,8 @@ class Dashboard extends Controller
             ->where('status', Order::STATUS_PAID)->count();
         // 订单状态为 已支付 = 已支付未发货
 
+        $dashboard['login'] = \App\Log::where('action', \App\Log::ACTION_LOGIN)->latest()->firstOrFail();
+
         return Response::success($dashboard);
     }
 

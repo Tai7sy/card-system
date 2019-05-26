@@ -18,6 +18,7 @@
           <el-select v-model="form.shop_theme_material_list_type">
             <el-option value="dropdown" label="下拉式"/>
             <el-option value="button" label="按钮式"/>
+            <el-option value="list" label="列表式"/>
           </el-select>
         </el-form-item>
         <el-form-item class="item-container">

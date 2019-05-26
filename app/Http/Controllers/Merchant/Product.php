@@ -8,6 +8,7 @@ use App\System;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use voku\helper\AntiXSS;
 
 class Product extends Controller
@@ -89,25 +90,41 @@ class Product extends Controller
      */
     function edit(Request $request)
     {
+        $this->validate($request, [
+            'id' => 'sometimes|integer',
+            'category_id' => 'required|integer',
+            'description' => 'required|string',
+            'instructions' => 'required|string',
+            'sort' => 'required|integer|min:0|max:10000000',
+            'inventory' => 'required|integer|between:0,2',
+            'buy_min' => 'required|integer|min:0|max:10000',
+            'buy_max' => 'required|integer|min:0|max:10000',
+            'cost' => 'required|numeric|min:0|max:10000000',
+            'price' => 'required|numeric|min:0.01|max:10000000',
+            'price_whole' => 'required|string',
+            'enabled' => 'required|integer|between:0,1'
+        ]);
+
         $category_id = (int)$request->post('category_id');
+        if (!$this->authQuery($request, \App\Category::class)->where('id', $category_id)->exists()) {
+            return Response::fail('商品分类不存在');
+        }
         $name = $request->post('name');
         $description = $request->post('description');
         $instructions = $request->post('instructions');
-        $sort = $request->post('sort');
-        $sort = $sort === NULL ? 1000 : (int)$sort;
 
-        $count_warn = (int)$request->post('count_warn', 0);
         $buy_min = (int)$request->post('buy_min', 0);
         $buy_max = (int)$request->post('buy_max', 0);
-
-        $support_coupon = $request->post('support_coupon', 0) === 'true';
-        $password = $request->post('password');
-        $password_open = $request->post('password_open', 0) === 'true';
 
         $cost = (int)round($request->post('cost') * 100);
         $price = (int)round($request->post('price') * 100);
         $price_whole = $request->post('price_whole'); // [1:]
-        $enabled = (int)$request->post('enabled');
+        $price_whole_arr = @json_decode($price_whole, true);
+        foreach ($price_whole_arr as $whole_item) {
+            if ($whole_item[1] < 1 || $whole_item[1] > 1000000000)
+                return Response::fail('商品批发价需要在 0.01-10000000 之间');
+
+        }
 
         if (System::_getInt('filter_words_open') === 1) {
             $words = explode('|', System::_get('filter_words'));
@@ -117,24 +134,6 @@ class Product extends Controller
                 return Response::fail('提交失败! 商品描述包含敏感词: ' . $ret);
             if (($ret = Helper::filterWords($instructions, $words)) !== false)
                 return Response::fail('提交失败! 商品使用说明包含敏感词: ' . $ret);
-        }
-
-        if ($buy_min < 1 || $buy_min > 10000)
-            return Response::fail('最小购买量不能超过10000');
-        if ($buy_max < 1 || $buy_max > 10000)
-            return Response::fail('最大购买量不能超过10000');
-
-        if ($count_warn < 0 || $count_warn > 10000000)
-            return Response::fail('库存预警需要在0-10000000之间');
-
-        if ($sort < 0 || $sort > 10000000)
-            return Response::fail('排序需要在0-10000000之间');
-
-        if ($cost > 1000000000 || $price > 1000000000) {
-            return Response::fail('商品价格不能超过10000000, 请重新输入');
-        }
-        if ($cost < 0 || $price < 0) {
-            return Response::fail('价格不能为负数');
         }
 
         if ((int)$request->post('id')) {
@@ -148,7 +147,7 @@ class Product extends Controller
                 if ($buy_min !== 1) return Response::fail('该商品含有重复售卖的卡密, 最小购买量必须为1件');
                 if ($buy_max !== 1) return Response::fail('该商品含有重复售卖的卡密, 最大购买量必须为1件');
             }
-        }else{
+        } else {
             $product = new \App\Product;
             $product->count_sold = 0;
             $product->user_id = $this->getUserIdOrFail($request);
@@ -160,29 +159,35 @@ class Product extends Controller
         $antiXss = new AntiXSS();
         $product->description = $antiXss->xss_clean($description);
         $product->instructions = $antiXss->xss_clean($instructions);
-        $product->sort = $sort;
+        $product->sort = $request->post('sort');
 
         $product->buy_min = $buy_min;
         $product->buy_max = $buy_max;
-        $product->count_warn = $count_warn;
+        $product->count_warn = $request->post('count_warn');
 
-        $product->support_coupon = $support_coupon;
-        $product->password = $password;
-        $product->password_open = $password_open;
+        $product->support_coupon = $request->post('support_coupon') === 'true';
+        $product->password = $request->post('password');
+        $product->password_open = $request->post('password_open') === 'true';
 
         $product->cost = $cost;
         $product->price = $price;
         $product->price_whole = $price_whole;
-        $product->enabled = $enabled;
+        $product->enabled = (int)$request->post('enabled');
+
+        $product->inventory = (int)$request->post('inventory');
         $product->saveOrFail();
         return Response::success();
     }
 
     function enable(Request $request)
     {
-        $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
+        $this->validate($request, [
+            'ids' => 'required|string',
+            'enabled' => 'required|integer'
+        ]);
+        $ids = $request->post('ids');
         $enabled = (int)$request->post('enabled');
+
 
         $this->authQuery($request, \App\Product::class)
             ->whereIn('id', explode(',', $ids))
@@ -193,11 +198,22 @@ class Product extends Controller
 
     function delete(Request $request)
     {
-        $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
+        $this->validate($request, [
+            'ids' => 'required|string'
+        ]);
+        $ids = $request->post('ids');
+        $ids = explode(',', $ids);
 
-        $this->authQuery($request, \App\Product::class)
-            ->whereIn('id', explode(',', $ids))->delete();
-        return Response::success();
+        $product_sql = $this->authQuery($request, \App\Product::class)
+            ->whereIn('id', $ids);
+
+        $card_sql = $this->authQuery($request, \App\Card::class)
+            ->whereIn('product_id', $ids);
+
+        return DB::transaction(function () use ($product_sql, $card_sql) {
+            $product_sql->delete();
+            $card_sql->forceDelete();
+            return Response::success();
+        });
     }
 }

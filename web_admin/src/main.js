@@ -9,6 +9,7 @@ import NProgress from 'nprogress'; // Progress 进度条
 import 'nprogress/nprogress.css'; // Progress 进度条 样式
 import 'normalize.css/normalize.css'; // normalize.css 样式格式化
 import 'quill/dist/quill.snow.css'
+import $ from 'jquery'
 import errLog from '@/store/errLog'; // error log组件
 import { getToken, removeToken } from '~/utils/auth'
 import '~/utils/helper'
@@ -27,6 +28,8 @@ window.Vuex = require('vuex');
 window.$http = axios;
 window.$router = router;
 window.$store = store;
+window.$ = $;
+window.jQuery = $;
 window.plugins = [];
 window.NProgress = NProgress;
 

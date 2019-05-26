@@ -30,7 +30,7 @@
 </template>
 
 <script>
-  import NProgress from 'nprogress'; // Progress 进度条
+  import NProgress from 'nprogress'
   import setInfo from './_info'
   import setTheme from './_theme'
   import setEmail from './_email.vue'
@@ -58,10 +58,13 @@
       setStorage,
     },
     data () {
+      const activeTab = this.$route.query.tab || 'info';
+      const initialized =  Object.assign({}, const_init);
+      initialized[activeTab] = true;
       return {
         loading: false,
-        activeTab: '',
-        initialized: Object.assign({}, const_init)
+        activeTab,
+        initialized
       }
     },
     watch: {
@@ -81,9 +84,7 @@
         }
       }
     },
-    mounted () {
-      this.activeTab = this.$route.query.tab || 'info';
-    },
+    mounted () {},
     methods: {}
   }
 </script>

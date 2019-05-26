@@ -1,11 +1,15 @@
 import fetch from '~/utils/fetch';
 
 
-export function login (params) {
+export function login (email, password, remember = false) {
   return fetch({
     url: 'login',
     method: 'post',
-    data: params
+    data: {
+      email,
+      password,
+      remember
+    }
   });
 }
 
@@ -15,11 +19,11 @@ export function getVerify () {
     method: 'post'
   });
 }
-export function changePass (params) {
+export function changePass (data) {
   return fetch({
     url: 'login/password',
     method: 'post',
-    data: params
+    data
   });
 }
 

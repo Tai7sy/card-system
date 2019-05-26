@@ -19,22 +19,24 @@ class ConfigServiceProvider extends ServiceProvider
         // config('filesystems.default');
 
         if (app()->runningInConsole()) {
-            return;
-        }
-
-        try {
-            DB::connection()->getPdo();
-            if (DB::table('migrations')->count() === 0) {
-                die(" * No migration table, please install your website first.\r\n");
-            }
-            if (!Schema::hasTable('systems')) {
-                die(" * No system table, please install your website first.\r\n");
-            }
-        } catch (\Exception $e) {
-            if (config('database.connections.mysql.host') === '数据库地址') {
-                die(" * Please change your config of database in '.env' file \r\n");
-            } else {
-                die(" * Database connection error: " . $e->getMessage() . "\r\n");
+            try {
+                DB::connection()->getPdo();
+                if (!Schema::hasTable('migrations')) {
+                    // 有安装表, 已经安装过?
+                    echo(" * No migration table, please install your website first.\r\n");
+                    return;
+                }
+                if (!Schema::hasTable('systems')) {
+                    echo(" * No system table, please install your website first.\r\n");
+                    return;
+                }
+            } catch (\Exception $e) {
+                if (config('database.connections.mysql.host') === '数据库地址') {
+                    echo(" * Please change your config of database in '.env' file \r\n");
+                    return;
+                } else {
+                    die(" * Database connection error: " . $e->getMessage() . "\r\n");
+                }
             }
         }
 

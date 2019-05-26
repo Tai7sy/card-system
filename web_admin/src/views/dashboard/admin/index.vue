@@ -220,6 +220,7 @@
     }
   }
 </script>
+
 <style lang="scss">
   .order-chart-day {
     position: absolute;
@@ -235,7 +236,6 @@
   }
 </style>
 <style lang="scss" scoped>
-
   .home-row {
     display: flex;
     margin: 0;
@@ -265,14 +265,18 @@
     flex-grow: 1;
   }
 
-  .col-home-balance {
+  .col-home-left-balance {
     width: 324px;
   }
 
   .col-home-left-chart {
     flex-grow: 1;
-    margin-left: 18px;
   }
+
+  .home-left-balance, .home-left-chart {
+    height: 308px;
+  }
+
 
   .col-home-account, .col-home-link {
     width: 324px;
@@ -316,7 +320,7 @@
       margin-left: 18px;
     }
     .home-link {
-      height: 282px;
+      height: 222px;
     }
 
     .col-home-left-chart {
@@ -329,14 +333,18 @@
   }
 
   @media only screen and (max-width: 836px) {
-    .col-home-account, .col-home-link, .col-home-balance, .col-home-left-chart {
+    .col-home-account, .col-home-link, .col-home-left-balance, .col-home-left-chart {
       width: 100%;
       flex: initial;
       margin: 0;
     }
 
+    .home-left-balance {
+      height: 278px;
+    }
+
     .col-home-right {
-      margin: 0;
+      display: none;
     }
   }
 

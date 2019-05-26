@@ -101,8 +101,11 @@ class Category extends Controller
 
     function enable(Request $request)
     {
+        $this->validate($request, [
+            'ids' => 'required|string',
+            'enabled' => 'required|integer|between:0,1'
+        ]);
         $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
         $enabled = (int)$request->post('enabled');
 
         $this->authQuery($request, \App\Category::class)
@@ -114,8 +117,10 @@ class Category extends Controller
 
     function delete(Request $request)
     {
+        $this->validate($request, [
+            'ids' => 'required|string'
+        ]);
         $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
 
         $this->authQuery($request, \App\Category::class)
             ->whereIn('id', explode(',', $ids))->delete();

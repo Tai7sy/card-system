@@ -3,17 +3,12 @@
     <div class="home-link">
       <div class="header"><span class="header-title">常用功能</span></div>
       <div class="functions">
-        <router-link class="function" to="/m/shop/info">店铺信息</router-link>
-        <router-link class="function" to="/m/shop/link">店铺链接</router-link>
-
-        <router-link class="function" to="/m/product/category">商品分类</router-link>
-        <router-link class="function" to="/m/product/list">商品列表</router-link>
-
-        <router-link class="function" to="/m/order/list">订单记录</router-link>
-        <router-link class="function" to="/m/order/analysis">收益统计</router-link>
-
-        <router-link class="function" to="/m/shop/rate">通道费率</router-link>
-        <router-link class="function" to="/m/api/pay">API接入</router-link>
+        <router-link class="function" to="/admin/system/set?tab=info">店铺信息</router-link>
+        <router-link class="function" to="/admin/product/category">商品分类</router-link>
+        <router-link class="function" to="/admin/product/list">商品列表</router-link>
+        <router-link class="function" to="/admin/order/list">订单记录</router-link>
+        <router-link class="function" to="/admin/order/analysis">收益统计</router-link>
+        <router-link class="function" to="/admin/system/pay">支付渠道</router-link>
 
       </div>
     </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Library\Helper;
+use Carbon\Carbon;
 use function foo\func;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -13,7 +14,6 @@ class Pay extends Controller
     function get(Request $request)
     {
         $query = \App\Pay::orderBy('sort');
-
 
         $enabled = $request->post('enabled');
         if (strlen($enabled))
@@ -31,12 +31,24 @@ class Pay extends Controller
 
     function stat(Request $request)
     {
-        $day = (int)$request->input('day', 7);
-        $list = \App\Order::where(function ($query) {
-            /** @var \Illuminate\Database\Eloquent\Builder $query */
-            $query->where('status', \App\Order::STATUS_PAID)
-                ->orWhere('status', \App\Order::STATUS_SUCCESS);
-        })->where('paid_at', '>=', Helper::getMysqlDate(-$day + 1))
+        $this->validate($request, [
+            'day' => 'required|integer|between:1,30'
+        ]);
+
+        $day = (int)$request->input('day');
+        if ($day === 30) {
+            $before = Carbon::now()->addMonths(-1);
+        } else {
+            $before = Carbon::now()->addDays(-$day);
+        }
+
+        $list = $this->authQuery($request, \App\Order::class)
+            ->where(function ($query) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
+                $query->where('status', \App\Order::STATUS_PAID)
+                    ->orWhere('status', \App\Order::STATUS_SUCCESS);
+            })
+            ->where('paid_at', '>=', $before)
             ->with(['pay' => function ($query) {
                 /** @var \Illuminate\Database\Eloquent\Builder $query */
                 $query->select(['id', 'name']);
@@ -44,6 +56,7 @@ class Pay extends Controller
             ->groupBy('pay_id')
             ->selectRaw('`pay_id`,COUNT(*) as "count",SUM(`paid`) as "sum"')
             ->get()->toArray();
+
         $ret = [];
         foreach ($list as $item) {
             if (isset($item['pay']) && isset($item['pay']['name']))
@@ -100,8 +113,10 @@ class Pay extends Controller
 
     function comment(Request $request)
     {
-        $id = (int)$request->post('id', -1);
-        if (!$id) return Response::forbidden();
+        $this->validate($request, [
+            'id' => 'required|integer',
+        ]);
+        $id = (int)$request->post('id');
         /* @var \App\Pay $pay */
         $pay = \App\Pay::findOrFail($id);
         $pay->comment = $request->post('comment');
@@ -112,8 +127,10 @@ class Pay extends Controller
 
     function sort(Request $request)
     {
-        $id = (int)$request->post('id', -1);
-        if (!$id) return Response::forbidden();
+        $this->validate($request, [
+            'id' => 'required|integer',
+        ]);
+        $id = (int)$request->post('id');
         /* @var \App\Pay $pay */
         $pay = \App\Pay::findOrFail($id);
         $pay->sort = (int)$request->post('sort', 1000);
@@ -128,8 +145,10 @@ class Pay extends Controller
      */
     function fee_system(Request $request)
     {
+        $this->validate($request, [
+            'id' => 'required|integer',
+        ]);
         $id = (int)$request->post('id');
-        if ($id < 1) return Response::forbidden();
         /* @var \App\Pay $pay */
         $pay = \App\Pay::findOrFail($id);
         $pay->fee_system = $request->post('fee_system');
@@ -140,8 +159,11 @@ class Pay extends Controller
 
     function enable(Request $request)
     {
+        $this->validate($request, [
+            'ids' => 'required|string',
+            'enabled' => 'required|integer|between:0,3'
+        ]);
         $ids = $request->post('ids');
-        if (strlen($ids) < 1) return Response::forbidden();
         $enabled = (int)$request->post('enabled');
         \App\Pay::whereIn('id', explode(',', $ids))->update([
             'enabled' => $enabled
@@ -157,8 +179,10 @@ class Pay extends Controller
      */
     function delete(Request $request)
     {
+        $this->validate($request, [
+            'id' => 'required|integer',
+        ]);
         $id = (int)$request->post('id');
-        if ($id < 1) return Response::forbidden();
 
         \App\Pay::whereId($id)->delete();
         return Response::success();

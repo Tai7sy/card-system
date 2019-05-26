@@ -116,8 +116,10 @@ class Card extends Controller
      */
     function trash(Request $request)
     {
-        $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
+        $this->validate($request, [
+            'ids' => 'required|string'
+        ]);
+        $ids = $request->post('ids');
 
         $query = $this->authQuery($request, \App\Card::class)
             ->whereIn('id', explode(',', $ids));
@@ -134,8 +136,10 @@ class Card extends Controller
      */
     function restoreTrashed(Request $request)
     {
-        $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
+        $this->validate($request, [
+            'ids' => 'required|string'
+        ]);
+        $ids = $request->post('ids');
 
         $query = $this->authQuery($request, \App\Card::class)
             ->whereIn('id', explode(',', $ids));
@@ -151,8 +155,10 @@ class Card extends Controller
      */
     function deleteTrashed(Request $request)
     {
-        $ids = $request->post('ids', '');
-        if (strlen($ids) < 1) return Response::forbidden();
+        $this->validate($request, [
+            'ids' => 'required|string'
+        ]);
+        $ids = $request->post('ids');
 
         $this->authQuery($request, \App\Card::class)
             ->whereIn('id', explode(',', $ids))
@@ -164,6 +170,7 @@ class Card extends Controller
      * 删除全部 - 自动判断是否回收站
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
      */
     function deleteAll(Request $request)
     {

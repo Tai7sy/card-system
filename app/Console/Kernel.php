@@ -30,6 +30,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        if (!app()->runningInConsole()) {
+            return;
+        }
+
         try {
             DB::connection()->getPdo();
             if (Schema::hasTable('migrations')) {
@@ -48,6 +52,7 @@ class Kernel extends ConsoleKernel
             }
         }
 
+
         // 清理7天未支付订单
         if (System::_getInt('order_clean_unpay_open') === 1) {
             $day = System::_getInt('order_clean_unpay_day', 7);
@@ -57,9 +62,23 @@ class Kernel extends ConsoleKernel
                     ->where('created_at', '<', (new Carbon)->addDays(-$day))
                     ->delete();
 
-                echo '[' . date('Y-m-d H:i:s') . "] unpaid orders cleaned \n";
+                $message = '[' . date('Y-m-d H:i:s') . "] unpaid-orders cleaned \n";
+                // Log::alert($message);
+                echo $message;
             })->dailyAt('01:00');
         }
+
+        // 清理回收站卡密
+        $schedule->call(function () {
+            $day = 7;
+            echo '[' . date('Y-m-d H:i:s') . "] cleaning deleted cards(${$day}days ago)...\n";
+            \App\Card::onlyTrashed()
+                ->where('deleted_at', '<', (new Carbon)->addDays(-$day))
+                ->forceDelete();
+            $message = '[' . date('Y-m-d H:i:s') . "] deleted-cards cleaned\n";
+            // Log::alert($message);
+            echo $message;
+        })->dailyAt('02:00');
     }
 
     /**

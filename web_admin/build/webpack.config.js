@@ -9,6 +9,8 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
+      'vue$': 'vue/dist/vue.esm.js',
+      '@': resolve('src'),
       '~': resolve('../../card/web_common'),
       '~admin': resolve('../../card/web_admin/src'),
       '~merchant': resolve('../../card/web_merchant/src'),
