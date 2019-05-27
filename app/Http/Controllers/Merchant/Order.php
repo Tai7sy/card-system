@@ -55,15 +55,38 @@ class Order extends Controller
         if ($recent) {
             // 最近订单, 限制开始时间(paid_at>=XXX)
             $start_at = (new Carbon)->addDay(-$recent);
-            $query->where('paid_at', '>=', $start_at);
+            $query->where(function ($query) use ($start_at) {
+                /* @var \Illuminate\Database\Eloquent\Builder $query */
+                $query->where('paid_at', '>=', $start_at)
+                    ->orWhere(function ($query) use ($start_at) {
+                        /* @var \Illuminate\Database\Eloquent\Builder $query */
+                        $query->whereNull('paid_at')->where('created_at', '>=', $start_at);
+                    });
+            });
         } else {
             $start_at = $request->post('start_at', false);
-            if (strlen($start_at))
-                $query->where('paid_at', '>=', $start_at . ' 00:00:00');
+            if (strlen($start_at)) {
+                $query->where(function ($query) use ($start_at) {
+                    /* @var \Illuminate\Database\Eloquent\Builder $query */
+                    $query->where('paid_at', '>=', $start_at . ' 00:00:00')
+                        ->orWhere(function ($query) use ($start_at) {
+                            /* @var \Illuminate\Database\Eloquent\Builder $query */
+                            $query->whereNull('paid_at')->where('created_at', '>=', $start_at . ' 00:00:00');
+                        });
+                });
+            }
 
             $end_at = $request->post('end_at', false);
-            if (strlen($end_at))
-                $query->where('paid_at', '<=', $end_at . ' 23:59:59');
+            if (strlen($end_at)) {
+                $query->where(function ($query) use ($end_at) {
+                    /* @var \Illuminate\Database\Eloquent\Builder $query */
+                    $query->where('paid_at', '<=', $end_at . ' 23:59:59')
+                        ->orWhere(function ($query) use ($end_at) {
+                            /* @var \Illuminate\Database\Eloquent\Builder $query */
+                            $query->whereNull('paid_at')->where('created_at', '<=', $end_at . ' 23:59:59');
+                        });
+                });
+            }
         }
 
         if ($only_profit) {
@@ -72,7 +95,7 @@ class Order extends Controller
 
             // 利润总和统计
             $query2 = clone $query;
-            $profit_sum = $query2->selectRaw('SUM(`income`) as income, SUM(`income`-`cost`) as profit')->first();
+            $profit_sum = $query2->selectRaw('SUM(`income`) as income, SUM(`paid`-`cost`-`fee`) as profit')->first();
         } else {
 
             $status = $request->post('status');
@@ -81,19 +104,19 @@ class Order extends Controller
             } else {
                 $query->where('status', '!=', \App\Order::STATUS_UNPAY);
             }
+        }
 
-            if ($is_api) {
-                // 只获取API订单
-                $query->where('product_id', \App\Product::ID_API);
-            } else {
-                $query->where('product_id', '>', 0);
-                // 这时候确认加入订单详情
-                $query->with(['product' => function (Relation $query) {
-                    $query->select(['id', 'name']);
-                }, 'card_orders.card' => function (Relation $query) {
-                    $query->select(['id', 'card']);
-                }]);
-            }
+        if ($is_api) {
+            // 只获取API订单
+            $query->where('product_id', \App\Product::ID_API);
+        } else {
+            $query->where('product_id', '>', 0);
+            // 这时候确认加入订单详情
+            $query->with(['product' => function (Relation $query) {
+                $query->select(['id', 'name']);
+            }, 'card_orders.card' => function (Relation $query) {
+                $query->select(['id', 'card']);
+            }]);
         }
 
         $query->with(['pay' => function (Relation $query) {
@@ -116,21 +139,32 @@ class Order extends Controller
 
     function stat(Request $request)
     {
-        $day = (int)$request->input('day', 7);
+        $this->validate($request, [
+            'day' => 'required|integer|between:7,30'
+        ]);
+
+        $day = (int)$request->input('day');
+        if ($day === 30) {
+            $before = Carbon::now()->addMonths(-1);
+        } else {
+            $before = Carbon::now()->addDays(-$day);
+        }
+
         $list = $this->authQuery($request, \App\Order::class)
             ->where(function ($query) {
                 /** @var \Illuminate\Database\Eloquent\Builder $query */
                 $query->where('status', \App\Order::STATUS_PAID)
                     ->orWhere('status', \App\Order::STATUS_SUCCESS);
             })
-            ->where('paid_at', '>=', Helper::getMysqlDate(-$day + 1))
+            ->where('paid_at', '>=', $before)
             ->groupBy('date')->orderBy('date', 'DESC')
-            ->selectRaw('DATE(`paid_at`) as "date",COUNT(*) as "count",SUM(`income`) as "sum"')
+            /** 这里按照付款 统计金额 */
+            ->selectRaw('DATE(`paid_at`) as "date",COUNT(*) as "count",SUM(`paid`) as "paid",SUM(`paid`-`cost`-`fee`) as "profit"')
             ->get()->toArray();
 
         $ret = [];
         foreach ($list as $item) {
-            $ret[$item['date']] = [(int)$item['count'], (int)$item['sum']];
+            $ret[$item['date']] = [(int)$item['count'], (int)$item['paid'], (int)$item['profit']];
         }
 
         return Response::success($ret);
@@ -247,11 +281,10 @@ class Order extends Controller
                     \App\Library\LogHelper::setLogFile('card');
                 }
             }
-            $order->addHidden(['system_fee']);
-            $order = $order->toArray();
-            $order['cards'] = array_map(function ($item) {
-                return ['card' => $item];
+            $order['card_orders'] = array_map(function ($item) {
+                return ['card' => ['card' => $item]];
             }, $card_arr);
+            $order->addHidden(['system_fee']);
             return Response::success($order);
         } else {
             // orderSuccess 里面写过详细log了

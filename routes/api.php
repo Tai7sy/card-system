@@ -88,7 +88,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
     Route::post('log', 'Merchant\Log@get');                               //    ┆
     // Merchant 复用     -------------------------------------------------------------------┘
 
-    Route::post('order/stat', 'Admin\Order@stat');
+    Route::get('order/stat', 'Merchant\Order@stat');
     Route::post('order/delete', 'Admin\Order@delete');
     Route::post('order/freeze', 'Admin\Order@freeze');
     Route::post('order/unfreeze', 'Admin\Order@unfreeze');

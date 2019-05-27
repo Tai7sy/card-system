@@ -5,19 +5,19 @@ import Layout from '@/views/layout/Layout.vue';
 
 import View404 from '~admin/views/404'
 import ViewAbout from '~admin/views/about'
+import ViewPayList from '~admin/views/pay/list'
 import ViewLog from '~merchant/views/log/list'
-
 import ViewCategoryList from '~merchant/views/category/list'
-
 import ViewProductAdd from '~merchant/views/product/add'
 import ViewProductList from '~merchant/views/product/list'
-
 import ViewCardAdd from '~merchant/views/card/add'
 import ViewCardList from '~merchant/views/card/list'
 import ViewCardRecycle from '~merchant/views/card/recycle'
-
 import ViewCouponList from '~merchant/views/coupon/list'
 import ViewCouponAdd from '~merchant/views/coupon/add'
+import ViewOrderList from '~merchant/views/order/list'
+import ViewOrderRecentList from '~merchant/views/order/recent'
+import ViewOrderProfitList from '~merchant/views/order/profit'
 
 const _import = file => () => import('@/views/' + file + '.vue');
 
@@ -53,7 +53,7 @@ const constantRouterMap = [
     name: '管理中心',
     children: [
       { path: 'set', name: '网站设置', icon: 'cog', component: _import('system/set/index') },
-      { path: 'pay', name: '支付渠道', icon: 'credit-card', component: _import('pay/list/index') },
+      { path: 'pay', name: '支付渠道', icon: 'credit-card', component: ViewPayList },
       { path: 'logs', name: '登录日志', icon: 'regular/sticky-note', component: ViewLog },
       { path: 'security', name: '修改密码', icon: 'regular/shield-alt', component: _import('system/security/index') },
     ]
@@ -82,9 +82,9 @@ const constantRouterMap = [
     icon: 'list-ul',
     name: '交易管理',
     children: [
-      { path: 'list', name: '订单记录', icon: 'bars', component: _import('order/list/index') },
-      { path: 'recent', name: '7日订单', icon: 'bars', component: _import('order/recent/index') },
-      { path: 'analysis', name: '收益统计', icon: 'chart-bar', component: _import('order/profit/index') }
+      { path: 'list', name: '订单记录', icon: 'bars', component: ViewOrderList },
+      { path: 'recent', name: '7日订单', icon: 'bars', component: ViewOrderRecentList },
+      { path: 'analysis', name: '收益统计', icon: 'chart-bar', component: ViewOrderProfitList }
     ]
   },
   {

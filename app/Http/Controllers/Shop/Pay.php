@@ -598,8 +598,6 @@ class Pay extends Controller
 
                     /** @var \App\Product $product */
                     $product = $order->product()->lockForUpdate()->firstOrFail();
-                    $product->count_sold += $order->count;
-                    $product->saveOrFail();
 
                     $order->pay_trade_no = $trade_no; // 支付通道订单号
                     $order->paid_at = Carbon::now();
@@ -635,6 +633,9 @@ class Pay extends Controller
 
                         $order->status = \App\Order::STATUS_SUCCESS;
                         $order->saveOrFail();
+
+                        $product->count_sold += $order->count;
+                        $product->saveOrFail();
 
                         return FundHelper::ACTION_CONTINUE;
                     }

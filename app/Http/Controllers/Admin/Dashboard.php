@@ -15,12 +15,12 @@ class Dashboard extends Controller
         $dashboard = [
             'today' => [
                 'count' => 0,
-                'income' => 0,
+                'paid' => 0,
                 'profit' => 0
             ],
             'yesterday' => [
                 'count' => 0,
-                'income' => 0,
+                'paid' => 0,
                 'profit' => 0
             ]
         ];
@@ -32,7 +32,7 @@ class Dashboard extends Controller
                 $query->where('status', Order::STATUS_PAID)
                     ->orWhere('status', Order::STATUS_SUCCESS);
             })
-            ->selectRaw('COUNT(*) as `count`,SUM(`income`) as `income`,SUM(`income`-`cost`) as `profit`')
+            ->selectRaw('COUNT(*) as `count`,SUM(`paid`) as `paid`,SUM(`paid`-`cost`-`fee`) as `profit`')
             ->get()->toArray();
 
         $ordersYesterday = Order::whereUserId(\Auth::Id())
@@ -42,21 +42,21 @@ class Dashboard extends Controller
                 $query->where('status', Order::STATUS_PAID)
                     ->orWhere('status', Order::STATUS_SUCCESS);
             })
-            ->selectRaw('COUNT(*) as `count`,SUM(`income`) as `income`,SUM(`income`-`cost`) as `profit`')
+            ->selectRaw('COUNT(*) as `count`,SUM(`paid`) as `paid`,SUM(`paid`-`cost`-`fee`) as `profit`')
             ->get()->toArray();
 
 
         if (isset($ordersToday[0]) && isset($ordersToday[0]['count'])) {
             $dashboard['today'] = [
                 'count' => (int)$ordersToday[0]['count'],
-                'income' => (int)$ordersToday[0]['income'],
+                'paid' => (int)$ordersToday[0]['paid'],
                 'profit' => (int)$ordersToday[0]['profit']
             ];
         }
         if (isset($ordersYesterday[0]) && isset($ordersYesterday[0]['count'])) {
             $dashboard['yesterday'] = [
                 'count' => (int)$ordersYesterday[0]['count'],
-                'income' => (int)$ordersYesterday[0]['income'],
+                'paid' => (int)$ordersYesterday[0]['paid'],
                 'profit' => (int)$ordersYesterday[0]['profit']
             ];
         }

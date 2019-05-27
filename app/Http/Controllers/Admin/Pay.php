@@ -20,8 +20,16 @@ class Pay extends Controller
             $query->whereIn('enabled', explode(',', $enabled));
 
         $searchType = $request->post('search', false);
-        if ($searchType == 'simple')
-            return Response::success($query->get(['id', 'name']));
+        $searchVal = $request->post('val', false);
+        if ($searchType && $searchVal) {
+            if ($searchType == 'simple') {
+                return Response::success($query->get(['id', 'name']));
+            } elseif ($searchType == 'id') {
+                $query->where('id', $searchVal);
+            } else {
+                $query->where($searchType, 'like', '%' . $searchVal . '%');
+            }
+        }
 
         $list = $query->get();
 

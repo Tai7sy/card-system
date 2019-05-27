@@ -14,36 +14,6 @@ use Illuminate\Support\Facades\Log;
 
 class Order extends Controller
 {
-    function stat(Request $request)
-    {
-        $this->validate($request, [
-            'day' => 'required|integer|between:7,30'
-        ]);
-        $day = (int)$request->input('day');
-        if ($day === 30) {
-            $before = Carbon::now()->addMonths(-1);
-        } else {
-            $before = Carbon::now()->addDays(-$day);
-        }
-
-        $query = \App\Order::where(function ($query) {
-            /** @var \Illuminate\Database\Eloquent\Builder $query */
-            $query->where('status', \App\Order::STATUS_PAID)
-                ->orWhere('status', \App\Order::STATUS_SUCCESS);
-        })->where('paid_at', '>=', Helper::getMysqlDate(-$day + 1))
-            ->groupBy('date')->orderBy('date', 'DESC');
-
-        $query->selectRaw('DATE(`paid_at`) as "date",COUNT(*) as "count",SUM(`paid`) as "paid",SUM(`fee`-`system_fee`) as "profit"');
-
-        $list = $query->get()->toArray();
-        $ret = [];
-        foreach ($list as $item) {
-            $ret[$item['date']] = [(int)$item['count'], (int)$item['paid'], (int)$item['profit']];
-        }
-
-        return Response::success($ret);
-    }
-
     public function delete(Request $request)
     {
         $this->validate($request, [
@@ -152,7 +122,9 @@ class Order extends Controller
         }
 
         // 发货OK了. 重新获取一下订单状态
-        $order = \App\Order::with(['card_orders.card' => function (Relation $query) {
+        $order = \App\Order::with(['pay' => function (Relation $query) {
+            $query->select(['id', 'name']);
+        }, 'card_orders.card' => function (Relation $query) {
             $query->select(['id', 'card']);
         }])->findOrFail($id);
 
