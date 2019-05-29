@@ -87,6 +87,8 @@
                 function (r) {
                     if (r.code === 0) {
                         clearInterval(interval);
+                        $('.qr-image').remove();
+                        $('.tip').html('<p style="font-size:24px">已支付，正在处理...</p>');
                         window.location = r.data;
                     }
                 }, 'json');

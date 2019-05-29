@@ -92,6 +92,8 @@
                 },
                 function (r) {
                     clearInterval(interval);
+                    $('.qr-image').remove();
+                    $('.tip').html('<p style="font-size:24px">已支付，正在处理...</p>');
                     window.location = r.data;
                 }, 'json');
         }
@@ -102,7 +104,8 @@
     });
 
     if (navigator.userAgent.match(/MQQBrowser/i) !== null) {
-        location.href = code_url;
+        // 2019年4月18日 18:15:43 QQ内也不跳了, 妈的....
+        // location.href = code_url;
     } else {
         // call app
         if (navigator.userAgent.match(/(iPhone|iPod|Android|ios|SymbianOS)/i) !== null) {
