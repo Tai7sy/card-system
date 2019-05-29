@@ -57,7 +57,7 @@ class Kernel extends ConsoleKernel
         if (System::_getInt('order_clean_unpay_open') === 1) {
             $day = System::_getInt('order_clean_unpay_day', 7);
             $schedule->call(function () use ($day) {
-                echo '[' . date('Y-m-d H:i:s') . "] cleaning unpaid orders(${$day}days ago)...\n";
+                echo '[' . date('Y-m-d H:i:s') . "] cleaning unpaid orders($day days ago)...\n";
                 \App\Order::where('status', \App\Order::STATUS_UNPAY)
                     ->where('created_at', '<', (new Carbon)->addDays(-$day))
                     ->delete();
@@ -71,7 +71,7 @@ class Kernel extends ConsoleKernel
         // 清理回收站卡密
         $schedule->call(function () {
             $day = 7;
-            echo '[' . date('Y-m-d H:i:s') . "] cleaning deleted cards(${$day}days ago)...\n";
+            echo '[' . date('Y-m-d H:i:s') . "] cleaning deleted cards($day days ago)...\n";
             \App\Card::onlyTrashed()
                 ->where('deleted_at', '<', (new Carbon)->addDays(-$day))
                 ->forceDelete();
