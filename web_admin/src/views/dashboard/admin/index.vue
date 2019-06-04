@@ -7,7 +7,7 @@
           <div>
             <span class="info">目前您有&nbsp;<span class="red-text">{{dashboard.complaints_count}}</span>&nbsp;条投诉待处理，&nbsp;</span>
             <span class="info">其中&nbsp;<span class="red-text">{{dashboard.complaints_24hours}}</span>&nbsp;条已超过24小时&nbsp;</span>
-            <router-link class="info" to="/m/shop/complaint" style="color: #409EFF;">去处理</router-link>
+            <router-link class="info" to="/admin/shop/complaint" style="color: #409EFF;">去处理</router-link>
           </div>
         </el-alert>
       </el-col>
@@ -15,7 +15,7 @@
         <el-alert class="my-card todo-overview" title="未发货订单通知" type="warning">
           <div>
             <span class="info">目前您有&nbsp;<span class="red-text">{{dashboard.need_ship_count}}</span>&nbsp;个订单由于库存不足没有发货，&nbsp;</span>
-            <router-link class="info" to="/m/order/list?status=paid" style="color: #409EFF;">去处理</router-link>
+            <router-link class="info" to="/admin/order/list?status=paid" style="color: #409EFF;">去处理</router-link>
           </div>
         </el-alert>
       </el-col>
@@ -36,7 +36,7 @@
               <div>
                 <span class="info">目前您有&nbsp;<span class="red-text">{{dashboard.complaints_count}}</span>&nbsp;条投诉待处理，&nbsp;</span>
                 <span class="info">其中&nbsp;<span class="red-text">{{dashboard.complaints_24hours}}</span>&nbsp;条已超过24小时&nbsp;</span>
-                <router-link class="info" to="/m/shop/complaint" style="color: #409EFF;">去处理</router-link>
+                <router-link class="info" to="/admin/shop/complaint" style="color: #409EFF;">去处理</router-link>
               </div>
             </el-alert>
           </el-col>
@@ -44,7 +44,7 @@
             <el-alert class="my-card todo-overview" title="未发货订单通知" type="warning">
               <div>
                 <span class="info">目前您有&nbsp;<span class="red-text">{{dashboard.need_ship_count}}</span>&nbsp;个订单由于库存不足没有发货，&nbsp;</span>
-                <router-link class="info" to="/m/order/list?status=paid" style="color: #409EFF;">去处理</router-link>
+                <router-link class="info" to="/admin/order/list?status=paid" style="color: #409EFF;">去处理</router-link>
               </div>
             </el-alert>
           </el-col>
