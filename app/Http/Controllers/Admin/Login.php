@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Library\Helper;
 use App\Library\Geetest;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Library\Response;
