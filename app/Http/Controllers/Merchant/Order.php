@@ -234,8 +234,12 @@ class Order extends Controller
                     $errMsg = '该订单已经发货，无需再次发货';
                     return false;
                 }
+
+                /** @var \App\Product $product */
+                $product = $order->product()->lockForUpdate()->firstOrFail();
+
                 /** @var \App\Card[] $cards */
-                $cards = \App\Card::where('product_id', $order->product_id)
+                $cards = \App\Card::where('product_id', $product->id)
                     ->whereRaw('`count_sold`<`count_all`')
                     ->take($order->count)->lockForUpdate()->get();
 
@@ -257,6 +261,8 @@ class Order extends Controller
                         'count_sold' => DB::raw('`count_sold`+1')
                     ]);
 
+                    $product->count_sold += $order->count;
+                    $product->saveOrFail();
                     return FundHelper::ACTION_CONTINUE;
                 }
             }
