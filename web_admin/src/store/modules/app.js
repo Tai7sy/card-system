@@ -15,9 +15,9 @@ const app = {
   mutations: {
     TOGGLE_SIDEBAR: state => {
       if (state.sidebar.opened) {
-        localStorage.setItem('sidebarStatus', 1);
+        localStorage.setItem('sidebarStatus', '1');
       } else {
-        localStorage.setItem('sidebarStatus', 0);
+        localStorage.setItem('sidebarStatus', '0');
       }
       state.sidebar.opened = !state.sidebar.opened;
     },
@@ -26,10 +26,10 @@ const app = {
       state.visitedViews.push({ name: view.name, path: view.path })
     },
     DEL_VISITED_VIEWS: (state, view) => {
-      let index
+      let index;
       for (const [i, v] of state.visitedViews.entries()) {
         if (v.path === view.path) {
-          index = i
+          index = i;
           break
         }
       }
