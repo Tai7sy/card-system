@@ -1,22 +1,23 @@
-import Cookies from 'js-cookie';
 import device from '~/utils/device'
+
+const isMobile = device.isMobile();
 
 const app = {
   state: {
     sidebar: {
-      opened: false // !+Cookies.get('sidebarStatus')
+      opened: isMobile ? false : !+localStorage.getItem('sidebarStatus')
     },
     theme: 'default',
-    livenewsChannels: Cookies.get('livenewsChannels') || '[]',
+    livenewsChannels: localStorage.getItem('livenewsChannels') || '[]',
     visitedViews: [],
     isMobile: device.isMobile()
   },
   mutations: {
     TOGGLE_SIDEBAR: state => {
       if (state.sidebar.opened) {
-        Cookies.set('sidebarStatus', 1);
+        localStorage.setItem('sidebarStatus', 1);
       } else {
-        Cookies.set('sidebarStatus', 0);
+        localStorage.setItem('sidebarStatus', 0);
       }
       state.sidebar.opened = !state.sidebar.opened;
     },
