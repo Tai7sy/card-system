@@ -26,6 +26,7 @@ class CreateCardsTable extends Migration
             $table->softDeletes();
         });
 
+        DB::unprepared('ALTER TABLE `cards` CHANGE COLUMN `created_at` `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP;');
     }
 
     /**

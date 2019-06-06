@@ -216,4 +216,10 @@ class Product extends Controller
             return Response::success();
         });
     }
+
+    function count_sync(Request $request)
+    {
+        \App\Product::refreshCount($this->getUser($request));
+        return Response::success();
+    }
 }

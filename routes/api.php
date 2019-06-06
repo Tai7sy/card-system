@@ -60,6 +60,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
     Route::post('product/edit', 'Merchant\Product@edit');
     Route::post('product/enable', 'Merchant\Product@enable');             //    ┆
     Route::post('product/delete', 'Merchant\Product@delete');             //    ┆
+    Route::post('product/count/sync', 'Merchant\Product@count_sync');     //    ┆
     Route::post('file/upload', 'Merchant\File@upload_merchant');          //    ┆
 
     Route::post('card', 'Merchant\Card@get');                             //    ┆
