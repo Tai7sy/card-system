@@ -208,12 +208,6 @@ class Card extends Controller
         if (str_contains($cards, '<') || str_contains($cards, '>'))
             return Response::fail('卡密不能包含 < 或 > 符号');
 
-        if (\App\Card::where('user_id', \Auth::id())
-                ->where('status', \App\Card::STATUS_NORMAL)
-                ->count() > 10000) {
-            return Response::fail('您的库存卡密已经超过10000张，本次添加失败');
-        }
-
         $user_id = $this->getUserIdOrFail($request);
         /* @var \App\Product $product */
         $product_sql = $this->authQuery($request, \App\Product::class)->where('id', $product_id);
@@ -270,8 +264,8 @@ class Card extends Controller
                 if (strlen($card) < 1)
                     continue;
 
-                if (strlen($card) > 100)
-                    return Response::fail('第 ' . $i . ' 张卡密 ' . $card . ' 长度错误<br>卡密最大长度为100');
+                if (strlen($card) > 255)
+                    return Response::fail('第 ' . $i . ' 张卡密 ' . $card . ' 长度错误<br>卡密最大长度为255');
 
                 if ($is_check) {
                     if (in_array($card, $cards_all)) {

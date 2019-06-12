@@ -17,7 +17,7 @@ class CreateCardsTable extends Migration
             $table->increments('id');
             $table->integer('user_id')->index();
             $table->integer('product_id')->index();
-            $table->string('card',100);
+            $table->text('card');
             $table->integer('type');
             $table->integer('status')->default(\App\Card::STATUS_NORMAL);
             $table->integer('count_sold')->default(0); // type 为 TYPE_REPEAT 时, 表示已卖出次数

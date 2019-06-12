@@ -66,7 +66,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
     Route::post('card', 'Merchant\Card@get');                             //    ┆
     Route::post('card/add', 'Merchant\Card@add');                         //    ┆
     Route::post('card/edit', 'Merchant\Card@edit');                       //    ┆
-    Route::post('card/export', 'Merchant\Card@export');                   //    ┆
+    Route::any('card/export', 'Merchant\Card@export');                   //    ┆
     Route::post('card/delete', 'Merchant\Card@trash');                    //    ┆
     Route::post('card/trash/delete', 'Merchant\Card@deleteTrashed');      //    ┆
     Route::post('card/trash/restore', 'Merchant\Card@restoreTrashed');    //    ┆
