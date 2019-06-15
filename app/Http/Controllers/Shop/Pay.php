@@ -657,16 +657,18 @@ class Pay extends Controller
                         \App\Library\LogHelper::setLogFile('card');
                     }
                 }
-
                 // ------------------------------------------------------------------------ 提醒库存 end
+
+                // 需要发货到邮箱
+                if (System::_getInt('mail_send_order') === 1 && filter_var($order->email, FILTER_VALIDATE_EMAIL)) {
+                    self::showOrderResult($request, $order, true);
+                }
             } else {
-                throw new \Exception('merchant operate exception!');
+                // 数据库报错 or 已经处理过(status !== UN_PAY)
+                // 数据库报错的话 orderSuccess 里面写过详细log了
+                // throw new \Exception('merchant operate exception!');
             }
 
-            // 需要发货到邮箱
-            if (System::_getInt('mail_send_order') === 1 && filter_var($order->email, FILTER_VALIDATE_EMAIL)) {
-                self::showOrderResult($request, $order, true);
-            }
         } else {
             Log::debug('Shop.Pay.shipOrder: .order_no:' . $order->order_no . ' already processed! #1');
         }
