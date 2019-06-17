@@ -84,10 +84,10 @@ class Product extends Model
         $product = $this;
         $count = $product->count;
 
-        //$inventory = $product->inventory;
-        //if ($inventory == User::INVENTORY_AUTO) {
-        $inventory = System::_getInt('shop_inventory');
-        //}
+        $inventory = $product->inventory;
+        if ($inventory == User::INVENTORY_AUTO) {
+            $inventory = System::_getInt('shop_inventory');
+        }
 
         if ($inventory == User::INVENTORY_RANGE) {
             if ($count <= 0) {
