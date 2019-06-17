@@ -105,7 +105,7 @@ class Product extends Model
         }
         $product->setAttribute('count', $count); // 真正的数量
 
-        $product->setVisible(['id', 'name', 'description', 'fields', 'count', 'count2', 'buy_min', 'buy_max',
+        $product->setVisible(['id', 'name', 'description', 'fields', 'delivery', 'count', 'count2', 'buy_min', 'buy_max',
             'support_coupon', 'password_open', 'price', 'price_whole']);
     }
 }

@@ -131,7 +131,7 @@ class HomeController extends Controller
             $user->theme_config[$shop_theme->name] :
             $shop_theme->config;
 
-        if(isset($config['theme']['background']) && $config['theme']['background'] === '内置1'){
+        if (isset($config['theme']['background']) && $config['theme']['background'] === '内置1') {
             $config['theme']['background'] = Helper::b1_rand_background();
         }
 
@@ -254,6 +254,8 @@ class HomeController extends Controller
 
         $config = [];
         $config['url'] = config('app.url');
+
+        $config['functions'] = ['product_manual']; // 开启手动发货功能
 
         $config['vcode'] = [
             'driver' => System::_get('vcode_driver'),
