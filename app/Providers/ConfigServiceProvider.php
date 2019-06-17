@@ -64,7 +64,7 @@ class ConfigServiceProvider extends ServiceProvider
                 'mail.password' => System::_get('mail_smtp_password'),
                 'mail.from.address' => System::_get('mail_smtp_from_address'),
                 'mail.from.name' => System::_get('mail_smtp_from_name'),
-                'mail.encryption' => System::_get('mail_smtp_encryption'),
+                'mail.encryption' => System::_get('mail_smtp_encryption') === 'null' ? null : System::_get('mail_smtp_encryption'),
                 'services.sendcloud.api_user' => System::_get('sendcloud_user'),
                 'services.sendcloud.api_key' => System::_get('sendcloud_key'),
 

@@ -9,11 +9,24 @@ class Order extends Model
 {
     protected $guarded = [];
 
+    /** @var int 未支付 */
     const STATUS_UNPAY = 0;
-    const STATUS_PAID = 1;    // 已付款未发货
-    const STATUS_SUCCESS = 2; // 已发货成功
+    /** @var int 已付款未发货 */
+    const STATUS_PAID = 1;
+    /** @var int 已发货成功 */
+    const STATUS_SUCCESS = 2;
+    /** @var int 已冻结(未付款冻结/已付款冻结) */
     const STATUS_FROZEN = 3;
+    /** @var int 已退款 */
     const STATUS_REFUND = 4;
+
+    const STATUS = [
+        0 => '未支付',
+        1 => '未发货',
+        2 => '已发货',
+        3 => '已冻结',
+        4 => '已退款',
+    ];
 
     protected $casts = [
         'api_info' => 'array',

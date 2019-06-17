@@ -5,39 +5,56 @@
 
       <el-form-item prop="shop_theme" class="item-container">
         <span style="display: block">默认主题</span>
-        <el-select v-model="form.shop_theme">
-          <el-option v-for="item in themes" :key="item.id" :label="item.name + ' - ' + item.description"
-                     :value="item.name"/>
+        <el-select class="theme-select" v-model="theme" @change="form.shop_theme = theme.name">
+          <el-option v-for="item in themes"
+                     :key="'theme_'+item.id"
+                     :label="item.name + ' - ' + item.description"
+                     :value="item"/>
         </el-select>
       </el-form-item>
 
-      <el-card class="child-option" v-show="form.shop_theme==='Material'">
-        <p class="child-option-title">默认主题设置</p>
-        <el-form-item class="item-container">
-          <span style="display: block">商品排列方式</span>
-          <el-select v-model="form.shop_theme_material_list_type">
-            <el-option value="dropdown" label="下拉式"/>
-            <el-option value="button" label="按钮式"/>
-            <el-option value="list" label="列表式"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item class="item-container">
-          <span style="display: block">店铺背景</span>
-          <el-input type="text" placeholder="店铺背景(图片URL)"
-                    v-model="form.shop_theme_material_background" :disabled="themeMaterialNoBackground"/>
-          <el-checkbox size="small" v-model="themeMaterialNoBackground">
-            不显示背景图片
+      <el-card class="child-option" v-if="theme">
+        <p class="child-option-title">主题默认配置</p>
+        <el-form-item class="item-container" v-for="(option, name) in theme.options" :key="'theme_option_'+name">
+          <span v-if="option.type!=='checkbox'"
+                style="display: block"
+          >{{option.label}}</span>
+
+          <el-input v-if="option.type==='text'"
+                    v-model="option.value"
+                    :type="option.inputType || 'text'"
+                    :maxlength="option.size"
+                    :placeholder="option.placeholder || ''"/>
+
+          <el-input v-if="option.type==='textarea'"
+                    v-model="option.value"
+                    type="textarea"
+                    :maxlength="option.size"
+                    :rows="option.rows"
+                    :placeholder="option.placeholder || ''"/>
+
+
+          <el-checkbox v-if="option.type==='checkbox'"
+                       v-model="option.value"
+                       :true-label="1" :false-label="0">
+            {{option.label}}
           </el-checkbox>
-        </el-form-item>
-      </el-card>
-      <el-card class="child-option" v-show="form.shop_theme==='Classic'">
-        <p class="child-option-title">默认主题设置</p>
-        <el-form-item class="item-container">
-          <span style="display: block">商品排列方式</span>
-          <el-select v-model="form.shop_theme_classic_list_type">
-            <el-option value="dropdown" label="下拉式"/>
-            <el-option value="button" label="按钮式"/>
+
+          <el-select v-if="option.type==='select'"
+                     v-model="option.value">
+            <el-option v-for="(option2,name2) in option.values"
+                       :key="'theme_option_' + name + '_' + name2"
+                       :value="name2"
+                       :label="option2.label"/>
           </el-select>
+
+          <el-radio-group v-if="option.type==='radio'"
+                          v-model="option.value">
+            <el-radio v-for="(option2,name2) in option.values"
+                      :key="'theme_option_' + name + '_' + name2"
+                      :label="name2">{{option2.label}}
+            </el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-card>
 
@@ -60,14 +77,11 @@
         loading: false,
         labelWidth: '0px', // this.$store.state.app.isMobile ? '70px' : '90px',
         themes: [],
+        theme: null,
         form: {
           shop_theme: '',
-          shop_theme_material_list_type: '',
-          shop_theme_material_background: '',
-          shop_theme_classic_list_type: '',
         },
         formRules: {},
-        themeMaterialNoBackground: false,
       }
     },
     watch: {
@@ -87,16 +101,19 @@
         this.loading = true;
         theme().then(res => {
           this.themes = res.data.themes;
-          this.themes.forEach(e => {
-            if (e.name === 'Material') {
-              this.form.shop_theme_material_list_type = e.config.list_type;
-              this.form.shop_theme_material_background = e.config.background;
-              this.themeMaterialNoBackground = this.form.shop_theme_material_background === '0';
-            } else if (e.name === 'Classic') {
-              this.form.shop_theme_classic_list_type = e.config.list_type;
+          this.themes.forEach(theme => {
+            theme.value = theme.name;
+            if (theme.options && theme.config) {
+              for (const key in theme.options) {
+                if (theme.options.hasOwnProperty(key) && theme.config.hasOwnProperty(key)) {
+                  theme.options[key].value = theme.config[key]
+                }
+              }
             }
           });
           this.form.shop_theme = res.data.default;
+          this.theme = this.themes.find(e => e.name === this.form.shop_theme);
+        }).finally(() => {
           this.loading = false;
         });
       },
@@ -107,9 +124,11 @@
         this.$refs['form'].validate(valid => {
           if (!valid) return;
           this.loading = true;
-          if (this.themeMaterialNoBackground) {
-            this.form.shop_theme_material_background = '0';
-          }
+          this.form.theme_config = {};
+          Object.keys(this.theme.options).map(key => {
+            this.form.theme_config[key] = this.theme.options[key].value;
+          });
+          this.form.theme_config = JSON.stringify(this.form.theme_config);
           theme(this.form).then(() => {
             this.loading = false;
             this.$notify({ title: '操作成功', message: '配置保存成功', type: 'success' });
@@ -123,9 +142,15 @@
 </script>
 
 <style lang="scss" scoped>
+
+  .theme-select {
+    display: block;
+  }
+
   .child-option {
     box-shadow: none !important;
     margin-bottom: 16px;
+
     .child-option-title {
       margin: 0 0 4px 0;
     }

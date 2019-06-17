@@ -39,7 +39,14 @@ class CreateProductsTable extends Migration
 
             $table->text('instructions')->nullable(); // 使用说明
 
+            $table->text('fields')->nullable(); // 自定义联系方式字段
+
             $table->boolean('enabled');
+
+            $table->tinyInteger('inventory')->default(\App\User::INVENTORY_AUTO); // 商品库存状态 默认跟随店铺
+            $table->tinyInteger('fee_type')->default(\App\User::FEE_TYPE_AUTO);// 商品手续费状态 默认跟随店铺
+            $table->tinyInteger('delivery')->default(\App\Product::DELIVERY_AUTO); // 商品发货模式, 默认自动发货
+
             $table->timestamps();
         });
 

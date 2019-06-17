@@ -130,8 +130,13 @@ class Order extends Controller
 
         if ($order->status === \App\Order::STATUS_PAID) {
             // 已付款未发货
-            $success = false;
-            $msg = '已标记为付款成功, 但是买家库存不足, 发货失败, 请稍后尝试手动发货';
+            if($order->product->delivery === \App\Product::DELIVERY_MANUAL){
+                $success = true;
+                $msg = '已标记为付款成功<br>当前商品为手动发货商品, 请手动进行发货。';
+            }else{
+                $success = false;
+                $msg = '已标记为付款成功, <br>但是买家库存不足, 发货失败, 请稍后尝试手动发货。';
+            }
         }
 
         return Response::success([

@@ -11,6 +11,7 @@ class ShopTheme extends Model
     public $timestamps = false;
 
     protected $casts = [
+        'options' => 'array',
         'config' => 'array'
     ];
 
@@ -48,17 +49,28 @@ class ShopTheme extends Model
         });
         foreach (scandir($path) as $theme_name) {
             if ($theme_name === '.' || $theme_name === '..') continue;
-            if (!\App\ShopTheme::query()->where('name', $theme_name)->exists()) {
-                try {
-                    @$theme = include($path . DIRECTORY_SEPARATOR . $theme_name . DIRECTORY_SEPARATOR . 'config.php');
-                } catch (\Exception $e) {
-                    continue;
-                }
+            try {
+                @$theme = include($path . DIRECTORY_SEPARATOR . $theme_name . DIRECTORY_SEPARATOR . 'config.php');
+            } catch (\Exception $e) {
+                continue;
+            }
+            $theme['config'] = array_map(function ($item) {
+                return $item['value'];
+            }, @$theme['options'] ?? []);
+
+            $old = \App\ShopTheme::query()->where('name', $theme_name)->first();
+            if ($old) {
+                $old->description = $theme['description'];
+                $old->options = @$theme['options'] ?? [];
+                $old->config = ($old->config ?? []) + $theme['config'];
+                $old->saveOrFail();
+            }else{
                 if ($theme && isset($theme['description'])) {
-                    \App\ShopTheme::query()->insert([
+                    \App\ShopTheme::query()->create([
                         'name' => $theme_name,
                         'description' => $theme['description'],
-                        'config' => json_encode(@$theme['config'])
+                        'options' => @$theme['options'] ?? [],
+                        'config' => $theme['config']
                     ]);
                 }
             }

@@ -14,8 +14,11 @@ class Card extends Model
 
     protected $dates = ['deleted_at'];
 
+    /** @var int 正常可用状态 */
     const STATUS_NORMAL = 0;
+    /** @var int 标记一下, 已经卖过 */
     const STATUS_SOLD = 1;
+    /** @var int 暂未用到此状态 */
     const STATUS_USED = 2;
 
     const TYPE_ONETIME = 0;

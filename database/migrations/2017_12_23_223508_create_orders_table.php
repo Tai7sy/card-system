@@ -18,6 +18,7 @@ class CreateOrdersTable extends Migration
             $table->integer('user_id')->index();
             $table->string('order_no', 128)->index(); //订单序列号 带有时间的很长的那种
             $table->integer('product_id');
+            $table->string('product_name')->nullable(); // 商品名称备份, 防止商户修改商品
             $table->integer('count'); //购买数量
             $table->string('email')->nullable(); //购买者邮箱 or 联系方式
             $table->string('ip')->nullable(); //购买者IP

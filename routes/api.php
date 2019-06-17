@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -12,7 +10,6 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 
 Route::post('admin/login', 'Admin\Login@login')->middleware('api');
 Route::post('admin/login/logout', 'Admin\Login@logout')->middleware('api');
@@ -56,6 +53,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
 
     Route::post('product', 'Merchant\Product@get');                       //    ┆
     Route::post('product/sort', 'Merchant\Product@sort');                 //    ┆
+    Route::post('product/set_count', 'Merchant\Product@set_count');       //    ┆
     Route::post('product/category', 'Merchant\Product@category_change');  //    ┆
     Route::post('product/edit', 'Merchant\Product@edit');
     Route::post('product/enable', 'Merchant\Product@enable');             //    ┆
@@ -82,6 +80,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
 
 
     Route::post('order', 'Merchant\Order@get');                           //    ┆
+    Route::get('order/export', 'Merchant\Order@export');                  //    ┆
     Route::post('order/info', 'Merchant\Order@info');                     //    ┆
     Route::post('order/remark', 'Merchant\Order@remark');                 //    ┆
     Route::post('order/ship', 'Merchant\Order@ship');                     //    ┆

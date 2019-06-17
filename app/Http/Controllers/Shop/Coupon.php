@@ -45,6 +45,6 @@ class Coupon extends Controller
                 return Response::success($coupon);
             }
         }
-        return Response::fail('优惠券信息无效');
+        return Response::fail('您输入的优惠券信息无效<br>如果没有优惠券请不要填写');
     }
 }

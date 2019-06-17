@@ -25,6 +25,9 @@ class Product extends Controller
         $searchVal = $request->post('val', false);
         if ($searchType && $searchVal) {
             if ($searchType == 'simple') {
+                if ($request->post('from') === 'card') {
+                    $query->where('delivery', \App\Product::DELIVERY_AUTO); // 自动发货商品才能添加卡密
+                }
                 return Response::success($query->where('category_id', $searchVal)->get(['id', 'name']));
             } elseif ($searchType == 'id') {
                 $query->where('id', $searchVal);
@@ -56,13 +59,28 @@ class Product extends Controller
     function sort(Request $request)
     {
         $this->validate($request, [
-            'id' => 'required|integer'
+            'id' => 'required|integer',
+            'sort' => 'required|integer',
         ]);
         /* @var \App\Product $product */
         $product = $this->authQuery($request, \App\Product::class)
             ->findOrFail($request->post('id'));
-        $product->sort = (int)$request->post('sort', 1000);
-        $product->save();
+        $product->sort = $request->post('sort');
+        $product->saveOrFail();
+        return Response::success();
+    }
+
+    function set_count(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required|integer',
+            'count' => 'required|integer',
+        ]);
+        /* @var \App\Product $product */
+        $product = $this->authQuery($request, \App\Product::class)
+            ->findOrFail($request->post('id'));
+        $product->count_all = $product->count_sold + $request->post('count');
+        $product->saveOrFail();
         return Response::success();
     }
 
@@ -95,6 +113,7 @@ class Product extends Controller
             'category_id' => 'required|integer',
             'description' => 'required|string',
             'instructions' => 'required|string',
+            'fields' => 'required|string',
             'sort' => 'required|integer|min:0|max:10000000',
             'inventory' => 'required|integer|between:0,2',
             'buy_min' => 'required|integer|min:0|max:10000',
@@ -159,6 +178,8 @@ class Product extends Controller
         $antiXss = new AntiXSS();
         $product->description = $antiXss->xss_clean($description);
         $product->instructions = $antiXss->xss_clean($instructions);
+        $product->fields = $request->post('fields');
+        $product->delivery = (int)$request->post('delivery');
         $product->sort = $request->post('sort');
 
         $product->buy_min = $buy_min;
@@ -174,7 +195,7 @@ class Product extends Controller
         $product->price_whole = $price_whole;
         $product->enabled = (int)$request->post('enabled');
 
-        $product->inventory = (int)$request->post('inventory');
+        $product->inventory = (int)$request->post('inventory'); // 库存类型
         $product->saveOrFail();
         return Response::success();
     }

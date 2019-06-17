@@ -36,7 +36,16 @@ class SystemSeeder extends Seeder
             'storage_driver' => 'local',
 
             'order_clean_unpay_open' => '0',
-            'order_clean_unpay_day' => '7'
+            'order_clean_unpay_day' => '7',
+
+            'mail_driver' => 'smtp',
+            'mail_smtp_host' => 'smtp.mailtrap.io',
+            'mail_smtp_port' => '25',
+            'mail_smtp_username' => 'xxx',
+            'mail_smtp_password' => 'xxx',
+            'mail_smtp_from_address' => 'hello@example.com',
+            'mail_smtp_from_name' => 'test',
+            'mail_smtp_encryption' => 'null'
 
         ];
         $systems = [];

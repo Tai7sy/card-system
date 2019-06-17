@@ -205,15 +205,16 @@ class Pay extends Controller
             'user_id' => $product->user_id,
             'order_no' => $order_no,
             'product_id' => $product_id,
+            'product_name' => $product->name,   // 缓存一个商品名称
             'count' => $count,
             'email' => $email,
             'ip' => Helper::getIP(),
             'customer' => $customer,
             'email_sent' => false,
-            'cost' => $count * $product->cost, // 商户成本
-            'price' => $price, // 应售价格
-            'discount' => $discount_fee, // 优惠金额
-            'paid' => $pay_money, //实际支付金额
+            'cost' => $count * $product->cost,  // 商户成本
+            'price' => $price,                  // 应售价格
+            'discount' => $discount_fee,        // 优惠金额
+            'paid' => $pay_money,               // 实际支付金额
             'pay_id' => $pay->id,
             'fee' => $system_fee,
             'system_fee' => $system_fee,
@@ -602,20 +603,25 @@ class Pay extends Controller
                     $order->pay_trade_no = $trade_no; // 支付通道订单号
                     $order->paid_at = Carbon::now();
 
+                    if($product->delivery === \App\Product::DELIVERY_MANUAL){
+                        // 手动发货的商品, 这里标记为已支付待发货, 然后返回
+                        $order->status = \App\Order::STATUS_PAID;
+                        $order->saveOrFail();
+                        return true;
+                    }
+
                     /** @var \App\Card[] $cards */
                     $cards = Card::where('product_id', $order->product_id)
                         ->whereRaw('`count_sold`<`count_all`')
                         ->take($order->count)->lockForUpdate()->get();
                     // 这里注意 如果商品包含重复卡密, 则商品,每次限购1件
 
-
                     if (count($cards) !== $order->count) {
                         Log::alert('Shop.Pay.shipOrder: 订单:' . $order->order_no .
                             ', 购买数量:' . $order->count .
                             ', 卡数量:' . count($cards) . ' 卡密不足(已支付 未发货)');
 
-                        // 库存不足了, GG
-                        // 已支付 未发货
+                        // 库存不足了, GG 已支付 未发货
                         $order->status = \App\Order::STATUS_PAID;
                         $order->saveOrFail();
                         return true;

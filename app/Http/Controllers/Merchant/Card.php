@@ -14,9 +14,9 @@ class Card extends Controller
 {
     /**
      * @param Request $request
-     * @param bool $is_export
-     * @param bool $is_delete
-     * @param bool $is_restore
+     * @param bool $is_export 是否导出
+     * @param bool $is_delete 是否删除
+     * @param bool $is_restore 是否恢复
      * @return \Illuminate\Http\JsonResponse
      * @throws \Throwable
      */

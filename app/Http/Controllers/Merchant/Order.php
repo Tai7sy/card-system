@@ -13,12 +13,13 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class Order extends Controller
 {
-    function get(Request $request)
+    function get(Request $request, $is_export = false)
     {
         $query = $this->authQuery($request, \App\Order::class);
 
@@ -39,7 +40,6 @@ class Order extends Controller
             }
         }
 
-
         if ($category_id > 0) {
             if ($product_id > 0) $query->where('product_id', $product_id);
             else {
@@ -49,7 +49,6 @@ class Order extends Controller
                 });
             }
         }
-
 
         $recent = (int)$request->post('recent', 0);
         if ($recent) {
@@ -113,7 +112,7 @@ class Order extends Controller
             $query->where('product_id', '>', 0);
             // 这时候确认加入订单详情
             $query->with(['product' => function (Relation $query) {
-                $query->select(['id', 'name']);
+                $query->select(['id', 'name', 'delivery']);
             }, 'card_orders.card' => function (Relation $query) {
                 $query->select(['id', 'card']);
             }]);
@@ -123,11 +122,49 @@ class Order extends Controller
             $query->select(['id', 'name']);
         }]);
 
+        $query->orderBy('id', 'DESC');
+
+        if ($is_export === true) {
+            $order_txt = "\xEF\xBB\xBF"; // UTF8-BOM
+            $order_txt .= '"订单号","商品名称","下单时间","订单金额","优惠金额","实付金额","手续费","成本价","利润","支付方式","支付流水号","支付时间","订单状态","买家联系方式"' . "\r\n";
+            $query->chunk(100, function ($orders) use (&$order_txt) {
+                /* @var \App\Order[] $orders */
+                foreach ($orders as $order) {
+                    $email = $order->email;
+                    if ($email[0] === '[')
+                        $email = substr($email, 2);
+                    if ($email[strlen($email) - 1] === ']')
+                        $email = substr($email, 0, -2);
+
+                    $order_txt .= '"' . $order->order_no . '","' .
+                        $order->product_name . '","' .
+                        $order->created_at . '","' .
+                        sprintf('%.2f', $order->price / 100) . '","' .
+                        sprintf('%.2f', $order->discount / 100) . '","' .
+                        sprintf('%.2f', $order->paid / 100) . '","' .
+                        sprintf('%.2f', $order->fee / 100) . '","' .
+                        sprintf('%.2f', $order->cost / 100) . '","' .
+                        sprintf('%.2f', ($order->paid - $order->fee - $order->cost) / 100) . '","' .
+                        ($order->pay ? $order->pay->name : ('未知#' . $order->pay_id)) . '","' .
+                        $order->pay_trade_no . '","' .
+                        $order->paid_at . '","' .
+                        \App\Order::STATUS[$order->status] . '","' .
+                        $email . '"';
+                    $order_txt .= "\r\n";
+                }
+            });
+
+            $file_name = 'export_orders_' . $this->getUserIdOrFail($request) . '_' . date('YmdHis') . '.csv';
+            $headers = ['Content-type' => 'text/plain',
+                'Content-Disposition' => sprintf('attachment; filename="%s"', $file_name),
+                'Content-Length' => strlen($order_txt)];
+            return response()->make($order_txt, 200, $headers);
+        }
 
         $page = $request->post('current_page', 1);
         $pageSize = $request->post('per_page', 20);
 
-        $list = $query->orderBy('id', 'DESC')->paginate($pageSize, ['*'], 'page', $page);
+        $list = $query->paginate($pageSize, ['*'], 'page', $page);
 
         if ($only_profit) {
             $list = $list->toArray();
@@ -136,6 +173,10 @@ class Order extends Controller
         return Response::success($list);
     }
 
+    function export(Request $request)
+    {
+        return self::get($request, true);
+    }
 
     function stat(Request $request)
     {
@@ -219,14 +260,25 @@ class Order extends Controller
         ]);
 
         /* @var \App\Order $order */
-        $order = $this->authQuery($request, \App\Order::class)->findOrFail($request->post('id'));
+        $order = $this->authQuery($request, \App\Order::class)->with('product')->findOrFail($request->post('id'));
         if ($order->status !== \App\Order::STATUS_PAID) {
             return Response::fail('订单不是待发货状态, 无法发货');
+        }
+        if ($order->product === null) {
+            return Response::fail('订单对应商品不存在, 无法发货');
+        }
+        $delivery = $order->product->delivery;
+        $deliveryCard = '';
+        if ($delivery === \App\Product::DELIVERY_MANUAL) {
+            $this->validate($request, [
+                'card' => 'required|string'
+            ]);
+            $deliveryCard = $request->input('card');
         }
         $errMsg = null;
         $card_arr = [];
         if (FundHelper::orderSuccess($order->id,
-            function () use (&$order, &$errMsg, &$card_arr) {
+            function () use (&$order, &$errMsg, &$card_arr, $delivery, $deliveryCard) {
                 /** @var \App\Order $order */
                 $order = \App\Order::where('id', $order->id)->lockForUpdate()->firstOrFail();
 
@@ -237,6 +289,27 @@ class Order extends Controller
 
                 /** @var \App\Product $product */
                 $product = $order->product()->lockForUpdate()->firstOrFail();
+
+                if ($delivery === \App\Product::DELIVERY_MANUAL) {
+                    $order->status = \App\Order::STATUS_SUCCESS;
+                    $order->saveOrFail();
+
+                    $card = \App\Card::create([
+                        'user_id' => Auth::id(),
+                        'product_id' => $product->id,
+                        'card' => $deliveryCard,
+                        'type' => \App\Card::TYPE_ONETIME,
+                        'status' => \App\Card::STATUS_SOLD, // 已经卖出
+                        'count_sold' => 1,
+                        'count_all' => 1
+                    ]);
+                    $card_arr[] = $card->card;
+                    $order->cards()->attach($card->id); // 使用了 card_order 这个中间表
+
+                    $product->count_sold += $order->count;
+                    $product->saveOrFail();
+                    return FundHelper::ACTION_CONTINUE;
+                }
 
                 /** @var \App\Card[] $cards */
                 $cards = \App\Card::where('product_id', $product->id)

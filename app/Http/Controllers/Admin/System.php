@@ -100,27 +100,11 @@ class System extends Controller
             ]);
         }
 
-        $theme = $request->post('shop_theme');
-        if (!\App\ShopTheme::whereName($theme)->exists()) {
-            return Response::fail();
-        }
-        \App\System::_set('shop_theme_default', $theme);
+        $shop_theme = \App\ShopTheme::whereName($request->post('shop_theme'))->firstOrFail();
 
-        \App\ShopTheme::each(function (\App\ShopTheme $e) use ($request) {
-            if ($e->name === 'Material') {
-                $e->config = [
-                    'list_type' => $request->post('shop_theme_material_list_type'),
-                    'background' => $request->post('shop_theme_material_background')
-                ];
-                $e->saveOrFail();
-            }
-            if ($e->name === 'Classic') {
-                $e->config = [
-                    'list_type' => $request->post('shop_theme_classic_list_type')
-                ];
-                $e->saveOrFail();
-            }
-        });
+        \App\System::_set('shop_theme_default', $shop_theme->name);
+        $shop_theme->config = @json_decode($request->post('theme_config')) ?? [];
+        $shop_theme->saveOrFail();
 
         return Response::success();
     }
@@ -274,7 +258,8 @@ class System extends Controller
         }
     }
 
-    function orderClean(Request $request){
+    function orderClean(Request $request)
+    {
         $this->validate($request, [
             'day' => 'required|integer|min:1',
         ]);
