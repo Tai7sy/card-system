@@ -23,15 +23,15 @@ class Order extends Controller
     {
         $query = $this->authQuery($request, \App\Order::class);
 
-        $category_id = (int)$request->post('category_id');
-        $product_id = (int)$request->post('product_id');
+        $category_id = (int)$request->input('category_id');
+        $product_id = (int)$request->input('product_id');
 
-        $only_profit = (int)$request->post('profit');
+        $only_profit = (int)$request->input('profit');
         $is_api = $category_id === \App\Product::ID_API || $product_id === \App\Product::ID_API;
 
 
-        $searchType = $request->post('search', false);
-        $searchVal = $request->post('val', false);
+        $searchType = $request->input('search', false);
+        $searchVal = $request->input('val', false);
         if ($searchType && $searchVal) {
             if ($searchType == 'id' || $searchType == 'order_no' || $searchType === 'pay_trade_no' || $searchType === 'api_out_no') {
                 $query->where($searchType, $searchVal);
@@ -50,7 +50,7 @@ class Order extends Controller
             }
         }
 
-        $recent = (int)$request->post('recent', 0);
+        $recent = (int)$request->input('recent', 0);
         if ($recent) {
             // 最近订单, 限制开始时间(paid_at>=XXX)
             $start_at = (new Carbon)->addDay(-$recent);
@@ -63,7 +63,7 @@ class Order extends Controller
                     });
             });
         } else {
-            $start_at = $request->post('start_at', false);
+            $start_at = $request->input('start_at', false);
             if (strlen($start_at)) {
                 $query->where(function ($query) use ($start_at) {
                     /* @var \Illuminate\Database\Eloquent\Builder $query */
@@ -75,7 +75,7 @@ class Order extends Controller
                 });
             }
 
-            $end_at = $request->post('end_at', false);
+            $end_at = $request->input('end_at', false);
             if (strlen($end_at)) {
                 $query->where(function ($query) use ($end_at) {
                     /* @var \Illuminate\Database\Eloquent\Builder $query */
@@ -97,7 +97,7 @@ class Order extends Controller
             $profit_sum = $query2->selectRaw('SUM(`income`) as income, SUM(`paid`-`cost`-`fee`) as profit')->first();
         } else {
 
-            $status = $request->post('status');
+            $status = $request->input('status');
             if (strlen($status)) {
                 $query->whereIn('status', explode(',', $status));
             } else {
@@ -125,16 +125,32 @@ class Order extends Controller
         $query->orderBy('id', 'DESC');
 
         if ($is_export === true) {
+            $export_update_status = (int)$request->input('export_update_status');
+            $export_update_card = $request->input('export_update_card');
             $order_txt = "\xEF\xBB\xBF"; // UTF8-BOM
-            $order_txt .= '"订单号","商品名称","下单时间","订单金额","优惠金额","实付金额","手续费","成本价","利润","支付方式","支付流水号","支付时间","订单状态","买家联系方式"' . "\r\n";
-            $query->chunk(100, function ($orders) use (&$order_txt) {
+            $order_txt .= '"订单号","商品名称","下单时间","订单金额","优惠金额","实付金额","手续费","成本价","利润","支付方式","支付流水号","支付时间","订单状态","买家联系方式","买家附加信息"' . "\r\n";
+            $query->chunk(100, function ($orders) use (&$order_txt, $export_update_status, $export_update_card) {
                 /* @var \App\Order[] $orders */
                 foreach ($orders as $order) {
-                    $email = $order->email;
-                    if ($email[0] === '[')
-                        $email = substr($email, 2);
-                    if ($email[strlen($email) - 1] === ']')
-                        $email = substr($email, 0, -2);
+
+                    if ($order->status === \App\Order::STATUS_PAID) {
+                        if ($export_update_status === \App\Order::SEND_STATUS_CARD_PROCESSING) {
+                            $order->send_status = $export_update_status;
+                            $order->saveOrFail();
+                        } elseif ($export_update_status === \App\Order::SEND_STATUS_CARD_SUCCESS) {
+                            $order->send_status = $export_update_status;
+                            $order->saveOrFail();
+                            $this->ship(new Request(['id' => $order->id, 'card' => $export_update_card]));
+                        }
+                    }
+
+                    $contact_ext = $order->contact_ext;
+                    if ($contact_ext) {
+                        if ($contact_ext[0] === '[')
+                            $contact_ext = substr($contact_ext, 2);
+                        if ($contact_ext[strlen($contact_ext) - 1] === ']')
+                            $contact_ext = substr($contact_ext, 0, -2);
+                    }
 
                     $order_txt .= '"' . $order->order_no . '","' .
                         $order->product_name . '","' .
@@ -149,7 +165,8 @@ class Order extends Controller
                         $order->pay_trade_no . '","' .
                         $order->paid_at . '","' .
                         \App\Order::STATUS[$order->status] . '","' .
-                        $email . '"';
+                        $order->contact . '","' .
+                        $contact_ext . '"';
                     $order_txt .= "\r\n";
                 }
             });
@@ -161,8 +178,8 @@ class Order extends Controller
             return response()->make($order_txt, 200, $headers);
         }
 
-        $page = $request->post('current_page', 1);
-        $pageSize = $request->post('per_page', 20);
+        $page = $request->input('current_page', 1);
+        $pageSize = $request->input('per_page', 20);
 
         $list = $query->paginate($pageSize, ['*'], 'page', $page);
 
@@ -216,7 +233,7 @@ class Order extends Controller
         $this->validate($request, [
             'id' => 'required|integer'
         ]);
-        $id = $request->post('id');
+        $id = $request->input('id');
 
         /* @var \App\Order $order */
         $order = $this->authQuery($request, \App\Order::class)
@@ -237,16 +254,32 @@ class Order extends Controller
             'id' => 'required|integer',
             'remark' => 'required|string'
         ]);
-        $id = $request->post('id');
+        $id = $request->input('id');
 
         /* @var \App\Order $order */
         $order = $this->authQuery($request, \App\Order::class)->findOrFail($id);
 
-        $order->remark = $request->post('remark');
+        $order->remark = $request->input('remark');
         $order->save();
         return Response::success();
     }
 
+    function set_send_status(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required|integer',
+            'send_status' => 'required|integer'
+        ]);
+
+        $id = $request->input('id');
+
+        /* @var \App\Order $order */
+        $order = $this->authQuery($request, \App\Order::class)->findOrFail($id);
+
+        $order->send_status = $request->input('send_status');
+        $order->saveOrFail();
+        return Response::success();
+    }
 
     /**
      * 后台重新发货(适合未发货订单)
@@ -260,7 +293,7 @@ class Order extends Controller
         ]);
 
         /* @var \App\Order $order */
-        $order = $this->authQuery($request, \App\Order::class)->with('product')->findOrFail($request->post('id'));
+        $order = $this->authQuery($request, \App\Order::class)->with('product')->findOrFail($request->input('id'));
         if ($order->status !== \App\Order::STATUS_PAID) {
             return Response::fail('订单不是待发货状态, 无法发货');
         }
@@ -292,6 +325,7 @@ class Order extends Controller
 
                 if ($delivery === \App\Product::DELIVERY_MANUAL) {
                     $order->status = \App\Order::STATUS_SUCCESS;
+                    $order->send_status = \App\Order::SEND_STATUS_CARD_SUCCESS;
                     $order->saveOrFail();
 
                     $card = \App\Card::create([
@@ -340,20 +374,22 @@ class Order extends Controller
                 }
             }
         )) {
-            if (filter_var($order->email, FILTER_VALIDATE_EMAIL)) {
+            if (filter_var($order->contact, FILTER_VALIDATE_EMAIL)) {
                 $cards_br = join('<br>', $card_arr);
                 try {
-                    Mail::to($order->email)->Queue(
+                    Mail::to($order->contact)->Queue(
                         new OrderShipped($order,
                             '订单#' . $order->order_no . '&nbsp;已支付，卡号列表：',
                             $cards_br));
-                    $order->email_sent = true;
+                    $order->send_status = \App\Order::SEND_STATUS_EMAIL_SUCCESS;
                     $order->saveOrFail();
                 } catch (\Throwable $e) {
+                    $order->send_status = \App\Order::SEND_STATUS_EMAIL_FAILED;
+                    $order->saveOrFail();
                     // set to mail
                     \App\Library\LogHelper::setLogFile('mail');
                     \Log::error('Order.ship error, order_no:' . $order->order_no .
-                        ', email:' . $order->email . ', cards:' . $cards_br .
+                        ', email:' . $order->contact . ', cards:' . $cards_br .
                         ', Exception:' . $e->getMessage());
 
                     // 还原

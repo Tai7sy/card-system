@@ -13,7 +13,7 @@ class OrdersSeeder extends Seeder
             'order_no' => '123456',
             'product_id' => \App\Product::first()->id,
             'count' => 0,
-            'email' => '',
+            'contact' => '',
             'pay_id' => 0,
             'status' => \App\Order::STATUS_UNPAY
         ]);

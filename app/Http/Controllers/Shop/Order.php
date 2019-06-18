@@ -37,11 +37,11 @@ class Order extends Controller
             if (strlen($order_no) !== 19)
                 return Response::success();
             $query->where('order_no', $order_no);
-        } elseif ($type === 'email') {
-            $email = $request->post('email', '');
-            if (strlen($email) < 6)
+        } elseif ($type === 'contact') {
+            $contact = $request->post('contact', '');
+            if (strlen($contact) < 6)
                 return Response::success();
-            $query->where('email', $email);
+            $query->where('contact', $contact);
         } else {
             return Response::fail('请选择查询类型');
         }
@@ -49,7 +49,7 @@ class Order extends Controller
 
         // 这里不要显示商品名称
         $list = $query->orderBy('id', 'DESC')
-            ->get(['id', 'created_at', 'order_no', 'email', 'status', 'count', 'paid']);
+            ->get(['id', 'created_at', 'order_no', 'contact', 'status', 'send_status' ,'count', 'paid']);
 
 
         $showMsg = '';

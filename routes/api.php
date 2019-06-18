@@ -83,6 +83,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
     Route::get('order/export', 'Merchant\Order@export');                  //    ┆
     Route::post('order/info', 'Merchant\Order@info');                     //    ┆
     Route::post('order/remark', 'Merchant\Order@remark');                 //    ┆
+    Route::post('order/set_send_status', 'Merchant\Order@set_send_status');//   ┆
     Route::post('order/ship', 'Merchant\Order@ship');                     //    ┆
 
     Route::post('log', 'Merchant\Log@get');                               //    ┆

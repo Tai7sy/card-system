@@ -46,7 +46,7 @@ import {
   Loading,
   MessageBox,
   Message,
-  Notification
+  Notification,
 } from 'element-ui';
 
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';

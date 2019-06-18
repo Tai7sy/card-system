@@ -37,7 +37,7 @@ if (!isset($result['success'])) {
     <title>支付结果</title>
 </head>
 <body id="page">
-<h3>{{ isset($result['title']) ? $result['title'] : ($result['success'] ? '恭喜，支付成功！' : '支付失败！' ) }}</h3>
+<h3>{{ isset($result['title']) ? $result['title'] : ($result['success'] ? '订单已支付' : '支付失败！' ) }}</h3>
 <div>
     <p class="status-msg">{!! $result['msg'] !!}</p>
     @if(isset($card_txt))
@@ -55,9 +55,6 @@ if (!isset($result['success'])) {
             function renderDescription(delta){if(!delta){return''}if(typeof delta==='string'){if(delta[0]!=='{'){return delta}try{delta=JSON.parse(delta)}catch(e){return delta}}var for_render=new Quill(document.createElement('div'));for_render.setContents(delta);return for_render.root.innerHTML}
             document.getElementById('instructions').innerHTML = renderDescription({!! $product['instructions'] !!});
         </script>
-    @endif
-    @if(isset($order) && isset($order['order_no']))
-        <a style="float: left;" href="/s#/report?order_no={!! $order['order_no'] !!}" target="_blank">投诉此订单</a>
     @endif
     <a style="float:right" href="javascript:window.close()">关闭</a>
     <br/>

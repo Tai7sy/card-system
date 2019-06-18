@@ -17,19 +17,12 @@ class CreateShopThemesTable extends Migration
             $table->increments('id');
             $table->string('name', 128)->unique();
             $table->string('description')->nullable();
+            $table->text('options')->nullable();
             $table->text('config')->nullable();
             $table->boolean('enabled')->default(true);
         });
 
-        \App\ShopTheme::insert([
-            'id' => 1,
-            'name' => 'Material',
-            'description' => 'Material Design',
-            'config' => json_encode([
-                'list_type' => 'dropdown',
-                'background' => 'https://open.saintic.com/api/bingPic/'
-            ])
-        ]);
+        \App\ShopTheme::freshList();
     }
 
     /**

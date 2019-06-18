@@ -28,6 +28,19 @@ class Order extends Model
         4 => '已退款',
     ];
 
+    /** @var int 发货后, 通知状态, 用于 邮件/手机 通知 */
+    const SEND_STATUS_UN = 0;
+    const SEND_STATUS_EMAIL_SUCCESS = 1;
+    const SEND_STATUS_EMAIL_FAILED = 2;
+    const SEND_STATUS_MOBILE_SUCCESS = 3;
+    const SEND_STATUS_MOBILE_FAILED = 4;
+
+    /** @var int 手动发货 的备注字段 */
+    const SEND_STATUS_CARD_UN = 100;
+    const SEND_STATUS_CARD_PROCESSING = 101;
+    const SEND_STATUS_CARD_SUCCESS = 102;
+    const SEND_STATUS_CARD_FAILED = 103;
+
     protected $casts = [
         'api_info' => 'array',
     ];

@@ -45,8 +45,8 @@ class Product extends Controller
         if (strlen($enabled))
             $query->whereIn('enabled', explode(',', $enabled));
 
-        $page = $request->post('current_page', 1);
-        $pageSize = $request->post('per_page', 20);
+        $page = (int)$request->post('current_page', 1);
+        $pageSize = (int)$request->post('per_page', 20);
         $list = $query->orderBy('sort')->paginate($pageSize, ['*'], 'page', $page);
 
         foreach ($list->items() as $product) {

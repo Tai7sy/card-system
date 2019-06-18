@@ -92,11 +92,12 @@ class Pay extends Controller
         $product_id = (int)$request->input('product_id');
         $count = (int)$request->input('count');
         $coupon = $request->input('coupon');
-        $email = $request->input('email');
+        $contact = $request->input('contact');
+        $contact_ext = $request->input('contact_ext') ?? null;
         $pay_id = (int)$request->input('pay_id');
         if (!$category_id || !$product_id)
             return self::renderResultPage($request, ['msg' => '请选择商品']);
-        if (strlen($email) < 1)
+        if (strlen($contact) < 1)
             return self::renderResultPage($request, ['msg' => '请输入联系方式']);
 
         /* @var \App\Category $category */
@@ -181,7 +182,7 @@ class Pay extends Controller
                     }
                 }
             }
-            if($used_coupon === null){
+            if ($used_coupon === null) {
                 return self::renderResultPage($request, ['msg' => '优惠券信息错误，请重新输入']);
             }
             $pay_money -= $discount_fee;
@@ -207,10 +208,10 @@ class Pay extends Controller
             'product_id' => $product_id,
             'product_name' => $product->name,   // 缓存一个商品名称
             'count' => $count,
-            'email' => $email,
             'ip' => Helper::getIP(),
             'customer' => $customer,
-            'email_sent' => false,
+            'contact' => $contact,
+            'contact_ext' => $contact_ext,
             'cost' => $count * $product->cost,  // 商户成本
             'price' => $price,                  // 应售价格
             'discount' => $discount_fee,        // 优惠金额
@@ -485,7 +486,8 @@ class Pay extends Controller
      */
     function result(Request $request, $order_no)
     {
-        $order = \App\Order::whereOrderNo($order_no)->first();
+        /** @var \App\Order $order */
+        $order = \App\Order::where('order_no', $order_no)->first();
         if ($order == null) {
             return self::renderResultPage($request, ['msg' => '订单未找到，请重试']);
         }
@@ -493,7 +495,11 @@ class Pay extends Controller
         if ($order->status === \App\Order::STATUS_PAID) {
             // 处于已支付 (不是 SUCCESS) , 说明没货了
             $qq = $order->user->qq;
-            $msg = '商家库存不足，因此没有自动发货，请联系商家客服发货';
+            if($order->product->delivery === \App\Product::DELIVERY_MANUAL){
+                $msg = '您购买的为手动充值商品，请耐心等待处理';
+            }else{
+                $msg = '商家库存不足，因此没有自动发货，请联系商家客服发货';
+            }
             if ($qq) {
                 $msg .= '<br><a href="http://wpa.qq.com/msgrd?v=3&uin=' . $qq . '&site=qq&menu=yes" target="_blank">客服QQ:' . $qq . '</a>';
             }
@@ -603,9 +609,10 @@ class Pay extends Controller
                     $order->pay_trade_no = $trade_no; // 支付通道订单号
                     $order->paid_at = Carbon::now();
 
-                    if($product->delivery === \App\Product::DELIVERY_MANUAL){
+                    if ($product->delivery === \App\Product::DELIVERY_MANUAL) {
                         // 手动发货的商品, 这里标记为已支付待发货, 然后返回
                         $order->status = \App\Order::STATUS_PAID;
+                        $order->send_status = \App\Order::SEND_STATUS_CARD_UN;
                         $order->saveOrFail();
                         return true;
                     }
@@ -666,7 +673,7 @@ class Pay extends Controller
                 // ------------------------------------------------------------------------ 提醒库存 end
 
                 // 需要发货到邮箱
-                if (System::_getInt('mail_send_order') === 1 && filter_var($order->email, FILTER_VALIDATE_EMAIL)) {
+                if (System::_getInt('mail_send_order') === 1 && filter_var($order->contact, FILTER_VALIDATE_EMAIL)) {
                     self::showOrderResult($request, $order, true);
                 }
             } else {
@@ -697,7 +704,8 @@ class Pay extends Controller
             $cards[] = $card->card;
         });
 
-        if (count($cards) < $order->count) {
+        // 若发货的卡密少于购买的数量 且 不是手动发货
+        if (count($cards) < $order->count && $order->product->delivery !== \App\Product::DELIVERY_MANUAL) {
             // Tip:
             // 卡密若包含可以重复使用, 则商品限购一件
             // 即: $order->count === 1
@@ -718,14 +726,16 @@ class Pay extends Controller
         if ($renderToEmail) {
             $cards_br = join('<br>', $cards);
             try {
-                Mail::to($order->email)->Queue(new OrderShipped($order, $card_msg, $cards_br));
-                $order->email_sent = true;
+                Mail::to($order->contact)->Queue(new OrderShipped($order, $card_msg, $cards_br));
+                $order->send_status = \App\Order::SEND_STATUS_EMAIL_SUCCESS;
                 $order->saveOrFail();
             } catch (\Throwable $e) {
+                $order->send_status = \App\Order::SEND_STATUS_EMAIL_FAILED;
+                $order->saveOrFail();
                 // set to mail
                 \App\Library\LogHelper::setLogFile('mail');
                 \Log::error('shipOrder.need_mail error, order_no:' . $order->order_no .
-                    ', email:' . $order->email . ', cards:' . $cards_br .
+                    ', email:' . $order->contact . ', cards:' . $cards_br .
                     ', Exception:' . $e->getMessage());
                 // 还原
                 \App\Library\LogHelper::setLogFile('card');
