@@ -11,8 +11,8 @@ $version = '1.0';
     <meta name=keywords content="{{ $keywords }}">
     <script src="/shop_theme/classic/jquery-1.8.3.min.js"></script>
     <link href="/shop_theme/ms/app.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/assets/css/quill.snow.css">
-    <script type="text/javascript" src="/assets/js/quill.min.js"></script>
+    <link rel="stylesheet" href="/plugins/css/quill.snow.css">
+    <script type="text/javascript" src="/plugins/js/quill.min.js"></script>
     @if($config['vcode']['buy'] && $config['vcode']['driver'] === 'geetest')
         <script type="text/javascript" src="/plugins/js/gt.js"></script>
     @endif

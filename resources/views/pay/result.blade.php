@@ -31,8 +31,9 @@ if (!isset($result['success'])) {
         .card-txt{width:100%;border:1px solid #999}
     </style>
     @if(isset($product))
-        <link rel="stylesheet" href="/assets/css/quill.snow.css">
-        <script type="text/javascript" src="/assets/js/quill.min.js"></script>
+        <link rel="stylesheet" href="/plugins/css/quill.snow.css">
+        <script type="text/javascript" src="/plugins/js/quill.min.js"></script>
+        <script type="text/javascript" src="/plugins/js/clipboard.min.js"></script>
     @endif
     <title>支付结果</title>
 </head>
@@ -42,7 +43,11 @@ if (!isset($result['success'])) {
     <p class="status-msg">{!! $result['msg'] !!}</p>
     @if(isset($card_txt))
         <div>
-            <textarea class="card-txt" title="卡号列表" rows="6" readonly>{{ $card_txt }}</textarea>
+            <textarea id="card-txt" class="card-txt" title="卡密列表" rows="6" readonly>{{ $card_txt }}</textarea>
+            <a id="card-copy" href="#" data-clipboard-target="#card-txt">一键复制</a>
+            <script type="text/javascript">
+                new ClipboardJS('#card-copy');
+            </script>
         </div>
     @endif
     <br/>
@@ -56,7 +61,7 @@ if (!isset($result['success'])) {
             document.getElementById('instructions').innerHTML = renderDescription({!! $product['instructions'] !!});
         </script>
     @endif
-    <a style="float:right" href="javascript:window.close()">关闭</a>
+    <a style="float:right" href="/">首页</a>
     <br/>
 </div>
 </body>

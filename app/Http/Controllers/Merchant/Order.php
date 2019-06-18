@@ -276,6 +276,10 @@ class Order extends Controller
         /* @var \App\Order $order */
         $order = $this->authQuery($request, \App\Order::class)->findOrFail($id);
 
+        if ($order->status !== \App\Order::STATUS_PAID) {
+            // 不是等待发货状态不允许设置
+            return Response::fail('此订单不是未发货状态, 无法增加发货标记');
+        }
         $order->send_status = $request->input('send_status');
         $order->saveOrFail();
         return Response::success();
