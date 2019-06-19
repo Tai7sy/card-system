@@ -47,10 +47,16 @@ class Order extends Controller
         }
 
 
+        $columns = ['id', 'created_at', 'order_no', 'contact', 'status', 'send_status', 'count', 'paid'];
         // 这里不要显示商品名称
-        $list = $query->orderBy('id', 'DESC')
-            ->get(['id', 'created_at', 'order_no', 'contact', 'status', 'send_status' ,'count', 'paid']);
+        if (1) {
+            $columns[] = 'product_name';
+            $columns[] = 'contact';
+            $columns[] = 'contact_ext';
+        }
 
+        $list = $query->orderBy('id', 'DESC')
+            ->get($columns);
 
         $showMsg = '';
         return Response::success([
