@@ -46,7 +46,7 @@
                 <p>请使用支付宝扫一扫</p>
                 <p style="color: red">先扫红包更省钱</p>
             </div>
-            <img src="http://ww1.sinaimg.cn/large/8a01d75dly1g0oojbxoqsj20fs0notar.jpg" style="max-width: 70%; margin-top: 24px"/>
+            <img src="https://s2.ax1x.com/2019/06/20/Vj4sWq.jpg" style="max-width: 70%; margin-top: 24px"/>
         </div>
         <div class="tip-text">
         </div>
@@ -61,7 +61,7 @@
         <!-- Modal content -->
         <div class="modal-content">
             <span class="close" id="dialog-close">&times;</span>
-            <img src="http://ww1.sinaimg.cn/large/8a01d75dly1g0oojbxoqsj20fs0notar.jpg" style="max-width: 100%"/>
+            <img src="https://s2.ax1x.com/2019/06/20/Vj4sWq.jpg" style="max-width: 100%"/>
         </div>
 
     </div>
