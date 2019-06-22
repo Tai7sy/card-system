@@ -58,6 +58,7 @@ class System extends Controller
             'shop_ann',
             'shop_ann_pop',
             'shop_qq',
+            'icp',
             'js_tj',
             'js_kf'
         ];
