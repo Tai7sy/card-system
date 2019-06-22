@@ -12,8 +12,8 @@ if (process.platform === 'win32') {
   exec(`xcopy /I /E /Y ${resolve('../../card/web_admin/src/store')} ${resolve('src/store')}`);
   exec(`xcopy /I /E /Y ${resolve('../../card/web_admin/src/views/layout')} ${resolve('src/views/layout')}`);
 } else {
-  console.error('please config ln -s ...');
-  process.exit();
+  exec(`cp -R ${resolve('../../card/web_admin/src/store/')} ${resolve('src/store/')}`);
+  exec(`cp -R ${resolve('../../card/web_admin/src/views/layout/')} ${resolve('src/views/layout/')}`);
 }
 
 module.exports = {
