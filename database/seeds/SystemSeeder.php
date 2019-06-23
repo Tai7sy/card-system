@@ -17,12 +17,16 @@ class SystemSeeder extends Seeder
             'app_url' => 'http://www.example.com',
             'app_url_api' => 'http://www.example.com',
 
+            'company' => '©2019 Windy',
+
             'keywords' => '在线发卡系统',
             'description' => '我是一个发卡系统, 这里填写描述',
             'shop_bkg' => 'http://api.izhao.me/img',
             'shop_ann' => '欢迎来到XXX小店',
             'shop_ann_pop' => '',
             'shop_inventory' => 1,
+
+
 
             'js_tj' => '',
             'js_kf' => '',

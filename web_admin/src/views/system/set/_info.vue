@@ -59,9 +59,9 @@
         <span>描述</span>
         <el-input type="text" placeholder="请输入网站描述(description)" v-model="form.description"/>
       </el-form-item>
-      <el-form-item prop="icp" class="item-container">
-        <span>备案/版权</span>
-        <el-input type="text" placeholder="备案号以及版权号等信息" v-model="form.icp"/>
+      <el-form-item prop="company" class="item-container">
+        <span>底部版权</span>
+        <el-input type="text" placeholder="备案号以及版权号等信息" v-model="form.company"/>
       </el-form-item>
       <el-form-item prop="qq" class="item-container">
         <span>客服QQ</span>
@@ -108,7 +108,7 @@
           description: '',
           shop_ann: '',
           shop_inventory: 0,
-          icp: '',
+          company: '',
           shop_qq: '',
           js_tj: '',
           js_kf: ''

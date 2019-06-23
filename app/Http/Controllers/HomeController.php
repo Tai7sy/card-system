@@ -31,8 +31,13 @@ class HomeController extends Controller
             'url' => config('app.url'),//支付域名
             'company' => config('app.company'),
             'name' => config('app.name'),
-            'logo' => config('app.logo')
+            'logo' => config('app.logo'),
         ];
+
+        if (System::_getInt('product_manual')) {
+            $config['functions'] = ['product_manual']; // 开启手动发货功能
+        }
+
         $config['shop'] = [
             'name' => config('app.name'),
             'qq' => System::_get('shop_qq'),
@@ -255,7 +260,9 @@ class HomeController extends Controller
         $config = [];
         $config['url'] = config('app.url');
 
-        $config['functions'] = ['product_manual']; // 开启手动发货功能
+        if (System::_getInt('product_manual')) {
+            $config['functions'] = ['product_manual']; // 开启手动发货功能
+        }
 
         $config['vcode'] = [
             'driver' => System::_get('vcode_driver'),
