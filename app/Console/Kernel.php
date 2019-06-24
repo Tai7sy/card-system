@@ -34,25 +34,6 @@ class Kernel extends ConsoleKernel
             return;
         }
 
-        try {
-            DB::connection()->getPdo();
-            if (Schema::hasTable('migrations')) {
-                // 有安装表, 已经安装过?
-                if (!Schema::hasTable('systems')) {
-                    die(" * No system table, please install your website first.\r\n");
-                }
-            } else {
-                return;
-            }
-        } catch (\Exception $e) {
-            if (config('database.connections.mysql.host') === '数据库地址') {
-                die(" * Please change your config of database in '.env' file \r\n");
-            } else {
-                die(" * Database connection error: " . $e->getMessage() . "\r\n");
-            }
-        }
-
-
         // 清理7天未支付订单
         if (System::_getInt('order_clean_unpay_open') === 1) {
             $day = System::_getInt('order_clean_unpay_day', 7);

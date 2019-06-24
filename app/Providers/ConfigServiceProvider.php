@@ -18,30 +18,10 @@ class ConfigServiceProvider extends ServiceProvider
     {
         // config('filesystems.default');
 
-        if (app()->runningInConsole()) {
-            try {
-                DB::connection()->getPdo();
-                if (!Schema::hasTable('migrations')) {
-                    // 有安装表, 已经安装过?
-                    echo(" * No migration table, please install your website first.\r\n");
-                    return;
-                }
-                if (!Schema::hasTable('systems')) {
-                    echo(" * No system table, please install your website first.\r\n");
-                    return;
-                }
-            } catch (\Exception $e) {
-                if (config('database.connections.mysql.host') === '数据库地址') {
-                    echo(" * Please change your config of database in '.env' file \r\n");
-                    return;
-                } else {
-                    die(" * Database connection error: " . $e->getMessage() . "\r\n");
-                }
-            }
-        }
-
         try {
             config()->set([
+                'app.project' => 'card_free',
+
                 'app.name' => System::_get('app_name'),
                 'app.title' => System::_get('app_title'),
 

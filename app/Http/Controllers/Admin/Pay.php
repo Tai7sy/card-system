@@ -33,7 +33,13 @@ class Pay extends Controller
 
         $list = $query->get();
 
-        return Response::success($list);
+        return Response::success([
+            'list' => $list,
+            'urls' => [
+                'url' => config('app.url'),
+                'url_api' => config('app.url_api'),
+            ]
+        ]);
     }
 
 
