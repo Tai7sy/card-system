@@ -50,7 +50,7 @@ class WxPayApi
             $inputObj->SetSub_appid(WxPayConfig::SUBAPPID);
         }
         if (@WxPayConfig::SUBMCHID) {
-            $inputObj->SetMch_id(WxPayConfig::SUBMCHID);
+            $inputObj->SetSub_mch_id(WxPayConfig::SUBMCHID);
         }
         //$inputObj->SetSpbill_create_ip($_SERVER['REMOTE_ADDR']);//终端ip
         //$inputObj->SetSpbill_create_ip("1.1.1.1");
