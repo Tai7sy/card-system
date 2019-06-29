@@ -18,8 +18,8 @@ class WxPayApi
      * appid、mchid、spbill_create_ip、nonce_str不需要填入
      * @param \WxPayUnifiedOrder $inputObj
      * @param int $timeOut
-     * @throws \WxPayException
      * @return array 成功时返回，其他抛异常
+     * @throws \WxPayException
      */
     public static function unifiedOrder($inputObj, $timeOut = 6)
     {
@@ -45,6 +45,13 @@ class WxPayApi
 
         $inputObj->SetAppid(WxPayConfig::APPID);//公众账号ID
         $inputObj->SetMch_id(WxPayConfig::MCHID);//商户号
+
+        if (@WxPayConfig::SUBAPPID) {
+            $inputObj->SetSub_appid(WxPayConfig::SUBAPPID);
+        }
+        if (@WxPayConfig::SUBMCHID) {
+            $inputObj->SetMch_id(WxPayConfig::SUBMCHID);
+        }
         //$inputObj->SetSpbill_create_ip($_SERVER['REMOTE_ADDR']);//终端ip
         //$inputObj->SetSpbill_create_ip("1.1.1.1");
         $inputObj->SetNonce_str(self::getNonceStr());//随机字符串
@@ -67,8 +74,8 @@ class WxPayApi
      * appid、mchid、spbill_create_ip、nonce_str不需要填入
      * @param WxPayOrderQuery $inputObj
      * @param int $timeOut
-     * @throws WxPayException
      * @return array 成功时返回，其他抛异常
+     * @throws WxPayException
      */
     public static function orderQuery($inputObj, $timeOut = 6)
     {
@@ -79,6 +86,9 @@ class WxPayApi
         }
         $inputObj->SetAppid(WxPayConfig::APPID);//公众账号ID
         $inputObj->SetMch_id(WxPayConfig::MCHID);//商户号
+        if (@WxPayConfig::SUBMCHID) {
+            $inputObj->SetSub_mch_id(WxPayConfig::SUBMCHID);//商户号
+        }
         $inputObj->SetNonce_str(self::getNonceStr());//随机字符串
 
         $inputObj->SetSign();//签名
@@ -98,8 +108,8 @@ class WxPayApi
      * appid、mchid、spbill_create_ip、nonce_str不需要填入
      * @param WxPayCloseOrder $inputObj
      * @param int $timeOut
-     * @throws WxPayException
      * @return 成功时返回，其他抛异常
+     * @throws WxPayException
      */
     public static function closeOrder($inputObj, $timeOut = 6)
     {
@@ -130,8 +140,8 @@ class WxPayApi
      * appid、mchid、spbill_create_ip、nonce_str不需要填入
      * @param WxPayRefund $inputObj
      * @param int $timeOut
-     * @throws WxPayException
      * @return 成功时返回，其他抛异常
+     * @throws WxPayException
      */
     public static function refund($inputObj, $timeOut = 6)
     {
@@ -171,8 +181,8 @@ class WxPayApi
      * appid、mchid、spbill_create_ip、nonce_str不需要填入
      * @param WxPayRefundQuery $inputObj
      * @param int $timeOut
-     * @throws WxPayException
      * @return 成功时返回，其他抛异常
+     * @throws WxPayException
      */
     public static function refundQuery($inputObj, $timeOut = 6)
     {
@@ -204,8 +214,8 @@ class WxPayApi
      * appid、mchid、spbill_create_ip、nonce_str不需要填入
      * @param WxPayDownloadBill $inputObj
      * @param int $timeOut
-     * @throws WxPayException
      * @return string 成功时返回，其他抛异常
+     * @throws WxPayException
      */
     public static function downloadBill($inputObj, $timeOut = 6)
     {
@@ -308,8 +318,8 @@ class WxPayApi
      * appid、mchid、spbill_create_ip、nonce_str不需要填入
      * @param \WxPayReport $inputObj
      * @param int $timeOut
-     * @throws \WxPayException
      * @return 成功时返回，其他抛异常
+     * @throws \WxPayException
      */
     public static function report($inputObj, $timeOut = 1)
     {
@@ -350,8 +360,8 @@ class WxPayApi
      * appid、mchid、spbill_create_ip、nonce_str不需要填入
      * @param WxPayBizPayUrl $inputObj
      * @param int $timeOut
-     * @throws WxPayException
      * @return array 成功时返回，其他抛异常
+     * @throws WxPayException
      */
     public static function bizpayurl($inputObj, $timeOut = 6)
     {
@@ -377,8 +387,8 @@ class WxPayApi
      * appid、mchid、spbill_create_ip、nonce_str不需要填入
      * @param WxPayShortUrl $inputObj
      * @param int $timeOut
-     * @throws WxPayException
      * @return string 成功时返回，其他抛异常
+     * @throws WxPayException
      */
     public static function shorturl($inputObj, $timeOut = 6)
     {
@@ -553,7 +563,7 @@ class WxPayApi
             curl_setopt($ch, CURLOPT_SSLCERT, WxPayConfig::SSLCERT_PATH);
             curl_setopt($ch, CURLOPT_SSLKEYTYPE, 'PEM');
             curl_setopt($ch, CURLOPT_SSLKEY, WxPayConfig::SSLKEY_PATH);
-        }else{
+        } else {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         }
         //post提交方式

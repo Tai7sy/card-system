@@ -56,9 +56,9 @@ class Api implements ApiInterface
                 die('<h1>获取微信OPENID<br>错误信息: ' . (isset($ret['errcode']) ? $ret['errcode'] : $ret) . '<br>' . (isset($ret['errmsg']) ? $ret['errmsg'] : $ret) . '<br>请返回重试</h1>');
             }
             $openid = $ret['openid'];
-        }else{
+        } else {
             // 如果在微信外部, 且支付方式是JSAPI, 二维码为当前页面
-            if ($payway === 'JSAPI'){
+            if ($payway === 'JSAPI') {
                 $pay_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}" . '/pay/' . $out_trade_no;
                 // $auth_url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' . $config['APPID'] . '&redirect_uri=' . urlencode($pay_url) . '&response_type=code&scope=snsapi_base#wechat_redirect';
                 // $auth_url 太复杂了以至于不能生成二维码....
@@ -94,12 +94,6 @@ class Api implements ApiInterface
         $input->SetSpbill_create_ip(Helper::getIP());
         $input->SetNotify_url($this->url_notify); // 异步通知url
 
-        if(isset($config['sub_appid'])){
-            $input->SetSub_appid($config['sub_appid']);
-        }
-        if(isset($config['sub_mch_id'])){
-            $input->SetSub_mch_id($config['sub_mch_id']);
-        }
         $result = $notify->unifiedOrder($input);
 
         function getValue($out_trade_no, $result, $key)
@@ -151,6 +145,10 @@ class Api implements ApiInterface
         if (!defined('wx_MCHID'))
             define('wx_MCHID', $config['MCHID']);//商户号（必须配置，开户邮件中可查看）
 
+        if (!defined('wx_SUBAPPID'))
+            define('wx_SUBAPPID', @$config['sub_appid']);
+        if (!defined('wx_SUBMCHID'))
+            define('wx_SUBMCHID', @$config['sub_mch_id']);
         /**
          * KEY：商户支付密钥，参考开户邮件设置（必须配置，登录商户平台自行设置）
          * 设置地址：https://pay.weixin.qq.com/index.php/account/api_cert
@@ -179,11 +177,15 @@ class Api implements ApiInterface
             $out_trade_no = @$config['out_trade_no'];
             $input = new \WxPayOrderQuery();
             $input->SetOut_trade_no($out_trade_no);
+            if (isset($config['sub_mch_id'])) {
+                $input->SetSub_mch_id($out_trade_no);
+            }
             $result = \WxPayApi::orderQuery($input);
             if (array_key_exists('trade_state', $result) && $result['trade_state'] == 'SUCCESS') {
                 call_user_func_array($successCallback, [$result['out_trade_no'], $result['total_fee'], $result['transaction_id']]);
                 return true;
             } else {
+                Log::debug('Pay.WeChat.verify, orderQuery failed. ' . json_encode($result));
                 return false;
             }
         }

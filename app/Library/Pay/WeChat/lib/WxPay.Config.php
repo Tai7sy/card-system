@@ -24,6 +24,8 @@ class WxPayConfig
 	 */
     const APPID = wx_APPID;
     const MCHID = wx_MCHID;
+    const SUBAPPID = wx_SUBAPPID;
+    const SUBMCHID = wx_SUBMCHID;
     const KEY = wx_KEY;
     const APPSECRET = wx_APPSECRET;
 	
