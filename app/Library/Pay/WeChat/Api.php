@@ -85,7 +85,6 @@ class Api implements ApiInterface
         $input->SetTime_start(date('YmdHis'));
         $input->SetTime_expire(date('YmdHis', time() + 600));
         $input->SetGoods_tag('pay');//商品标记 主要用于优惠券立减功能
-        $input->SetNotify_url($this->url_notify);
         $input->SetTrade_type($payway);
         if ($payway === 'MWEB')
             $input->SetScene_info('{"h5_info": {"type":"Wap","wap_url": "' . SYS_URL . '","wap_name": "发卡平台"}}');
@@ -93,6 +92,14 @@ class Api implements ApiInterface
             $input->SetOpenid($openid);
         $input->SetProduct_id($out_trade_no);//商品ID  可自定义
         $input->SetSpbill_create_ip(Helper::getIP());
+        $input->SetNotify_url($this->url_notify); // 异步通知url
+
+        if(isset($config['sub_appid'])){
+            $input->SetSub_appid($config['sub_appid']);
+        }
+        if(isset($config['sub_mch_id'])){
+            $input->SetSub_mch_id($config['sub_mch_id']);
+        }
         $result = $notify->unifiedOrder($input);
 
         function getValue($out_trade_no, $result, $key)

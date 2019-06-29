@@ -57,5 +57,4 @@ class WxPayConfig
 	 */
 	const REPORT_LEVENL = 1;
 
-	const NOTIFY_URL = '';
 }

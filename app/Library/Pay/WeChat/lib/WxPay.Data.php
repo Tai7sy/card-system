@@ -29,7 +29,7 @@ class WxPayDataBase
 	
 	/**
 	* 获取签名，详见签名生成算法的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetSign()
 	{
@@ -69,10 +69,11 @@ class WxPayDataBase
         $xml.="</xml>";
         return $xml; 
 	}
-	
+
     /**
      * 将xml转为array
      * @param string $xml
+     * @return array|mixed
      * @throws WxPayException
      */
 	public function FromXml($xml)
@@ -106,7 +107,7 @@ class WxPayDataBase
 	
 	/**
 	 * 生成签名
-	 * @return 签名，本函数不覆盖sign成员变量，如要设置签名需要调用SetSign方法赋值
+	 * @return string 签名，本函数不覆盖sign成员变量，如要设置签名需要调用SetSign方法赋值
 	 */
 	public function MakeSign()
 	{
@@ -139,10 +140,11 @@ class WxPayDataBase
  */
 class WxPayResults extends WxPayDataBase
 {
-	/**
-	 * 
-	 * 检测签名
-	 */
+    /**
+     *
+     * 检测签名
+     * @throws WxPayException
+     */
 	public function CheckSign()
 	{
 		//fix异常
@@ -166,13 +168,15 @@ class WxPayResults extends WxPayDataBase
 	{
 		$this->values = $array;
 	}
-	
-	/**
-	 * 
-	 * 使用数组初始化对象
-	 * @param array $array
-	 * @param 是否检测签名 $noCheckSign
-	 */
+
+    /**
+     *
+     * 使用数组初始化对象
+     * @param array $array
+     * @param bool $noCheckSign
+     * @return WxPayResults
+     * @throws WxPayException
+     */
 	public static function InitFromArray($array, $noCheckSign = false)
 	{
 		$obj = new self();
@@ -193,10 +197,11 @@ class WxPayResults extends WxPayDataBase
 	{
 		$this->values[$key] = $value;
 	}
-	
+
     /**
      * 将xml转为array
      * @param string $xml
+     * @return array
      * @throws WxPayException
      */
 	public static function Init($xml)
@@ -240,11 +245,11 @@ class WxPayNotifyReply extends  WxPayDataBase
 		return $this->values['return_code'];
 	}
 
-	/**
-	 * 
-	 * 设置错误信息
-	 * @param string $return_code
-	 */
+    /**
+     *
+     * 设置错误信息
+     * @param $return_msg
+     */
 	public function SetReturn_msg($return_msg)
 	{
 		$this->values['return_msg'] = $return_msg;
@@ -290,12 +295,30 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
 		return $this->values['appid'];
 	}
+
+    /**
+     * 子商户公众账号ID
+     * @param string $value
+     **/
+    public function SetSub_appid($value)
+    {
+        $this->values['sub_appid'] = $value;
+    }
+    /**
+     * 子商户公众账号ID
+     * @return string|int 值
+     **/
+    public function GetSub_appid()
+    {
+        return $this->values['sub_appid'];
+    }
+
 	/**
 	* 判断微信分配的公众账号ID是否存在
 	* @return true 或 false
@@ -314,14 +337,16 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	{
 		$this->values['mch_id'] = $value;
 	}
+
 	/**
 	* 获取微信支付分配的商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetMch_id()
 	{
 		return $this->values['mch_id'];
 	}
+
 	/**
 	* 判断微信支付分配的商户号是否存在
 	* @return true 或 false
@@ -331,8 +356,26 @@ class WxPayUnifiedOrder extends WxPayDataBase
 		return array_key_exists('mch_id', $this->values);
 	}
 
+    /**
+     * 设置微信支付分配的子商户号
+     * @param string $value
+     **/
+    public function SetSub_mch_id($value)
+    {
+        $this->values['sub_mch_id'] = $value;
+    }
 
-	/**
+
+    /**
+     * 获取微信支付分配的子商户号的值
+     * @return string|int 值
+     **/
+    public function GetSub_mch_id()
+    {
+        return $this->values['sub_mch_id'];
+    }
+
+    /**
 	* 设置微信支付分配的终端设备号，商户自定义
 	* @param string $value 
 	**/
@@ -342,7 +385,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的终端设备号，商户自定义的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetDevice_info()
 	{
@@ -368,7 +411,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取随机字符串，不长于32位。推荐随机数生成算法的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetNonce_str()
 	{
@@ -393,7 +436,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取商品或支付单简要描述的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetBody()
 	{
@@ -419,7 +462,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取商品名称明细列表的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetDetail()
 	{
@@ -445,7 +488,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取附加数据，在查询API和支付通知中原样返回，该字段主要用于商户携带订单的自定义数据的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAttach()
 	{
@@ -471,7 +514,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取商户系统内部的订单号,32个字符内、可包含字母, 其他说明见商户订单号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOut_trade_no()
 	{
@@ -497,7 +540,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取符合ISO 4217标准的三位字母代码，默认人民币：CNY，其他值列表详见货币类型的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetFee_type()
 	{
@@ -523,7 +566,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取订单总金额，只能为整数，详见支付金额的值
-	* @return 值
+	* @return string 值
 	**/
 	public function GetTotal_fee()
 	{
@@ -549,7 +592,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取APP和网页支付提交用户端ip，Native支付填调用微信支付API的机器IP。的值
-	* @return 值
+	* @return string 值
 	**/
 	public function GetSpbill_create_ip()
 	{
@@ -575,7 +618,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取订单生成时间，格式为yyyyMMddHHmmss，如2009年12月25日9点10分10秒表示为20091225091010。其他详见时间规则的值
-	* @return 值
+	* @return string 值
 	**/
 	public function GetTime_start()
 	{
@@ -601,7 +644,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取订单失效时间，格式为yyyyMMddHHmmss，如2009年12月27日9点10分10秒表示为20091227091010。其他详见时间规则的值
-	* @return 值
+	* @return string 值
 	**/
 	public function GetTime_expire()
 	{
@@ -627,7 +670,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取商品标记，代金券或立减优惠功能的参数，说明详见代金券或立减优惠的值
-	* @return 值
+	* @return string 值
 	**/
 	public function GetGoods_tag()
 	{
@@ -653,21 +696,12 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取接收微信支付异步通知回调地址的值
-	* @return 值
+	* @return string 值
 	**/
 	public function GetNotify_url()
 	{
 		return $this->values['notify_url'];
 	}
-	/**
-	* 判断接收微信支付异步通知回调地址是否存在
-	* @return true 或 false
-	**/
-	public function IsNotify_urlSet()
-	{
-		return array_key_exists('notify_url', $this->values);
-	}
-
 
 	/**
 	* 设置取值如下：JSAPI，NATIVE，APP，详细说明见参数规定
@@ -679,7 +713,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取取值如下：JSAPI，NATIVE，APP，详细说明见参数规定的值
-	* @return 值
+	* @return string 值
 	**/
 	public function GetTrade_type()
 	{
@@ -705,7 +739,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取trade_type=NATIVE，此参数必传。此id为二维码中包含的商品ID，商户自行定义。的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetProduct_id()
 	{
@@ -731,7 +765,7 @@ class WxPayUnifiedOrder extends WxPayDataBase
 	}
 	/**
 	* 获取trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识。下单前需要调用【网页授权获取用户信息】接口获取到用户的Openid。 的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOpenid()
 	{
@@ -784,7 +818,7 @@ class WxPayOrderQuery extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
@@ -810,7 +844,7 @@ class WxPayOrderQuery extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetMch_id()
 	{
@@ -836,7 +870,7 @@ class WxPayOrderQuery extends WxPayDataBase
 	}
 	/**
 	* 获取微信的订单号，优先使用的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetTransaction_id()
 	{
@@ -862,7 +896,7 @@ class WxPayOrderQuery extends WxPayDataBase
 	}
 	/**
 	* 获取商户系统内部的订单号，当没提供transaction_id时需要传这个。的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOut_trade_no()
 	{
@@ -888,7 +922,7 @@ class WxPayOrderQuery extends WxPayDataBase
 	}
 	/**
 	* 获取随机字符串，不长于32位。推荐随机数生成算法的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetNonce_str()
 	{
@@ -922,7 +956,7 @@ class WxPayCloseOrder extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
@@ -948,7 +982,7 @@ class WxPayCloseOrder extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetMch_id()
 	{
@@ -974,7 +1008,7 @@ class WxPayCloseOrder extends WxPayDataBase
 	}
 	/**
 	* 获取商户系统内部的订单号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOut_trade_no()
 	{
@@ -1000,7 +1034,7 @@ class WxPayCloseOrder extends WxPayDataBase
 	}
 	/**
 	* 获取商户系统内部的订单号,32个字符内、可包含字母, 其他说明见商户订单号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetNonce_str()
 	{
@@ -1034,7 +1068,7 @@ class WxPayRefund extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
@@ -1060,7 +1094,7 @@ class WxPayRefund extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetMch_id()
 	{
@@ -1086,7 +1120,7 @@ class WxPayRefund extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的终端设备号，与下单一致的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetDevice_info()
 	{
@@ -1112,7 +1146,7 @@ class WxPayRefund extends WxPayDataBase
 	}
 	/**
 	* 获取随机字符串，不长于32位。推荐随机数生成算法的值
-	* @return 值
+	* @return string 值
 	**/
 	public function GetNonce_str()
 	{
@@ -1137,7 +1171,7 @@ class WxPayRefund extends WxPayDataBase
 	}
 	/**
 	* 获取微信订单号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetTransaction_id()
 	{
@@ -1163,7 +1197,7 @@ class WxPayRefund extends WxPayDataBase
 	}
 	/**
 	* 获取商户系统内部的订单号,transaction_id、out_trade_no二选一，如果同时存在优先级：transaction_id> out_trade_no的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOut_trade_no()
 	{
@@ -1189,7 +1223,7 @@ class WxPayRefund extends WxPayDataBase
 	}
 	/**
 	* 获取商户系统内部的退款单号，商户系统内部唯一，同一退款单号多次请求只退一笔的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOut_refund_no()
 	{
@@ -1215,7 +1249,7 @@ class WxPayRefund extends WxPayDataBase
 	}
 	/**
 	* 获取订单总金额，单位为分，只能为整数，详见支付金额的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetTotal_fee()
 	{
@@ -1241,7 +1275,7 @@ class WxPayRefund extends WxPayDataBase
 	}
 	/**
 	* 获取退款总金额，订单总金额，单位为分，只能为整数，详见支付金额的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetRefund_fee()
 	{
@@ -1267,7 +1301,7 @@ class WxPayRefund extends WxPayDataBase
 	}
 	/**
 	* 获取货币类型，符合ISO 4217标准的三位字母代码，默认人民币：CNY，其他值列表详见货币类型的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetRefund_fee_type()
 	{
@@ -1293,7 +1327,7 @@ class WxPayRefund extends WxPayDataBase
 	}
 	/**
 	* 获取操作员帐号, 默认为商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOp_user_id()
 	{
@@ -1327,7 +1361,7 @@ class WxPayRefundQuery extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
@@ -1353,7 +1387,7 @@ class WxPayRefundQuery extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetMch_id()
 	{
@@ -1379,7 +1413,7 @@ class WxPayRefundQuery extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的终端设备号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetDevice_info()
 	{
@@ -1405,7 +1439,7 @@ class WxPayRefundQuery extends WxPayDataBase
 	}
 	/**
 	* 获取随机字符串，不长于32位。推荐随机数生成算法的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetNonce_str()
 	{
@@ -1430,7 +1464,7 @@ class WxPayRefundQuery extends WxPayDataBase
 	}
 	/**
 	* 获取微信订单号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetTransaction_id()
 	{
@@ -1456,7 +1490,7 @@ class WxPayRefundQuery extends WxPayDataBase
 	}
 	/**
 	* 获取商户系统内部的订单号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOut_trade_no()
 	{
@@ -1482,7 +1516,7 @@ class WxPayRefundQuery extends WxPayDataBase
 	}
 	/**
 	* 获取商户退款单号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOut_refund_no()
 	{
@@ -1508,7 +1542,7 @@ class WxPayRefundQuery extends WxPayDataBase
 	}
 	/**
 	* 获取微信退款单号refund_id、out_refund_no、out_trade_no、transaction_id四个参数必填一个，如果同时存在优先级为：refund_id>out_refund_no>transaction_id>out_trade_no的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetRefund_id()
 	{
@@ -1542,7 +1576,7 @@ class WxPayDownloadBill extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
@@ -1568,7 +1602,7 @@ class WxPayDownloadBill extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetMch_id()
 	{
@@ -1594,7 +1628,7 @@ class WxPayDownloadBill extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的终端设备号，填写此字段，只下载该设备号的对账单的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetDevice_info()
 	{
@@ -1620,7 +1654,7 @@ class WxPayDownloadBill extends WxPayDataBase
 	}
 	/**
 	* 获取随机字符串，不长于32位。推荐随机数生成算法的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetNonce_str()
 	{
@@ -1645,7 +1679,7 @@ class WxPayDownloadBill extends WxPayDataBase
 	}
 	/**
 	* 获取下载对账单的日期，格式：20140603的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetBill_date()
 	{
@@ -1671,7 +1705,7 @@ class WxPayDownloadBill extends WxPayDataBase
 	}
 	/**
 	* 获取ALL，返回当日所有订单信息，默认值SUCCESS，返回当日成功支付的订单REFUND，返回当日退款订单REVOKED，已撤销的订单的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetBill_type()
 	{
@@ -1705,7 +1739,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
@@ -1731,7 +1765,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetMch_id()
 	{
@@ -1757,7 +1791,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的终端设备号，商户自定义的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetDevice_info()
 	{
@@ -1783,7 +1817,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取随机字符串，不长于32位。推荐随机数生成算法的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetNonce_str()
 	{
@@ -1809,7 +1843,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取上报对应的接口的完整URL，类似：https://api.mch.weixin.qq.com/pay/unifiedorder对于被扫支付，为更好的和商户共同分析一次业务行为的整体耗时情况，对于两种接入模式，请都在门店侧对一次被扫行为进行一次单独的整体上报，上报URL指定为：https://api.mch.weixin.qq.com/pay/micropay/total关于两种接入模式具体可参考本文档章节：被扫支付商户接入模式其它接口调用仍然按照调用一次，上报一次来进行。的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetInterface_url()
 	{
@@ -1835,7 +1869,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取接口耗时情况，单位为毫秒的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetExecute_time_()
 	{
@@ -1861,7 +1895,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取SUCCESS/FAIL此字段是通信标识，非交易标识，交易是否成功需要查看trade_state来判断的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetReturn_code()
 	{
@@ -1887,7 +1921,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取返回信息，如非空，为错误原因签名失败参数格式校验错误的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetReturn_msg()
 	{
@@ -1913,7 +1947,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取SUCCESS/FAIL的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetResult_code()
 	{
@@ -1939,7 +1973,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取ORDERNOTEXIST—订单不存在SYSTEMERROR—系统错误的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetErr_code()
 	{
@@ -1965,7 +1999,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取结果信息描述的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetErr_code_des()
 	{
@@ -1991,7 +2025,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取商户系统内部的订单号,商户可以在上报时提供相关商户订单号方便微信支付更好的提高服务质量。 的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOut_trade_no()
 	{
@@ -2017,7 +2051,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取发起接口调用时的机器IP 的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetUser_ip()
 	{
@@ -2043,7 +2077,7 @@ class WxPayReport extends WxPayDataBase
 	}
 	/**
 	* 获取系统时间，格式为yyyyMMddHHmmss，如2009年12月27日9点10分10秒表示为20091227091010。其他详见时间规则的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetTime()
 	{
@@ -2077,7 +2111,7 @@ class WxPayShortUrl extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
@@ -2103,7 +2137,7 @@ class WxPayShortUrl extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetMch_id()
 	{
@@ -2129,7 +2163,7 @@ class WxPayShortUrl extends WxPayDataBase
 	}
 	/**
 	* 获取需要转换的URL，签名用原串，传输需URL encode的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetLong_url()
 	{
@@ -2155,7 +2189,7 @@ class WxPayShortUrl extends WxPayDataBase
 	}
 	/**
 	* 获取随机字符串，不长于32位。推荐随机数生成算法的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetNonce_str()
 	{
@@ -2189,7 +2223,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
@@ -2215,7 +2249,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetMch_id()
 	{
@@ -2241,7 +2275,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取终端设备号(商户自定义，如门店编号)的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetDevice_info()
 	{
@@ -2267,7 +2301,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取随机字符串，不长于32位。推荐随机数生成算法的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetNonce_str()
 	{
@@ -2292,7 +2326,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取商品或支付单简要描述的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetBody()
 	{
@@ -2318,7 +2352,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取商品名称明细列表的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetDetail()
 	{
@@ -2344,7 +2378,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取附加数据，在查询API和支付通知中原样返回，该字段主要用于商户携带订单的自定义数据的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAttach()
 	{
@@ -2370,7 +2404,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取商户系统内部的订单号,32个字符内、可包含字母, 其他说明见商户订单号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOut_trade_no()
 	{
@@ -2396,7 +2430,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取订单总金额，单位为分，只能为整数，详见支付金额的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetTotal_fee()
 	{
@@ -2422,7 +2456,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取符合ISO 4217标准的三位字母代码，默认人民币：CNY，其他值列表详见货币类型的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetFee_type()
 	{
@@ -2448,7 +2482,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取调用微信支付API的机器IP 的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetSpbill_create_ip()
 	{
@@ -2474,7 +2508,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取订单生成时间，格式为yyyyMMddHHmmss，如2009年12月25日9点10分10秒表示为20091225091010。详见时间规则的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetTime_start()
 	{
@@ -2500,7 +2534,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取订单失效时间，格式为yyyyMMddHHmmss，如2009年12月27日9点10分10秒表示为20091227091010。详见时间规则的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetTime_expire()
 	{
@@ -2526,7 +2560,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取商品标记，代金券或立减优惠功能的参数，说明详见代金券或立减优惠的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetGoods_tag()
 	{
@@ -2552,7 +2586,7 @@ class WxPayMicroPay extends WxPayDataBase
 	}
 	/**
 	* 获取扫码支付授权码，设备读取用户微信中的条码或者二维码信息的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAuth_code()
 	{
@@ -2586,7 +2620,7 @@ class WxPayReverse extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
@@ -2612,7 +2646,7 @@ class WxPayReverse extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetMch_id()
 	{
@@ -2638,7 +2672,7 @@ class WxPayReverse extends WxPayDataBase
 	}
 	/**
 	* 获取微信的订单号，优先使用的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetTransaction_id()
 	{
@@ -2664,7 +2698,7 @@ class WxPayReverse extends WxPayDataBase
 	}
 	/**
 	* 获取商户系统内部的订单号,transaction_id、out_trade_no二选一，如果同时存在优先级：transaction_id> out_trade_no的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetOut_trade_no()
 	{
@@ -2690,7 +2724,7 @@ class WxPayReverse extends WxPayDataBase
 	}
 	/**
 	* 获取随机字符串，不长于32位。推荐随机数生成算法的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetNonce_str()
 	{
@@ -2734,7 +2768,7 @@ class WxPayJsApiPay extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
@@ -2760,7 +2794,7 @@ class WxPayJsApiPay extends WxPayDataBase
 	}
 	/**
 	* 获取支付时间戳的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetTimeStamp()
 	{
@@ -2785,7 +2819,7 @@ class WxPayJsApiPay extends WxPayDataBase
 	}
 	/**
 	* 获取notify随机字符串值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetReturn_code()
 	{
@@ -2811,7 +2845,7 @@ class WxPayJsApiPay extends WxPayDataBase
 	}
 	/**
 	* 获取订单详情扩展字符串的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetPackage()
 	{
@@ -2836,7 +2870,7 @@ class WxPayJsApiPay extends WxPayDataBase
 	}
 	/**
 	* 获取签名方式
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetSignType()
 	{
@@ -2861,7 +2895,7 @@ class WxPayJsApiPay extends WxPayDataBase
 	}
 	/**
 	* 获取签名方式
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetPaySign()
 	{
@@ -2895,7 +2929,7 @@ class WxPayBizPayUrl extends WxPayDataBase
 	}
 	/**
 	* 获取微信分配的公众账号ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetAppid()
 	{
@@ -2921,7 +2955,7 @@ class WxPayBizPayUrl extends WxPayDataBase
 	}
 	/**
 	* 获取微信支付分配的商户号的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetMch_id()
 	{
@@ -2946,7 +2980,7 @@ class WxPayBizPayUrl extends WxPayDataBase
 	}
 	/**
 	* 获取支付时间戳的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetTime_stamp()
 	{
@@ -2971,7 +3005,7 @@ class WxPayBizPayUrl extends WxPayDataBase
 	}
 	/**
 	* 获取随机字符串的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetNonce_str()
 	{
@@ -2996,7 +3030,7 @@ class WxPayBizPayUrl extends WxPayDataBase
 	}
 	/**
 	* 获取商品ID的值
-	* @return 值
+	* @return string|int 值
 	**/
 	public function GetProduct_id()
 	{
