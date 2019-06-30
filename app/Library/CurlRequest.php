@@ -2,37 +2,40 @@
 
 namespace App\Library;
 
+use Illuminate\Support\Facades\Log;
+
+
 class CurlRequest
 {
     /**
      * @param $url
      * @param int $method 0=GET 1=POST
      * @param string $post_data
-     * @param string $cookie
      * @param array $headers
      * @param int $timeout 单位 秒
+     * @param string|false $cookie
      * @return string
      */
-    private static function curl($url, $method = 0, $post_data = '', &$cookie = '', $headers = [], $timeout = 5)
+    private static function curl($url, $method = 0, $post_data = '', $headers = [], $timeout = 5, &$cookie = false)
     {
         if (!isset($headers['Accept'])) {
             $headers['Accept'] = "*
-    public static function get($url, &$cookie = '', $headers = [], $timeout = 5)
+    public static function get($url, $headers = [], $timeout = 5, &$cookie = false)
     {
-        return self::curl($url, 0, '', $cookie, $headers, $timeout);
+        return self::curl($url, 0, '', $headers, $timeout, $cookie);
     }
 
     /**
      * @param string $url
      * @param string $post_data
-     * @param string $cookie
      * @param array $headers
-     * @param int $timeout
+     * @param int $timeout 单位 秒
+     * @param string|false $cookie
      * @return string
      */
-    public static function post($url, $post_data = '', &$cookie = '', $headers = [], $timeout = 5)
+    public static function post($url, $post_data = '', $headers = [], $timeout = 5, &$cookie = false)
     {
-        return self::curl($url, 1, $post_data, $cookie, $headers, $timeout);
+        return self::curl($url, 1, $post_data, $headers, $timeout, $cookie);
     }
 
 

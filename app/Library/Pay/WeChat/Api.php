@@ -180,14 +180,20 @@ class Api implements ApiInterface
             if (isset($config['sub_mch_id'])) {
                 $input->SetSub_mch_id($out_trade_no);
             }
-            $result = \WxPayApi::orderQuery($input);
-            if (array_key_exists('trade_state', $result) && $result['trade_state'] == 'SUCCESS') {
-                call_user_func_array($successCallback, [$result['out_trade_no'], $result['total_fee'], $result['transaction_id']]);
-                return true;
-            } else {
-                Log::debug('Pay.WeChat.verify, orderQuery failed. ' . json_encode($result));
+            try {
+                $result = \WxPayApi::orderQuery($input);
+                if (array_key_exists('trade_state', $result) && $result['trade_state'] == 'SUCCESS') {
+                    call_user_func_array($successCallback, [$result['out_trade_no'], $result['total_fee'], $result['transaction_id']]);
+                    return true;
+                } else {
+                    Log::debug('Pay.WeChat.verify, orderQuery failed. ' . json_encode($result));
+                    return false;
+                }
+            } catch (\Throwable $e) {
+                Log::error('Pay.WeChat.verify, orderQuery exception:. ' . $e->getMessage(), ['exception' => $e]);
                 return false;
             }
+
         }
 
     }

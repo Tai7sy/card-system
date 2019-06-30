@@ -89,6 +89,10 @@ class Api implements ApiInterface
             //api调用
             $retXml = $qpayApi->req($params, $config);
             $result = \QpayMchUtil::xmlToArray($retXml);
+            if (!is_array($result)) {
+                Log::error('Pay.QPay.verify Error, $retXml' . $retXml);
+                return false;
+            }
 
             if (array_key_exists('trade_state', $result) && $result['trade_state'] == 'SUCCESS') {
                 call_user_func_array($successCallback, [$result['out_trade_no'], $result['total_fee'], $result['transaction_id']]);

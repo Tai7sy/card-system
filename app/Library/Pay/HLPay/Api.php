@@ -1,8 +1,14 @@
 <?php
 
+/**
+ * 恒隆支付
+ * 2019年3月3日
+ */
+
 namespace App\Library\Pay\HLPay;
 
 use App\Library\Pay\ApiInterface;
+use Illuminate\Support\Facades\Log;
 
 /** @noinspection SpellCheckingInspection */
 
@@ -28,6 +34,12 @@ class Api implements ApiInterface
      */
     function goPay($config, $out_trade_no, $subject, $body, $amount_cent)
     {
+        if (!isset($config['id'])) {
+            throw new \Exception('请填写id');
+        }
+        if (!isset($config['key'])) {
+            throw new \Exception('请填写key');
+        }
         $amount = sprintf('%.2f', $amount_cent / 100); // 元为单位
         $payway = $config['payway'];
         switch ($payway) {
@@ -66,12 +78,12 @@ class Api implements ApiInterface
         $ret_raw = $this->curl_post('http://henglpay.com/Pay_Index.html', $post_data);
         $ret = @json_decode($ret_raw, true);
         if (!$ret || !isset($ret['status'])) {
-            \Log::error('Pay.HLPay.goPay.order Error#1: ' . $ret_raw);
+            Log::error('Pay.HLPay.goPay.order Error#1: ' . $ret_raw);
             throw new \Exception('获取付款信息超时, 请刷新重试');
         }
 
         if ($ret['status'] !== '200' || !isset($ret['data']['QRCodeUrl'])) {
-            \Log::error('Pay.HLPay.goPay.order Error#2: ' . $ret_raw);
+            Log::error('Pay.HLPay.goPay.order Error#2: ' . $ret_raw);
             throw new \Exception('获取付款信息失败, 请联系客服反馈');
         }
 
@@ -84,7 +96,7 @@ class Api implements ApiInterface
             var_dump('未启用此方式: ');
             var_dump($ret['data']['QRCodeUrl']);
         } else {
-            \Log::error('Pay.HLPay.goPay.order Error#3: ' . $ret_raw);
+            Log::error('Pay.HLPay.goPay.order Error#3: ' . $ret_raw);
             throw new \Exception('获取付款信息失败, 请联系客服反馈');
         }
         exit;
@@ -107,7 +119,7 @@ class Api implements ApiInterface
                 $params[$column] = $_POST[$column];
 
             if ($this->getSign($params, $config['key']) !== $_POST['sign']) {
-                \Log::error('Pay.HLPay.verify, sign error $post:' . json_encode($_POST));
+                Log::error('Pay.HLPay.verify, sign error $post:' . json_encode($_POST));
                 echo 'sign error';
                 return false;
             }

@@ -42,10 +42,9 @@ class Api implements ApiInterface
             $headers = ['User-Agent' => 'Mozilla/5.0 AlipayChannelId/5136 AlipayDefined(nt:WIFI,ws:411|0|2.625) AliApp(AP/10.1.10.1226101) AlipayClient/10.1.10.1226101'];
         }
 
-        $cookie = '';
         // https://o2.qfpay.com/q/info?code=&huid=G39Mp&opuid=&reqid=
         // {"resperr":"","respcd":"0000","respmsg":"","data":{"profile":{"huid":"G39Mp","opuid":0,"currency":"156","appid":"","nickname":"\u4e1a\u52a1\u5458\u674e\u6587\u8c6a","currency_code":"\uffe5"},"customer":{"hcid":"vl","openid":"","balance":0},"reqid":"040a57f2c2ed4f9d","url":{"activity_tip":"https://marketing.qfpay.com/v1/mkw/activity_tip_page"}}}
-        $userInfo = Request::get('https://o2.qfpay.com/q/info?code=&huid=' . $config['id'] . '&opuid=&reqid=' . $out_trade_no, $cookie, $headers);
+        $userInfo = Request::get('https://o2.qfpay.com/q/info?code=&huid=' . $config['id'] . '&opuid=&reqid=' . $out_trade_no, $headers);
         $reqId = static::str_between($userInfo, 'reqid":"', '"');
         $currency = static::str_between($userInfo, 'currency":"', '"');
         if ($reqId == '' || $currency == '') {
@@ -54,9 +53,11 @@ class Api implements ApiInterface
         }
 
 
-        $payInfo = Request::post('https://o2.qfpay.com/q/payment', 'txamt=' . $amount_cent .
+        $payInfo = Request::post('https://o2.qfpay.com/q/payment',
+            'txamt=' . $amount_cent .
             '&openid=&appid=&huid=' . $config['id'] .
-            '&opuid=&reqid=' . $reqId . '&balance=0&currency=' . $currency, $cookie, $headers
+            '&opuid=&reqid=' . $reqId . '&balance=0&currency=' . $currency,
+            $headers
         );
         //{"resperr":"","respcd":"0000","respmsg":"","data":{"total_amt":11100,"reqid":"040a57f2c2ed4f9d","balance_amt":0,"coupon_code":"","coupon_title":"","pay_amt":11100,"redirect_uri":"https://marketing.qfpay.com/v1/mkw/payover_router?syssn=20180124000200020059243592","syssn":"20180124000200020059243592","pay_params":{"pubAccHint":"","pubAcc":"","tokenId":"6V437bc87d18b157dc0c218d68977a1b"},"coupon_amt":0,"type":"qqpay"}}
         $result = json_decode($payInfo, true);

@@ -33,8 +33,7 @@ class Api implements ApiInterface
             'sign' => $sign                     //签名（大写，详情见1.5）
         ], JSON_FORCE_OBJECT);
 
-        $cookie = '';
-        $ret_raw = CurlRequest::post('http://api.qwebank.top/open/v1/getAccessToken/merchant', $params, $cookie, [
+        $ret_raw = CurlRequest::post('http://api.qwebank.top/open/v1/getAccessToken/merchant', $params, [
             'Content-Type' => 'application/json'
         ]);
         $ret = @json_decode($ret_raw, true);
@@ -88,9 +87,8 @@ class Api implements ApiInterface
             }
             $params['param']['bankName'] = $config['bankName'];
         }
-        $cookie = '';
         $ret_raw = CurlRequest::post('http://api.qwebank.top/open/v1/order/' . $payway,
-            json_encode($params, JSON_FORCE_OBJECT), $cookie, [
+            json_encode($params, JSON_FORCE_OBJECT), [
                 'Content-Type' => 'application/json'
             ]);
         $ret = @json_decode($ret_raw, true);
@@ -124,9 +122,8 @@ class Api implements ApiInterface
                 'accessToken' => $this->getAccessToken($config),
                 'param' => $out_trade_no
             ];
-            $cookie = '';
             $ret_raw = CurlRequest::post('http://api.qwebank.top/open/v1/order/getByCustomerNo',
-                json_encode($params, JSON_FORCE_OBJECT), $cookie, [
+                json_encode($params, JSON_FORCE_OBJECT), [
                     'Content-Type' => 'application/json'
                 ]);
             $ret = @json_decode($ret_raw, true);

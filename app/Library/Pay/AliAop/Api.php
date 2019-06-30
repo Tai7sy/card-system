@@ -104,13 +104,13 @@ class Api implements ApiInterface
         if ($isNotify) {
 
 
-            if($this->aop($config)->verify($_POST)){
+            if ($this->aop($config)->verify($_POST)) {
                 if ($_POST['trade_status'] === 'TRADE_SUCCESS') {
                     $trade_no = $_POST['trade_no'];//支付宝交易号
                     $total_fee = (int)round($_POST['total_amount'] * 100);
                     $successCallback($_POST['out_trade_no'], $total_fee, $trade_no);
                 }
-            }else{
+            } else {
                 Log::error('Pay.AliAop.goPay.verify Error: ' . json_encode($_POST));
             }
             echo 'success'; // 输出 `success`，否则支付宝服务器将会重复通知
@@ -137,11 +137,15 @@ class Api implements ApiInterface
                 $successCallback($result['out_trade_no'], $total_fee, $trade_no);
                 return true;
             }
-        }else{
+        } else {
 
+            if(!isset($_GET['out_trade_no']) || !isset($_GET['total_amount'])){
+                return false;
+            }
             $passed = $this->aop($config)->verify($_GET);
             if (!$passed) {
-                throw new \Exception('支付宝签名校验失败');
+                Log::error('Pay.AliAop.verify Error: 支付宝签名校验失败', ['$_GET' => $_GET]);
+                return false;
             }
             $trade_no = $_GET['trade_no'];//支付宝交易号
             $total_fee = (int)round($_GET['total_amount'] * 100);
