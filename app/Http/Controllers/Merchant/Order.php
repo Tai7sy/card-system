@@ -379,15 +379,18 @@ class Order extends Controller
             }
         )) {
             // 需要发货到邮箱
-            if (System::_getInt('mail_send_order') && filter_var($order->contact, FILTER_VALIDATE_EMAIL)) {
-                $order->sendEmail();
+            if (System::_getInt('mail_send_order')) {
+                $mail = @json_decode($order->contact_ext, true)['_mail'];
+                if($mail){
+                    $order->sendEmail($mail);
+                }
             }
 
             // 需要发送到手机
-            if (System::_getInt('sms_send_order') && !empty(@json_decode($order->contact_ext, true)['_sms'])) {
-                if($order->status === \App\Order::STATUS_SUCCESS){
-                    // 这里可能会是发送一个信息, 提示卡密不足, 我们不发, 只发最终成功的
-                    $order->sendSms();
+            if ($order->status === \App\Order::STATUS_SUCCESS && System::_getInt('sms_send_order')) {
+                $mobile = @json_decode($order->contact_ext, true)['_mobile'];
+                if($mobile){
+                    $order->sendSms($mobile);
                 }
             }
 

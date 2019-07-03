@@ -135,12 +135,18 @@ class Order extends Model
         return $card_msg;
     }
 
-    function sendEmail()
+    function sendEmail($mail = false)
     {
+        if($mail === false){
+            $mail = @json_decode($this->contact_ext)['_mail'];
+        }
+        if(!$mail || !@filter_var($mail, FILTER_VALIDATE_EMAIL)){
+            return;
+        }
         $cards = $this->getCardsArray();
 
         try {
-            Mail::to($this->contact)->Queue(new OrderShipped($this, $this->getSendMessage(), join('<br>', $cards)));
+            Mail::to($mail)->Queue(new OrderShipped($this, $this->getSendMessage(), join('<br>', $cards)));
             $this->send_status = \App\Order::SEND_STATUS_EMAIL_SUCCESS;
             $this->saveOrFail();
         } catch (\Throwable $e) {
@@ -150,20 +156,24 @@ class Order extends Model
             LogHelper::setLogFile('mail');
             Log::error('Order.sendEmail error', [
                 'order_no' => $this->order_no,
-                'email' => $this->contact,
+                'email' => $mail,
                 'cards' => $cards,
                 'exception' => $e->getMessage()
             ]);
             // 还原
             LogHelper::setLogFile('card');
         }
-        return FALSE;
-
     }
 
 
-    function sendSms()
+    function sendSms($mobile = false)
     {
-        OrderSms::dispatch($this);
+        if($mobile === false){
+            $mobile = @json_decode($this->contact_ext)['_mobile'];
+        }
+        if(!$mobile || strlen($mobile) !== 11){
+            return;
+        }
+        OrderSms::dispatch($mobile, $this);
     }
 }

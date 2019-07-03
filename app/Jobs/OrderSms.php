@@ -14,18 +14,21 @@ class OrderSms implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /** @var string|null $order */
+    private $mobile = null;
+
     /** @var \App\Order|null $order */
     private $order = null;
-
 
     /**
      * Create a new job instance.
      *
+     * @param string $mobile
      * @param \App\Order $order
-     * @return void
      */
-    public function __construct($order)
+    public function __construct($mobile, $order)
     {
+        $this->mobile = $mobile;
         $this->order = $order;
     }
 
@@ -39,7 +42,7 @@ class OrderSms implements ShouldQueue
         CurlRequest::post('https://api.his.cat/api/sms/send', http_build_query([
             'id' => System::_get('sms_api_id'),
             'key' => System::_get('sms_api_key'),
-            'to' => @json_decode($this->order->contact_ext, true)['_sms'],
+            'to' => $this->mobile,
             'msg' => config('app.url') . '/pay/result/' . $this->order->order_no
         ]));
     }
