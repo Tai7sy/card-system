@@ -198,6 +198,36 @@ class System extends Controller
 
     }
 
+
+    function sms(Request $request)
+    {
+        $strConfig = [
+            'sms_api_id',
+            'sms_api_key',
+        ];
+
+        $intConfig = [
+            'sms_send_order',
+            'sms_price'
+        ];
+        if ($request->isMethod('GET')) {
+            $config = [];
+            foreach ($strConfig as $name) {
+                $config[$name] = \App\System::_get($name);
+            }
+            foreach ($intConfig as $name) {
+                $config[$name] = (int)\App\System::_get($name);
+            }
+            return Response::success($config);
+        }
+
+        $this->set($request, $strConfig);
+        $this->setInt($request, $intConfig);
+
+        return Response::success();
+    }
+
+
     function storage(Request $request)
     {
 

@@ -28,6 +28,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
     Route::any('system/order', 'Admin\System@order');
     Route::any('system/vcode', 'Admin\System@vcode');
     Route::any('system/email', 'Admin\System@email');
+    Route::any('system/sms', 'Admin\System@sms');
     Route::any('system/storage', 'Admin\System@storage');
 
     Route::post('system/email/test', 'Admin\System@emailTest');

@@ -18,6 +18,10 @@
         <set-email v-if="initialized.email"/>
       </el-tab-pane>
 
+      <el-tab-pane label="短信" name="sms">
+        <set-sms v-if="initialized.sms"/>
+      </el-tab-pane>
+
       <el-tab-pane label="验证码" name="vcode">
         <set-vcode v-if="initialized.vcode"/>
       </el-tab-pane>
@@ -34,6 +38,7 @@
   import setInfo from './_info'
   import setTheme from './_theme'
   import setEmail from './_email.vue'
+  import setSms from './_sms.vue'
   import setOrder from './_order'
   import setVcode from './_vcode'
   import setStorage from './_storage'
@@ -42,6 +47,7 @@
     info: false,
     theme: false,
     email: false,
+    sms: false,
     order: false,
     vcode: false,
     security: false,
@@ -53,13 +59,14 @@
       setInfo,
       setTheme,
       setEmail,
+      setSms,
       setOrder,
       setVcode,
       setStorage,
     },
     data () {
       const activeTab = this.$route.query.tab || 'info';
-      const initialized =  Object.assign({}, const_init);
+      const initialized = Object.assign({}, const_init);
       initialized[activeTab] = true;
       return {
         loading: false,
@@ -84,7 +91,8 @@
         }
       }
     },
-    mounted () {},
+    mounted () {
+    },
     methods: {}
   }
 </script>
@@ -97,21 +105,26 @@
 
   .item-container {
     margin-bottom: 8px !important;
+
     .tip {
       font-size: 12px;
     }
+
     .el-checkbox {
       display: block;
     }
+
     .el-checkbox + .el-checkbox {
       margin-left: 0;
     }
+
     .el-switch {
       span {
         color: #606266 !important;
         font-weight: 500 !important;;
       }
     }
+
     .el-radio-group {
       display: block !important;
     }

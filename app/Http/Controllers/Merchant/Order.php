@@ -378,28 +378,19 @@ class Order extends Controller
                 }
             }
         )) {
-            if (filter_var($order->contact, FILTER_VALIDATE_EMAIL)) {
-                $cards_br = join('<br>', $card_arr);
-                try {
-                    Mail::to($order->contact)->Queue(
-                        new OrderShipped($order,
-                            '订单#' . $order->order_no . '&nbsp;已支付，卡号列表：',
-                            $cards_br));
-                    $order->send_status = \App\Order::SEND_STATUS_EMAIL_SUCCESS;
-                    $order->saveOrFail();
-                } catch (\Throwable $e) {
-                    $order->send_status = \App\Order::SEND_STATUS_EMAIL_FAILED;
-                    $order->saveOrFail();
-                    // set to mail
-                    \App\Library\LogHelper::setLogFile('mail');
-                    \Log::error('Order.ship error, order_no:' . $order->order_no .
-                        ', email:' . $order->contact . ', cards:' . $cards_br .
-                        ', Exception:' . $e->getMessage());
+            // 需要发货到邮箱
+            if (System::_getInt('mail_send_order') && filter_var($order->contact, FILTER_VALIDATE_EMAIL)) {
+                $order->sendEmail();
+            }
 
-                    // 还原
-                    \App\Library\LogHelper::setLogFile('card');
+            // 需要发送到手机
+            if (System::_getInt('sms_send_order') && !empty(@json_decode($order->contact_ext, true)['_sms'])) {
+                if($order->status === \App\Order::STATUS_SUCCESS){
+                    // 这里可能会是发送一个信息, 提示卡密不足, 我们不发, 只发最终成功的
+                    $order->sendSms();
                 }
             }
+
             $order['card_orders'] = array_map(function ($item) {
                 return ['card' => ['card' => $item]];
             }, $card_arr);

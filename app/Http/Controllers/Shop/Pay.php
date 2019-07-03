@@ -6,6 +6,7 @@ use App\Card;
 use App\Category;
 use App\Library\FundHelper;
 use App\Library\Helper;
+use App\Library\LogHelper;
 use App\Product;
 use App\Library\Response;
 use App\Library\Pay\Pay as PayApi;
@@ -94,6 +95,7 @@ class Pay extends Controller
         $coupon = $request->input('coupon');
         $contact = $request->input('contact');
         $contact_ext = $request->input('contact_ext') ?? null;
+        $send_sms = !empty(@json_decode($contact_ext, true)['_sms']);
         $pay_id = (int)$request->input('pay_id');
         if (!$category_id || !$product_id)
             return self::renderResultPage($request, ['msg' => '请选择商品']);
@@ -188,42 +190,64 @@ class Pay extends Controller
             $pay_money -= $discount_fee;
         }
 
-        if ($used_coupon) {
-            $used_coupon->status = \App\Coupon::STATUS_USED;
-            $used_coupon->count_used++;
-            $used_coupon->save();
-            $remark = '使用优惠券: ' . $used_coupon->coupon;
-        } else {
-            $remark = null;
+        if ($send_sms) {
+            $price += 10;
+            $pay_money += 10;
         }
+
 
         $system_fee = (int)round($pay_money * $pay->fee_system);  // 系统通道手续费  ( 四舍五入 )
         $merchant_income = $pay_money - $system_fee; // 用户实际支付 - 手续费
-        //商户订单号，网站订单系统中唯一订单号
 
-        $order_no = \App\Order::unique_no();
-        \App\Order::insert([
-            'user_id' => $product->user_id,
-            'order_no' => $order_no,
-            'product_id' => $product_id,
-            'product_name' => $product->name,   // 缓存一个商品名称
-            'count' => $count,
-            'ip' => Helper::getIP(),
-            'customer' => $customer,
-            'contact' => $contact,
-            'contact_ext' => $contact_ext,
-            'cost' => $count * $product->cost,  // 商户成本
-            'price' => $price,                  // 应售价格
-            'discount' => $discount_fee,        // 优惠金额
-            'paid' => $pay_money,               // 实际支付金额
-            'pay_id' => $pay->id,
-            'fee' => $system_fee,
-            'system_fee' => $system_fee,
-            'income' => $merchant_income,
-            'status' => \App\Order::STATUS_UNPAY,
-            'remark' => $remark,
-            'created_at' => Carbon::now(),
-        ]);
+        $cost = $count * $product->cost; // 商品成本价
+
+        $order_no = \App\Order::unique_no();  //商户订单号，网站订单系统中唯一订单号
+
+        try{
+            DB::transaction(function () use (
+                $product, $order_no, $used_coupon, $contact, $contact_ext, $customer,
+                $count, $cost, $price, $discount_fee, $pay_money, $pay, $system_fee, $merchant_income
+            ) {
+
+                if ($used_coupon) {
+                    $used_coupon->status = \App\Coupon::STATUS_USED;
+                    $used_coupon->count_used++;
+                    $used_coupon->save();
+                    $remark = '使用优惠券: ' . $used_coupon->coupon;
+                } else {
+                    $remark = null;
+                }
+
+                $order = \App\Order::create([
+                    'user_id' => $product->user_id,
+                    'order_no' => $order_no,
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,   // 缓存一个商品名称
+                    'count' => $count,
+                    'ip' => Helper::getIP(),
+                    'customer' => $customer,
+                    'contact' => $contact,
+                    'contact_ext' => $contact_ext,
+                    'cost' => $cost,                    // 商户商品成本
+                    'price' => $price,                  // 应付款总额(单价*数量 + 短信0.1)
+                    'discount' => $discount_fee,        // 优惠金额
+                    'paid' => $pay_money,               // 实际支付金额 (price - discount + 短信0.1)
+                    'pay_id' => $pay->id,
+                    'fee' => $system_fee,
+                    'system_fee' => $system_fee,
+                    'income' => $merchant_income,
+                    'status' => \App\Order::STATUS_UNPAY,
+                    'remark' => $remark,
+                    'created_at' => Carbon::now(),
+                ]);
+
+                assert($order !== null);
+
+            });
+        }catch (\Throwable $e){
+            Log::error('Shop.Pay.buy 下单失败', ['Exception' => $e]);
+            return self::renderResultPage($request, ['msg' => '发生错误，下单失败，请稍后重试']);
+        }
 
         if ($pay_money === 0) {
             // 支付金额为0, 直接成功
@@ -495,9 +519,9 @@ class Pay extends Controller
         if ($order->status === \App\Order::STATUS_PAID) {
             // 处于已支付 (不是 SUCCESS) , 说明没货了
             $qq = $order->user->qq;
-            if($order->product->delivery === \App\Product::DELIVERY_MANUAL){
+            if ($order->product->delivery === \App\Product::DELIVERY_MANUAL) {
                 $msg = '您购买的为手动充值商品，请耐心等待处理';
-            }else{
+            } else {
                 $msg = '商家库存不足，因此没有自动发货，请联系商家客服发货';
             }
             if ($qq) {
@@ -659,22 +683,33 @@ class Pay extends Controller
                 if ($product->count_warn > 0 && $product->count < $product->count_warn) {
                     try {
                         // \Log::debug('shipOrder.count_warn step2');
-                        \Mail::to($order->user->email)->Queue(new ProductCountWarn($product, $product->count));
+                        Mail::to($order->user->email)->Queue(new ProductCountWarn($product, $product->count));
                         // \Log::debug('shipOrder.count_warn step3, email:' . $order->user->email);
                     } catch (\Throwable $e) {
                         // set to mail
-                        \App\Library\LogHelper::setLogFile('mail');
-                        \Log::error('shipOrder.count_warn error, product_id:' . $order->product_id .
-                            ', email:' . $order->user->email . ', Exception:' . $e);
+                        LogHelper::setLogFile('mail');
+                        Log::error('shipOrder.count_warn error', [
+                            'product_id' => $order->product_id,
+                            'email' => $order->user->email,
+                            'exception' => $e->getMessage()
+                        ]);
                         // 还原
-                        \App\Library\LogHelper::setLogFile('card');
+                        LogHelper::setLogFile('card');
                     }
                 }
                 // ------------------------------------------------------------------------ 提醒库存 end
 
                 // 需要发货到邮箱
-                if (System::_getInt('mail_send_order') === 1 && filter_var($order->contact, FILTER_VALIDATE_EMAIL)) {
-                    self::showOrderResult($request, $order, true);
+                if (System::_getInt('mail_send_order') && filter_var($order->contact, FILTER_VALIDATE_EMAIL)) {
+                    $order->sendEmail();
+                }
+
+                // 需要发送到手机
+                if (System::_getInt('sms_send_order') && !empty(@json_decode($order->contact_ext, true)['_sms'])) {
+                    if($order->status === \App\Order::STATUS_SUCCESS){
+                        // 这里可能会是发送一个信息, 提示卡密不足, 我们不发, 只发最终成功的
+                        $order->sendSms();
+                    }
                 }
             } else {
                 // 数据库报错 or 已经处理过(status !== UN_PAY)
@@ -692,62 +727,16 @@ class Pay extends Controller
      * 渲染已经支付的订单结果页面
      * @param Request $request
      * @param \App\Order $order
-     * @param bool $renderToEmail
      * @return mixed
      * @throws \Throwable
      */
-    private function showOrderResult($request, $order, $renderToEmail = false)
+    private function showOrderResult($request, $order)
     {
-        $cards = [];
-        $order->cards->each(function ($card) use (&$cards) {
-            /** @var \App\Card $card */
-            $cards[] = $card->card;
-        });
-
-        // 若发货的卡密少于购买的数量 且 不是手动发货
-        if (count($cards) < $order->count && $order->product->delivery !== \App\Product::DELIVERY_MANUAL) {
-            // Tip:
-            // 卡密若包含可以重复使用, 则商品限购一件
-            // 即: $order->count === 1
-            if (count($cards)) {
-                // 应该不会到这个分支, 因为检测到卡密不够不会发货
-                $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，目前库存不足，您还有' . ($order->count - count($cards)) . '件未发货，请联系商家客服发货<br>已发货商品见下方：<br>';
-            } else {
-                $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，目前库存不足，您购买的' . ($order->count - count($cards)) . '件未发货，请联系商家客服发货<br>';
-            }
-            $qq = $order->user->qq;
-            if ($qq) {
-                $card_msg .= '<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $qq . '&site=qq&menu=yes" target="_blank">商家客服QQ:' . $qq . '</a><br>';
-            }
-        } else {
-            $card_msg = '订单#' . $order->order_no . '&nbsp;已支付，您购买的内容如下：';
-        }
-
-        if ($renderToEmail) {
-            $cards_br = join('<br>', $cards);
-            try {
-                Mail::to($order->contact)->Queue(new OrderShipped($order, $card_msg, $cards_br));
-                $order->send_status = \App\Order::SEND_STATUS_EMAIL_SUCCESS;
-                $order->saveOrFail();
-            } catch (\Throwable $e) {
-                $order->send_status = \App\Order::SEND_STATUS_EMAIL_FAILED;
-                $order->saveOrFail();
-                // set to mail
-                \App\Library\LogHelper::setLogFile('mail');
-                \Log::error('shipOrder.need_mail error, order_no:' . $order->order_no .
-                    ', email:' . $order->contact . ', cards:' . $cards_br .
-                    ', Exception:' . $e->getMessage());
-                // 还原
-                \App\Library\LogHelper::setLogFile('card');
-            }
-            return FALSE;
-        }
-
         return self::renderResultPage($request, [
             'success' => true,
-            'msg' => $card_msg,
+            'msg' => $order->getSendMessage(),
         ], [
-            'card_txt' => join('&#013;&#010;', $cards),
+            'card_txt' => join('&#013;&#010;', $order->getCardsArray()),
             'order' => $order,
             'product' => $order->product
         ]);

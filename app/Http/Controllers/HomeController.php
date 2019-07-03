@@ -32,10 +32,22 @@ class HomeController extends Controller
             'company' => config('app.company'),
             'name' => config('app.name'),
             'logo' => config('app.logo'),
+            'functions' => []
         ];
 
         if (System::_getInt('product_manual')) {
-            $config['functions'] = ['product_manual']; // 开启手动发货功能
+            $config['functions'][] = 'product_manual'; // 开启手动发货功能
+        }
+
+        if (System::_getInt('mail_send_order')) {
+            $config['functions'][] = 'mail_send_order'; // 开启邮件功能
+        }
+
+        if (System::_getInt('sms_send_order')) {
+            $config['functions'][] = 'sms_send_order'; // 开启短信功能
+            $config['sms_send_order'] = [
+                'sms_price' => System::_getInt('sms_price')
+            ];
         }
 
         $config['shop'] = [
