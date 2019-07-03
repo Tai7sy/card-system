@@ -94,7 +94,7 @@ class Order extends Controller
 
             // 利润总和统计
             $query2 = clone $query;
-            $profit_sum = $query2->selectRaw('SUM(`income`) as income, SUM(`paid`-`cost`-`fee`) as profit')->first();
+            $profit_sum = $query2->selectRaw('SUM(`income`) as income, SUM(`paid`-`sms_price`-`cost`-`fee`) as profit')->first();
         } else {
 
             $status = $request->input('status');
@@ -217,7 +217,7 @@ class Order extends Controller
             ->where('paid_at', '>=', $before)
             ->groupBy('date')->orderBy('date', 'DESC')
             /** 这里按照付款 统计金额 */
-            ->selectRaw('DATE(`paid_at`) as "date",COUNT(*) as "count",SUM(`paid`) as "paid",SUM(`paid`-`cost`-`fee`) as "profit"')
+            ->selectRaw('DATE(`paid_at`) as "date",COUNT(*) as "count",SUM(`paid`) as "paid",SUM(`paid`-`sms_price`-`cost`-`fee`) as "profit"')
             ->get()->toArray();
 
         $ret = [];

@@ -32,7 +32,7 @@ class Dashboard extends Controller
                 $query->where('status', Order::STATUS_PAID)
                     ->orWhere('status', Order::STATUS_SUCCESS);
             })
-            ->selectRaw('COUNT(*) as `count`,SUM(`paid`) as `paid`,SUM(`paid`-`cost`-`fee`) as `profit`')
+            ->selectRaw('COUNT(*) as `count`,SUM(`paid`) as `paid`,SUM(`paid`-`sms_price`-`cost`-`fee`) as `profit`')
             ->get()->toArray();
 
         $ordersYesterday = Order::whereUserId(\Auth::Id())
@@ -42,7 +42,7 @@ class Dashboard extends Controller
                 $query->where('status', Order::STATUS_PAID)
                     ->orWhere('status', Order::STATUS_SUCCESS);
             })
-            ->selectRaw('COUNT(*) as `count`,SUM(`paid`) as `paid`,SUM(`paid`-`cost`-`fee`) as `profit`')
+            ->selectRaw('COUNT(*) as `count`,SUM(`paid`) as `paid`,SUM(`paid`-`sms_price`-`cost`-`fee`) as `profit`')
             ->get()->toArray();
 
 

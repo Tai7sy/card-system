@@ -190,23 +190,22 @@ class Pay extends Controller
             $pay_money -= $discount_fee;
         }
 
-        if ($send_sms) {
-            $price += 10;
-            $pay_money += 10;
-        }
-
-
         $system_fee = (int)round($pay_money * $pay->fee_system);  // 系统通道手续费  ( 四舍五入 )
         $merchant_income = $pay_money - $system_fee; // 用户实际支付 - 手续费
 
-        $cost = $count * $product->cost; // 商品成本价
+        // 短信费用
+        $sms_price = $send_sms ? System::_getInt('sms_price', 10) : 0;
+        $pay_money += $sms_price;
+
+        // 商品成本价
+        $cost = $count * $product->cost;
 
         $order_no = \App\Order::unique_no();  //商户订单号，网站订单系统中唯一订单号
 
         try{
             DB::transaction(function () use (
                 $product, $order_no, $used_coupon, $contact, $contact_ext, $customer,
-                $count, $cost, $price, $discount_fee, $pay_money, $pay, $system_fee, $merchant_income
+                $count, $cost, $price, $sms_price, $discount_fee, $pay_money, $pay, $system_fee, $merchant_income
             ) {
 
                 if ($used_coupon) {
@@ -229,7 +228,8 @@ class Pay extends Controller
                     'contact' => $contact,
                     'contact_ext' => $contact_ext,
                     'cost' => $cost,                    // 商户商品成本
-                    'price' => $price,                  // 应付款总额(单价*数量 + 短信0.1)
+                    'price' => $price,                  // 应付款总额(单价*数量)
+                    'sms_price' => $sms_price,
                     'discount' => $discount_fee,        // 优惠金额
                     'paid' => $pay_money,               // 实际支付金额 (price - discount + 短信0.1)
                     'pay_id' => $pay->id,
