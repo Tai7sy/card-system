@@ -1,0 +1,73 @@
+@media only screen and (max-width: 660px) {
+    .rootLink {
+        margin: 0 16px 0 0
+    }
+
+    .banner, .banner .header-container {
+        display: block;
+    }
+
+    .banner .header-container .left {
+        padding-top: 48px;
+    }
+
+    .banner .header-container .right {
+        display: none;
+    }
+
+    .banner .header-container {
+        height: 440px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .navRoot {
+        display: none;
+    }
+
+    .navRoot-Mobile {
+        display: flex;
+    }
+
+
+    .root-link {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .header {
+        height: 64px;
+    }
+
+    #banner-area {
+        margin-top: 64px;
+    }
+
+    header .mask {
+        top: 65px;
+    }
+
+    .product {
+        padding-bottom: 48px;
+        padding-top: 24px
+    }
+
+    .footer .link-box {
+        padding-top: 24px;
+    }
+
+
+    .ship-link .left {
+        min-width: 72px;
+    }
+
+}
+
+/* 开始缩减 */
+@media only screen and (max-width: 468px) {
+    .product .pro-box {
+        height: auto;
+        padding-bottom: 92px;
+    }
+}
