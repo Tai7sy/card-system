@@ -1,15 +1,11 @@
 import fetch from '~/utils/fetch';
 
 
-export function login (email, password, remember = false) {
+export function login (data) {
   return fetch({
     url: 'login',
     method: 'post',
-    data: {
-      email,
-      password,
-      remember
-    }
+    data
   });
 }
 

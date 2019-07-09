@@ -1,0 +1,244 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Library\CurlRequest;
+use function DeepCopy\deep_copy;
+use Illuminate\Console\Command;
+use Illuminate\Support\Str;
+
+class Update extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'update';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'check update';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    private function download_progress($url, $filepath)
+    {
+        // $this->comment($url . "\n --> \n" . $filepath);
+
+        $fp = fopen($filepath, 'w+');
+        if (!$fp) {
+            return false;
+        }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        //curl_setopt($ch, CURLOPT_BUFFERSIZE,128);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_PROGRESSFUNCTION, function (
+            $resource, $download_size, $downloaded, $upload_size, $uploaded
+        ) {
+            if ($download_size > 0)
+                echo("\r    download: " . sprintf('%.2f', $downloaded / $download_size * 100) . '%');
+        }
+        );
+        curl_setopt($ch, CURLOPT_NOPROGRESS, false); // needed to make progress function work
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'card update');
+        curl_exec($ch);
+        curl_close($ch);
+
+        echo "\n";
+        return true;
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        set_time_limit(0);
+
+        \Artisan::call('cache:clear');
+        \Artisan::call('config:clear');
+        echo "\n";
+
+        $this->comment('检查更新中...');
+        $this->info('当前版本: ' . config('app.version'));
+
+        $version = @json_decode(CurlRequest::get('https://github.com/Tai7sy/card-system/blob/master/.version'), true);
+
+        if (!@$version['data']['version']) {
+            $this->warn("检查更新失败!");
+            $this->warn("Error: " . ((@$version['message'] ?? $version) ?? 'Network error'));
+            goto LABEL_EXIT;
+        }
+
+        $version = $version['data'];
+
+        if (config('app.version') >= $version['version']) {
+            $this->comment('您的版本已是最新!');
+            goto LABEL_EXIT;
+        }
+
+        $this->info('最新版本: ' . $version['version']);
+        $this->info('版本说明: ' . (@$version['description'] ?? '无'));
+
+        $answer = strtolower($this->ask('是否现在更新 (yes/no)', 'no'));
+        if ($answer !== 'yes') {
+            goto LABEL_EXIT;
+        }
+
+        // 检查目录权限
+        $tmp_path = realpath(sys_get_temp_dir()); // 末尾不带 /
+        if (strlen($tmp_path) < 3) {
+            $this->warn('获取临时目录失败!');
+            goto LABEL_EXIT;
+        }
+        $tmp_path .= DIRECTORY_SEPARATOR . Str::random(16);
+        // $this->comment('临时目录: ' . $tmp_path);
+
+        if (!mkdir($tmp_path) || !is_writable($tmp_path) || !is_readable($tmp_path)) {
+            $this->warn('临时目录不可读写!');
+            goto LABEL_EXIT;
+        }
+
+        if (!function_exists('exec')) {
+            $this->warn('函数 exec 已被禁用, 无法继续更新!');
+            goto LABEL_EXIT;
+        }
+
+        // 检查是否有解压工具
+        if (PHP_OS === 'WINNT') {
+            $_7zip = 'C:\Program Files\7-Zip\7z.exe';
+            if (!is_file($_7zip)) {
+                $_7zip = strtolower($this->ask('未找到7-Zip, 请手动输入7zG.exe路径', $_7zip));
+            }
+            if (!is_file($_7zip)) {
+                $this->warn("7-Zip不可用, 请安装7-Zip后重试");
+                goto LABEL_EXIT;
+            }
+            $_7zip = '"' . $_7zip . '"';
+        } else {
+            exec('tar --version', $tar_output, $error_code);
+            if ($error_code) {
+                $this->warn("Error: tar --version \r\n" . join("\n", $tar_output));
+                goto LABEL_EXIT;
+            }
+        }
+
+        $this->comment('正在下载新版本...');
+        $filepath = $tmp_path . DIRECTORY_SEPARATOR . 'ka_update_' . Str::random(16) . '.tmp';
+
+        if (!$this->download_progress($version['url'], $filepath)) {
+            $this->warn('写入临时文件失败!');
+            goto LABEL_EXIT;
+        }
+
+        $real_sign = md5_file($filepath);
+        if ($real_sign !== $version['md5']) {
+            $this->warn('更新文件md5校验失败!, file:' . $real_sign . ', require:' . $version['md5']);
+            goto LABEL_EXIT;
+        }
+
+        $this->comment('正在解压...');
+        unset($tar_output);
+        if (PHP_OS === 'WINNT') {
+            exec("$_7zip x -so $filepath | $_7zip x -aoa -si -ttar -o$tmp_path", $tar_output, $error_code);
+        } else {
+            exec("tar -zxf $filepath -C $tmp_path", $tar_output, $error_code);
+        }
+
+        if ($error_code) {
+            $this->warn("Error: 解压失败 \r\n" . join("\n", $tar_output));
+            goto LABEL_EXIT;
+        }
+
+
+        $this->comment('正在关闭主站...');
+        \Artisan::call('down');
+
+        sleep(5);
+        $this->comment(' --> 正在清理旧文件...');
+        $base_path = base_path();
+        foreach ([
+                     'app',
+                     'bootstrap',
+                     'config',
+                     'public/dist',
+                     'database',
+                     'routes',
+                     'vendor'
+                 ] as $path) {
+            \File::deleteDirectory($base_path . DIRECTORY_SEPARATOR . $path);
+        }
+
+        // merge and override
+        $this->comment(' --> 正在复制新文件...');
+        \File::copyDirectory($tmp_path . DIRECTORY_SEPARATOR . 'card_dist', $base_path);
+
+
+        $this->comment(' --> 正在创建缓存...');
+        \Artisan::call('cache:clear');
+        \Artisan::call('route:cache');
+        \Artisan::call('config:cache');
+
+        $this->comment(' --> 正在更新数据库...');
+        \Artisan::call('migrate');
+
+
+        if (PHP_OS === 'WINNT') {
+            echo "\n";
+            $this->alert("请注意手动设置目录权限");
+            $this->comment("    storage 可读可写             ");
+            $this->comment("    bootstrap/cache/ 可读可写    ");
+            echo "\n\n";
+        } else {
+            $this->comment(' --> 正在设置目录权限...');
+            exec('rm -rf storage/framework/cache/data/*');
+            exec('chmod -R 777 storage/');
+            exec('chmod -R 777 bootstrap/cache/');
+        }
+
+        $this->comment('正在启用主站...');
+        \Artisan::call('up');
+        \Artisan::call('queue:restart'); // 重启队列
+
+        $isSuccess = true;
+
+        LABEL_EXIT:
+        if (isset($tmp_path) && strlen($tmp_path) > 19) {
+            $this->comment('清理临时目录...');
+            \File::deleteDirectory($tmp_path);
+        }
+        if (isset($isSuccess) && $isSuccess) {
+            $this->info('更新成功!');
+        }
+
+        if (PHP_OS === 'WINNT') {
+
+        } else {
+
+            exec('rm -rf storage/framework/cache/data/*');
+            exec('chmod -R 777 storage/');
+            exec('chmod -R 777 bootstrap/cache/');
+        }
+        echo "\n";
+        exit;
+    }
+}

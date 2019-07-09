@@ -100,6 +100,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
     Route::post('web/cache/clear', 'Admin\Dashboard@clearCache');
     // 查看 storage/logs
     Route::get('web/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+
+    // 尝试更新
+    Route::get('version', 'Admin\Dashboard@version');
+    Route::get('version/check_update','Admin\Dashboard@checkUpdate');
 });
 
 

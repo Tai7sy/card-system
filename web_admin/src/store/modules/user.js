@@ -24,7 +24,7 @@ const user = {
     // 登录
     Login ({ commit }, input) {
       return new Promise((resolve, reject) => {
-        login(input.email.trim(), input.password, input.remember).then(response => {
+        login(input).then(response => {
           const data = response.data;
           const userInfo = data.user;
           setToken(data.token, input.remember ? { expires: 7 } : null);

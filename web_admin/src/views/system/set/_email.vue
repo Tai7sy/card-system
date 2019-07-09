@@ -75,7 +75,6 @@
           :active-value="1"
           :inactive-value="0">
         </el-switch>
-        <span class="tip" style="display: block; margin-top: -12px;">注意：只有当联系方式为邮箱时才会发送</span>
       </el-form-item>
 
     </el-form>

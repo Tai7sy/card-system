@@ -27,7 +27,8 @@
 <script>
   import { validateEmail } from '~/utils/validate';
   import { getVerify } from '@/api/login'
-  // import NProgress from 'nprogress'
+  import $ from 'jquery'
+
   export default {
     data () {
       const vcodeConfig = window.config && window.config.vcode ? window.config.vcode : {};
@@ -114,7 +115,7 @@
         this.loading = true;
         const postData = Object.assign({}, this.form);
         if (typeof this.validate === 'object') {
-          console.log(this.validate);
+          console.log('this.validate', this.validate);
           postData.gt_c = this.validate.geetest_challenge;
           postData.gt_v = this.validate.geetest_validate;
           postData.gt_s = this.validate.geetest_seccode;
@@ -227,11 +228,13 @@
     background: #fff;
     border: 1px solid #eaeaea;
     box-shadow: 0 15px 30px 0 rgba(0, 0, 0, .2);
+
     .title {
       margin: 0 auto 40px auto;
       text-align: center;
       color: #505458;
     }
+
     .remember {
       margin: 0 0 28px 0;
     }
@@ -249,6 +252,7 @@
     font-size: 14px;
     text-align: center;
     padding-top: 16px;
+
     a {
       color: #20A0FF;
     }

@@ -1,15 +1,3 @@
-<?php
-if (!isset($order)) {
-    $order = array(
-        'id' => '未知',
-        'order_no' => '未知'
-    );
-}
-if (!isset($card_msg)) {
-    $card_msg = '系统错误，请联系客服';
-}
-
-?>
 <div class="email-paged"
      style="background-image: url();-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;background-position: center center;background-repeat: no-repeat;">
     <div class="email-content"

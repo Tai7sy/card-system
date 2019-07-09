@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Library\CurlRequest;
 use App\Library\Response;
 use App\Order;
 use Illuminate\Http\Request;
@@ -84,5 +85,15 @@ class Dashboard extends Controller
             return Response::fail($e->getMessage());
         }
         return Response::success();
+    }
+
+    function version(){
+        return Response::success([
+            'version' => config('app.version')
+        ]);
+    }
+
+    function checkUpdate(){
+        return Response::success(@json_decode(CurlRequest::get('https://github.com/Tai7sy/card-system/blob/master/.version'), true));
     }
 }

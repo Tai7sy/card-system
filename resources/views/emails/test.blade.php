@@ -1,5 +1,3 @@
-<?php
-?>
 <div class="email-paged"
      style="background-image: url();-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;background-position: center center;background-repeat: no-repeat;">
     <div class="email-content"

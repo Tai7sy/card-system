@@ -20,7 +20,7 @@ function goPage(targetUrl, packageName, forceIntent) {
             S = x.createElement("iframe"),
             S.id = "callapp_iframe_" + Date.now(),
             S.frameborder = "0",
-            S.style.cssText = "display:none;border:0;width:0;height:0;",
+            S.style.cssText = "display:none;",
             x.body.appendChild(S)),
             S.src = e
     }
@@ -59,14 +59,16 @@ function goPage(targetUrl, packageName, forceIntent) {
 
 
     return (function goPage(targetUrl, packageName, forceIntent) {
-        var finalUrl = targetUrl;
+        var finalUrl = targetUrl + '&_t=' + (new Date() - 0);
         console.log("targetUrl", targetUrl);
         var isOriginalChrome = g && v && !y
             , fixUgly = g && !!userAgent.match(/samsung/i) && compareVer(h, "4.3") >= 0 && compareVer(h, "4.5") < 0
             , ios9SafariFix = m && compareVer(h, "9.0") >= 0 && w;
+        var inQQ = userAgent.toLowerCase().indexOf('qq/') > -1;
         console.log("isOriginalChrome", isOriginalChrome);
         console.log("fixUgly", fixUgly);
         console.log("ios9SafariFix", ios9SafariFix);
+        console.log("inQQ", inQQ);
         console.log("forceIntent", forceIntent);
         if (isOriginalChrome || forceIntent) {
             var scheme = finalUrl.substring(0, finalUrl.indexOf("://"))
@@ -75,21 +77,13 @@ function goPage(targetUrl, packageName, forceIntent) {
                 finalUrl += intentUrl,
                 console.log("Intent", finalUrl)
         }
-        if (ios9SafariFix) {
-            if (isUrl(finalUrl))
-                return window.Tracker && window.Tracker.click && window.Tracker.click("not_schema"),
-                    void console.log("not schema");
-            setTimeout(function () {
-                openLinkByClickA(finalUrl)
-            }, 100)
+        if (ios9SafariFix || inQQ) {
+            openLinkByClickA(finalUrl);
         } else if (0 === finalUrl.indexOf("intent:")) {
             console.log("jump intent");
             window.location.href = finalUrl
-        }
-        else {
-            var x = /^(http(s)?\:|javascript\:|vbscript\:|file\:|data\:|sms\:|smsto\:|tel\:|mailto\:|aliim\:|dingtalk\:|weixin\:)/;
-            x.test(finalUrl.toLocaleLowerCase()) ? console.log("schema is url") : (console.log("call in iframe"),
-                openLinkByIframe(finalUrl))
+        } else {
+            openLinkByIframe(finalUrl);
         }
     })(targetUrl, packageName, forceIntent);
 }

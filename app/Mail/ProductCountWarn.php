@@ -12,18 +12,18 @@ class ProductCountWarn extends Mailable
     use Queueable, SerializesModels;
 
     public $product = null;
-    public $count = null;
+    public $product_count = null;
 
     /**
      * Create a new message instance.
      *
      * @param \App\Product $product
-     * @param int $count
+     * @param int $product_count
      */
-    public function __construct($product, $count)
+    public function __construct($product, $product_count)
     {
         $this->product = $product;
-        $this->count = $count;
+        $this->product_count = $product_count;
     }
 
     /**

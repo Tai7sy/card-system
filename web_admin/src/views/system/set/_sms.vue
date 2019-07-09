@@ -34,7 +34,6 @@
             :active-value="1"
             :inactive-value="0">
         </el-switch>
-        <span class="tip" style="display: block; margin-top: -12px;">注意：需要买家额外填写手机号信息</span>
       </el-form-item>
       <el-form-item prop="sms_price" class="item-container">
         <span>短信单价</span>

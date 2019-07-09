@@ -1,0 +1,46 @@
+body{margin:0;padding:0;letter-spacing:1.2px;font-family:Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Noto Sans CJK SC,WenQuanYi Micro Hei,Arial,sans-serif;color:#23233c;background:#f9fafe;font-size:12px}
+dd,dl,dt,li,p,ul{list-style:none;margin:0;padding:0}
+a{text-align:center}
+.clear{clear:both}
+.top_bg{height:110px;width:100%;background: #648ff7;box-shadow: 0 0 20px rgba(100,143,247,0.14);}
+.top{width:94%;height:40px;line-height:40px;padding:0 3%;color:#fff}
+.logo{float:left}
+.logo>a{color: white;text-decoration: none}
+.seller_name{float:right;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:150px}
+.seller_name i{vertical-align:middle;font-size:24px}
+.top_menu{width:94%;margin:16px auto}
+.top_menu li{float:left;text-align:center;width:33.3%;color:#fff;line-height:20px}
+.top_menu li i{font-size:24px}
+.seller_form{width:94%;margin:10px auto}
+.seller_form li{margin-bottom:12px}
+.seller_form li select{font-family:Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Noto Sans CJK SC,WenQuanYi Micro Hei,Arial,sans-serif;width:100%;padding:0 8px;height:36px;border:none;background:#fff;font-size:12px;color:#23233c;margin-top:4px;border-radius:4px;letter-spacing:1.2px}
+.seller_form li input[type=text],input[type=number]{font-family:Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Noto Sans CJK SC,WenQuanYi Micro Hei,Arial,sans-serif;width:calc(100% - 16px);padding:0 8px;height:36px;border:none;background:#fff;font-size:12px;color:#23233c;margin-top:4px;border-radius:4px;letter-spacing:1.2px}
+input::-webkit-input-placeholder{color:#9da7ad;letter-spacing:1px}
+.box_inline{display:inline-block}
+.spdj{line-height:36px;margin:4px 0 0 8px}
+.big_text{color:#fe825a;font-weight:700}
+.form_title{display:block;margin-left:8px; color: rgba(83,91,127,0.6);}
+.seller_sm{color:rgba(83,91,127,.6);padding:4px;line-height:18px;margin-top:2px;background:#fdfdfd;border-radius:4px}
+.seller_sm i{color:#fe825a}
+.payments{width:94%;margin:10px auto 66px auto}
+.payments li{position:relative;width:calc(100% - 16px);padding:0 8px;margin-bottom:8px;height:40px;border:1px solid #e9eef1;border-radius:4px;line-height:40px;background:#fff}
+.payments li img{height:24px;vertical-align:middle;margin-right:24px}
+.payments li span{position:absolute;right:8px;top:8px;height:23px;width:23px;border-radius:12px;border:1px solid rgba(51,51,79,.14)}
+.payments li span.disabled{background-color: #eee;}
+.payments li input{display:none}
+.payments li .pay_choose{border-color:#fe825a;background:url(./images/choose_bg.png) center no-repeat #fe825a}
+.pay_bottom{position:fixed;bottom:0;width:100%;height:44px;line-height:44px;border-top:1px solid #e9eef1;background:#fff}
+.pay_bottom p{float:left;margin-left:3%}
+.pay_all{font-size:18px;font-weight:700;color:#fe825a}
+.pay_bottom button{height:44px;width:120px;font-size:14px;float:right;border:none;color:#fff;background:#648ff7;position: fixed;right: 0;}
+.pf_btn{margin-left:10px;color:#658fe1}
+footer{color:#9da7ad;text-align:center;line-height:30px}
+footer a{color:#658fe1}
+select:disabled{appearance:none;-moz-appearance:none;-webkit-appearance:none;}
+#browser_shadow{top:0;left:0;position:fixed;background:rgba(0,0,0,0.7);width:100%;height:100%;text-align:right;padding-top:30px;z-index: 99999;}
+.btn-container{padding: 4px 8px;margin-bottom: -12px;}
+.button-select-item {position: relative;border-radius: 2px;border: 1px solid transparent;display: inline-block;user-select: none;cursor: pointer;padding: 4px 8px;margin: 0 12px 8px 0;transition: all 0.3s ease;box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2);}
+.button-select-item:hover {box-shadow: 0 1px 4px 0 rgba(101, 143, 225, .3);}
+.button-select-item.checked {border: 1px solid #658fe1;}
+.quill-html img{max-width:100%}
+.quill-html p{margin:0!important}
