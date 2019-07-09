@@ -15,6 +15,10 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'project' => env('APP_PROJECT', 'card_free'),
+
+    'version' => env('APP_VERSION', 'unknown'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
