@@ -1,0 +1,2 @@
+<?php
+namespace App\Mail; use Illuminate\Bus\Queueable; use Illuminate\Mail\Mailable; use Illuminate\Queue\SerializesModels; use Illuminate\Contracts\Queue\ShouldQueue; class OrderShipped extends Mailable { use Queueable, SerializesModels; public $order; public $card_msg; public $cards_txt; public function __construct($sp7dcca7, $sp04825e, $spa24ebf) { $this->order = $sp7dcca7; $this->card_msg = $sp04825e; $this->cards_txt = $spa24ebf; } public function build() { return $this->subject('订单提醒(#' . $this->order->order_no . ')-' . config('app.name'))->view('emails.order'); } }

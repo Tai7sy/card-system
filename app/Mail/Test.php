@@ -1,0 +1,2 @@
+<?php
+namespace App\Mail; use Illuminate\Bus\Queueable; use Illuminate\Mail\Mailable; use Illuminate\Queue\SerializesModels; use Illuminate\Contracts\Queue\ShouldQueue; class Test extends Mailable { use Queueable, SerializesModels; public function __construct() { } public function build() { return $this->subject(config('app.name') . '-测试邮件')->view('emails.test'); } }

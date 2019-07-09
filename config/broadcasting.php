@@ -1,0 +1,2 @@
+<?php
+return array('default' => env('BROADCAST_DRIVER', 'null'), 'connections' => array('pusher' => array('driver' => 'pusher', 'key' => env('PUSHER_APP_KEY'), 'secret' => env('PUSHER_APP_SECRET'), 'app_id' => env('PUSHER_APP_ID'), 'options' => array()), 'redis' => array('driver' => 'redis', 'connection' => 'default'), 'log' => array('driver' => 'log'), 'null' => array('driver' => 'null')));

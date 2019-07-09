@@ -1,0 +1,19 @@
+<svg width="400px" height="400px" viewBox="0 0 400 400" version="1.1" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>head-bg-circle3</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <ellipse id="path-1" cx="42.4395209" cy="42.5257732" rx="42.4395209" ry="42.5257732"></ellipse>
+    </defs>
+    <g>
+        <circle cx="200" cy="200" r="190" style="stroke: rgba(229, 238, 255, 0.44);fill:none;"
+                stroke-width="1"></circle>
+    </g>
+    <g>
+        <circle cx="390" cy="200" r="5" style="fill: rgba(229, 238, 255, 0.44);" transform="rotate(-202.408 150 150)">
+            <animateTransform attributeName="transform" dur="16s" type="rotate" from="90 200 200" to="-270 200 200"
+                              repeatCount="indefinite"></animateTransform>
+        </circle>
+    </g>
+</svg>
