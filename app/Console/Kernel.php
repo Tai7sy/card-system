@@ -34,6 +34,12 @@ class Kernel extends ConsoleKernel
             return;
         }
 
+        try {
+            System::_init();
+        } catch (\Throwable $e) {
+            return;
+        }
+
         // 清理7天未支付订单
         if (System::_getInt('order_clean_unpay_open') === 1) {
             $day = System::_getInt('order_clean_unpay_day', 7);
