@@ -15,9 +15,9 @@ class System extends Model
 
     public static function _init()
     {
-        Log::debug('SystemSetting._init');
+        // Log::debug('SystemSetting._init');
         static::$systems = Cache::remember('settings.all', 1, function () {
-            Log::debug('SystemSetting._init.fetch from database');
+            // Log::debug('SystemSetting._init.fetch from database');
             $systems = System::query()->get()->toArray();
             foreach ($systems as $system) {
                 static::$systems[$system['name']] = $system['value'];
