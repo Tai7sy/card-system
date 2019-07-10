@@ -81,7 +81,7 @@ class Update extends Command
         $this->comment('检查更新中...');
         $this->info('当前版本: ' . config('app.version'));
 
-        $version = @json_decode(CurlRequest::get('https://github.com/Tai7sy/card-system/blob/master/.version'), true);
+        $version = @json_decode(CurlRequest::get('https://raw.githubusercontent.com/Tai7sy/card-system/master/.version'), true);
 
         if (!@$version['data']['version']) {
             $this->warn("检查更新失败!");

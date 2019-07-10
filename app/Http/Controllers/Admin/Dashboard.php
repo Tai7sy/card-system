@@ -87,13 +87,19 @@ class Dashboard extends Controller
         return Response::success();
     }
 
-    function version(){
+    function version()
+    {
         return Response::success([
             'version' => config('app.version')
         ]);
     }
 
-    function checkUpdate(){
-        return Response::success(@json_decode(CurlRequest::get('https://github.com/Tai7sy/card-system/blob/master/.version'), true));
+    function checkUpdate()
+    {
+        return Response::success(
+            @json_decode(
+                CurlRequest::get('https://raw.githubusercontent.com/Tai7sy/card-system/master/.version'
+                ), true)
+        );
     }
 }
