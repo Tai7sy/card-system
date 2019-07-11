@@ -50,6 +50,7 @@ class Api implements ApiInterface
         // alipay(支付宝扫码)  wxwap(支付宝手机端, 自动判断浏览器/生活号)
         // jd unionpay
         $payway = $config['payway'];
+        $this->url_return .= '/' . $out_trade_no;
         switch ($payway) {
             case 'wx':
                 $channel = '102';      // 微信扫码（线下）
@@ -153,6 +154,7 @@ class Api implements ApiInterface
         } else {
             $out_trade_no = @$config['out_trade_no'];
             if (strlen($out_trade_no) < 5) {
+                // payReturn 页面
                 throw new \Exception('交易单号未传入');
             }
 
@@ -221,7 +223,7 @@ class Api implements ApiInterface
             throw new \Exception('获取付款信息超时, 请刷新重试');
         }
 
-        if (!isset($ret['code_url'])) {
+        if (empty($ret['code_url'])) {
             Log::error('Pay.JinfuPass.api_scan Error#2: ' . $ret_raw);
             throw new \Exception('获取付款信息失败, 请联系客服反馈');
         }

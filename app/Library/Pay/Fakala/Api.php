@@ -54,14 +54,30 @@ class Api implements ApiInterface
 
         if ($isNotify) {
             $result = $api->notify_verify();
+            $out_trade_no = $_POST['out_trade_no'];  // 本系统订单号
+            $total_fee = $_POST['total_fee'];
+            $fakala_no = $_POST['order_no']; // API渠道订单号
         } else {
-            $result = $api->return_verify();
+            // 可能是主动查询
+            if (empty($config['out_trade_no'])) {
+                $result = $api->return_verify();
+                $out_trade_no = $_GET['out_trade_no'];  // 本系统订单号
+                $total_fee = $_GET['total_fee'];
+                $fakala_no = $_GET['order_no']; // API渠道订单号
+            }else{
+                $order =  @$api->get_order($config['out_trade_no']);
+                if(empty($order['status'])){
+                    return false;
+                }
+
+                $result = @$order['status'] === 2;
+                $out_trade_no = $order['api_out_no'];  // 本系统订单号
+                $total_fee = $order['paid'];
+                $fakala_no = $order['order_no']; // API渠道订单号
+            }
         }
 
         if ($result) {
-            $out_trade_no = $_REQUEST['out_trade_no'];  // 本系统订单号
-            $total_fee = $_REQUEST['total_fee'];
-            $fakala_no = $_REQUEST['order_no']; // API渠道订单号
             $successCallback($out_trade_no, $total_fee, $fakala_no);
         }
 

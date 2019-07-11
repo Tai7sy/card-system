@@ -16,7 +16,7 @@ interface ApiInterface
 
     /**
      * @param array $config 支付渠道配置
-     * @param string $out_trade_no 外部订单号
+     * @param string $out_trade_no 本系统的订单号
      * @param string $subject 商品名称
      * @param string $body 商品介绍
      * @param int $amount_cent 金额/分

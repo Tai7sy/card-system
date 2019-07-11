@@ -47,7 +47,7 @@ class Api implements ApiInterface
 
             $request_url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' . $config['APPID'] . '&secret=' . $config['APPSECRET'] . '&code=' . $_GET['code'] . '&grant_type=authorization_code';
             $ret = @json_decode(CurlRequest::get($request_url), true);
-            if (!$ret || !isset($ret['openid'])) {
+            if (!is_array($ret) || empty($ret['openid'])) {
                 if (isset($ret['errcode']) && $ret['errcode'] === 40163) {
                     // code been used, 已经用过(用户的刷新行为), 重新发起
                     header('Location: ' . $auth_url);

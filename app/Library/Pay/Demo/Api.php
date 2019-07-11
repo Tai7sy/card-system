@@ -51,9 +51,13 @@ class Api implements ApiInterface
         } else {
             $order_no = @$config['out_trade_no'];  //商户订单号
             if (strlen($order_no) < 5) {
+                // 这里可能是payReturn支付返回页面的第一种情况, 没有传递 out_trade_no
+                // 这里的URL, $_GET 里面可能有订单参数用于校验订单是否成功(参考支付宝的AliAop逻辑)
                 throw new \Exception('交易单号未传入');
             }
 
+            // 用于payReturn支付返回页面第二种情况(传递了out_trade_no), 或者重新发起支付之前检查一下, 或者二维码支付页面主动请求
+            // 主动查询交易结果
             $pay_trade_no = date('YmdHis'); //支付流水号
             $successCallback($order_no, \App\Order::whereOrderNo($order_no)->first()->paid, $pay_trade_no);
             return true;

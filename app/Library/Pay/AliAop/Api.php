@@ -118,7 +118,7 @@ class Api implements ApiInterface
         }
 
         if (!empty($config['out_trade_no'])) {
-            // 当面付主动查询 or 查询页面点击支付 先查询一下
+            // payReturn(带订单号) or 当面付主动查询 or 查询页面点击支付 先查询一下
             $out_trade_no = $config['out_trade_no'];
             $request = \Alipay\AlipayRequestFactory::create('alipay.trade.query', [
                 'notify_url' => $this->url_notify,

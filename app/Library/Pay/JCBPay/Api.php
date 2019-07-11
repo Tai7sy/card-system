@@ -101,6 +101,8 @@ class Api implements ApiInterface
             if ($getkey !== $config['key']) exit('KEY错误');
             if (strtoupper($sign) !== strtoupper(md5($tno . $payno . $money . $config['md5key']))) exit('签名错误');
 
+            $order = \App\Order::whereOrderNo($payno)->first();
+            if(!$order) exit('订单不存在');
             //此处作逻辑处理
             $successCallback($payno, (int)round($money * 100), $tno);
 
