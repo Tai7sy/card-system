@@ -21,7 +21,7 @@ class ConfigServiceProvider extends ServiceProvider
         try {
             config()->set([
                 'app.project' => 'card_free',
-                'app.version' => '2.8',
+                'app.version' => '2.82',
 
                 'app.name' => System::_get('app_name'),
                 'app.title' => System::_get('app_title'),

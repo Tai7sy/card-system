@@ -14,7 +14,7 @@ class Update extends Command
      *
      * @var string
      */
-    protected $signature = 'update';
+    protected $signature = 'update {--proxy=} {--proxy-auth=}';
 
     /**
      * The console command description.
@@ -74,6 +74,15 @@ class Update extends Command
     {
         set_time_limit(0);
 
+        $proxy = $this->option('proxy');
+        if (!empty($proxy)) {
+            define('MY_PROXY', $proxy);
+        }
+        $proxy_auth = $this->option('proxy-auth');
+        if (!empty($proxy_auth)) {
+            define('MY_PROXY_PASS', $proxy_auth);
+        }
+
         \Artisan::call('cache:clear');
         \Artisan::call('config:clear');
         echo "\n";
@@ -83,13 +92,11 @@ class Update extends Command
 
         $version = @json_decode(CurlRequest::get('https://raw.githubusercontent.com/Tai7sy/card-system/master/.version'), true);
 
-        if (!@$version['data']['version']) {
+        if (!@$version['version']) {
             $this->warn("检查更新失败!");
-            $this->warn("Error: " . ((@$version['message'] ?? $version) ?? 'Network error'));
+            $this->warn("Error: " . ($version ? json_encode($version) : 'Network error'));
             goto LABEL_EXIT;
         }
-
-        $version = $version['data'];
 
         if (config('app.version') >= $version['version']) {
             $this->comment('您的版本已是最新!');
