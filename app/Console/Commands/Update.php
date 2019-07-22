@@ -197,7 +197,7 @@ class Update extends Command
 
         // merge and override
         $this->comment(' --> 正在复制新文件...');
-        \File::copyDirectory($tmp_path . DIRECTORY_SEPARATOR . 'card_dist', $base_path);
+        \File::copyDirectory($tmp_path . DIRECTORY_SEPARATOR . 'card_system_free_dist', $base_path);
 
 
         $this->comment(' --> 正在创建缓存...');
