@@ -116,18 +116,10 @@
         <li>
             <span class="form_title" style="display: inline-block; margin-right: 4px">附加服务</span>
             @if(in_array('sms_send_order', $config['functions']))
-                <label>
-                    <input type="checkbox" name="send-sms" id="send-sms"
-                           onclick="$('#sms_to_container').toggle(this.checked);calcTotalPrice();">
-                    短信提醒（￥{{ $config['sms_send_order']['sms_price']/100 }}）
-                </label>
+                <label><input type="checkbox" name="send-sms" id="send-sms" onclick="$('#sms_to_container').toggle(this.checked);calcTotalPrice();">短信提醒（￥{{ $config['sms_send_order']['sms_price']/100 }}）</label>
             @endif
             @if(in_array('mail_send_order', $config['functions']))
-                <label>
-                    <input type="checkbox" name="send-mail" id="send-mail"
-                           onclick="$('#mail_to_container').toggle(this.checked);calcTotalPrice();">
-                    邮件提醒
-                </label>
+                <label><input type="checkbox" name="send-mail" id="send-mail" onclick="$('#mail_to_container').toggle(this.checked);calcTotalPrice();">邮件提醒</label>
             @endif
         </li>
         <li id="sms_to_container" style="display:none">
@@ -171,16 +163,13 @@
     <p>店铺名称：{{ $config['shop']['name'] }}</p>
     <p>商品类型：数字卡密</p>
     <p>发货方式：自动发货</p>
-    <p>卖家Q Q：<a target="_blank"
-                href="mqqwpa://im/chat?chat_type=wpa&uin={{ $config['shop']['qq'] }}&version=1&src_type=web&web_src="
-                style="color:#449CF3">{{ $config['shop']['qq'] }}</a></p>
+    <p>卖家Q Q：<a target="_blank" href="mqqwpa://im/chat?chat_type=wpa&uin={{ $config['shop']['qq'] }}&version=1&src_type=web&web_src=" style="color:#449CF3">{{ $config['shop']['qq'] }}</a></p>
 </div>
 <!--/ 店铺信息 -->
 <!-- 商家公告 -->
 <div id="ann" style="display:none;">
     <div style="padding-bottom:5px;font-weight:bold;color:#449CF3"><span>卖家QQ：</span>
-        <a target="_blank"
-           href="mqqwpa://im/chat?chat_type=wpa&uin={{ $config['shop']['qq'] }}&version=1&src_type=web&web_src=">{{ $config['shop']['qq'] }}</a>
+        <a target="_blank" href="mqqwpa://im/chat?chat_type=wpa&uin={{ $config['shop']['qq'] }}&version=1&src_type=web&web_src=">{{ $config['shop']['qq'] }}</a>
     </div>
     <div class="container ql-editor quill-html" style="max-height:500px;overflow: scroll"></div>
 </div>

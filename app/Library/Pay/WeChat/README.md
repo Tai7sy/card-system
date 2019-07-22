@@ -1,4 +1,20 @@
-# weixin-pay
-微信H5支付sdk<br/>
-在原微信支付sdk基础上加入了H5支付<br/>
-H5支付主要用于触屏版的手机浏览器请求微信支付的场景。可以方便的从外部浏览器唤起微信支付。
+
+# WeChat 官方接口
+
+使用说明
+ * 驱动 WeChat 
+ * 方式 NATIVE / MWEB / JSAPI
+   - NATIVE 扫码支付
+   - MWEB H5支付(需开通权限)
+   - JSAPI 微信内支付(此方式无序手动配置, 会自动检测在微信内从而自动使用此方式)
+ * 配置 (JSON格式)
+    ```json
+    {
+        "APPID": "APPID",
+        "APPSECRET": "APP_SECRET",
+        "MCHID": "商户ID",
+        "KEY": "KEY",
+        "sub_mch_id": "子商户ID(可选)",
+        "sub_appid": "子商户APPID(可选)",
+    }
+    ```
