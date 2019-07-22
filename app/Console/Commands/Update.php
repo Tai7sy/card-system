@@ -58,6 +58,31 @@ class Update extends Command
         curl_setopt($ch, CURLOPT_NOPROGRESS, false); // needed to make progress function work
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_USERAGENT, 'card update');
+        if (defined('MY_PROXY')) {
+            $proxy = MY_PROXY;
+            $proxy_type = CURLPROXY_HTTP;
+            if (strpos($proxy, 'http://') || strpos($proxy, 'https://')) {
+                $proxy = str_replace('http://', $proxy, $proxy);
+                $proxy = str_replace('https://', $proxy, $proxy);
+                $proxy_type = CURLPROXY_HTTP;
+            } elseif (strpos($proxy, 'socks4://')) {
+                $proxy = str_replace('socks4://', $proxy, $proxy);
+                $proxy_type = CURLPROXY_SOCKS4;
+            } elseif (strpos($proxy, 'socks4a://')) {
+                $proxy = str_replace('socks4a://', $proxy, $proxy);
+                $proxy_type = CURLPROXY_SOCKS4A;
+            } elseif (strpos($proxy, 'socks5://')) {
+                $proxy = str_replace('socks5://', $proxy, $proxy);
+                $proxy_type = CURLPROXY_SOCKS5_HOSTNAME;
+            }
+
+            curl_setopt($ch, CURLOPT_PROXY, $proxy); // '121.42.144.136:58082'
+            curl_setopt($ch, CURLOPT_PROXYTYPE, $proxy_type); // 默认值: CURLPROXY_HTTP
+            //curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+
+            if (defined('MY_PROXY_PASS'))
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, MY_PROXY_PASS);
+        }
         curl_exec($ch);
         curl_close($ch);
 
