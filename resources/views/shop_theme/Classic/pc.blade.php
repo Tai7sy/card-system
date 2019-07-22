@@ -51,8 +51,7 @@
             </div>
             <p>
                 <b>卖家QQ </b><span>{{ $config['shop']['qq'] }}</span>
-                <a href="//wpa.qq.com/msgrd?v=1&uin={{ $config['shop']['qq'] }}&site=fakaxitong.com&menu=yes"
-                   target="_blank" class="qq1_btn">
+                <a href="//wpa.qq.com/msgrd?v=1&uin={{ $config['shop']['qq'] }}&site=fakaxitong.com&menu=yes" target="_blank" class="qq1_btn">
                     <i class="iconfont icon-qq-white"></i>咨询卖家</a>
                 <br><span style="color:red;font-size:12px">商品问题联系卖家</span>
             </p>
@@ -105,8 +104,7 @@
                 </li>
                 <li id="contact_info">
                     <label for="contact" class="span_up">联系方式</label>
-                    <input class="phone_num" id="contact" name="contact" type="text"
-                           placeholder="可以输入QQ、邮箱、手机号等等，用于查询订单">
+                    <input class="phone_num" id="contact" name="contact" type="text" placeholder="可以输入QQ、邮箱、手机号等等，用于查询订单">
                 </li>
                 <li id="coupon-box" style="display:none">
                     <label for="coupon" class="span_up">优惠券</label>
@@ -120,16 +118,11 @@
                 </li-->
                 <li style="height: 44px;line-height: 44px;">
                     @if(in_array('sms_send_order', $config['functions']))
-                        <label class="fz_lab"
-                               style="padding-right: 4px">短信提醒（￥{{ $config['sms_send_order']['sms_price']/100 }}）
-                            <input type="checkbox" name="send-sms" id="send-sms"
-                                   onclick="$('#sms_to_container').toggle(this.checked);calcTotalPrice();">
+                        <label class="fz_lab" style="padding-right: 4px">短信提醒（￥{{ $config['sms_send_order']['sms_price']/100 }}）<input type="checkbox" name="send-sms" id="send-sms" onclick="$('#sms_to_container').toggle(this.checked);calcTotalPrice();">
                         </label>
                     @endif
                     @if(in_array('mail_send_order', $config['functions']))
-                        <label class="fz_lab">邮箱提醒
-                            <input type="checkbox" name="send-mail" id="send-mail"
-                                   onclick="$('#mail_to_container').toggle(this.checked);calcTotalPrice();">
+                        <label class="fz_lab">邮箱提醒<input type="checkbox" name="send-mail" id="send-mail" onclick="$('#mail_to_container').toggle(this.checked);calcTotalPrice();">
                         </label>
                     @endif
                 </li>
@@ -172,16 +165,14 @@
         <div class="pay_box">
             <div class="pay_menu">
                 <div class="pay pay_cj_1 checked1">支付</div>
-                <div class="all_pay"><i class="iconfont icon-zijin"></i> 应付总额：<b class="tprice" id="should-pay">0.00</b>元
-                </div>
+                <div class="all_pay"><i class="iconfont icon-zijin"></i> 应付总额：<b class="tprice" id="should-pay">0.00</b>元</div>
             </div>
             <div class="pay_list1">
                 <?php $i_pay = 0;?>
                 @foreach ($config['pays'] as $pay)
                     <?php $i_pay++; ?>
                     <label class="lab3 {!! $i_pay == 1 ? 'checked2' : '' !!}">
-                        <input name="payway" value="{!! $pay['id'] !!}" title="{!! $pay['name'] !!}"
-                               type="radio" {!! $i_pay == 1 ? 'checked' : '' !!}>
+                        <input name="payway" value="{!! $pay['id'] !!}" title="{!! $pay['name'] !!}" type="radio" {!! $i_pay == 1 ? 'checked' : '' !!}>
                         <img src="{!! $pay['img'] !!}" alt="{!! $pay['name'] !!}" width="140">
                     </label>
                 @endforeach
