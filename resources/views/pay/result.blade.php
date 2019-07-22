@@ -57,6 +57,7 @@ if (!isset($result['success'])) {
             <div class="ql-editor quill-html" id="instructions"></div>
         </div>
         <script type="text/javascript">
+            Quill.imports['formats/link'].PROTOCOL_WHITELIST.push('mqqapi');
             function renderDescription(delta){if(!delta){return''}if(typeof delta==='string'){if(delta[0]!=='{'){return delta}try{delta=JSON.parse(delta)}catch(e){return delta}}var for_render=new Quill(document.createElement('div'));for_render.setContents(delta);return for_render.root.innerHTML}
             document.getElementById('instructions').innerHTML = renderDescription({!! $product['instructions'] !!});
         </script>
