@@ -1,2 +1,2 @@
 <?php
-namespace App\Library\Pay; interface ApiInterface { public function __construct($sp53f8aa); function goPay($spbe80b7, $spa3e681, $sp45f07e, $sp873488, $sp5213ee); function verify($spbe80b7, $sp04f0f8); }
+namespace App\Library\Pay; interface ApiInterface { public function __construct($sp3c46ab); function goPay($sp9d4382, $sp2e47fc, $spd4e90d, $spd0789a, $sp076ec7); function verify($sp9d4382, $sp9a4d97); }
