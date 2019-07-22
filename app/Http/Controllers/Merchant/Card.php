@@ -307,54 +307,43 @@ class Card extends Controller
     function edit(Request $request)
     {
         $id = (int)$request->post('id');
-        $cardNumber = $request->post('card'); // 卡号
-        $type = (int)$request->post('type', \App\Card::TYPE_ONETIME);
-
         /* @var \App\Card $card */
         $card = $this->authQuery($request, \App\Card::class)->findOrFail($id);
         if ($card) {
-            $card->card = $cardNumber;
-            $card->type = $type;
+            $cardNumber = $request->post('card'); // 卡号
+            $type = (int)$request->post('type', \App\Card::TYPE_ONETIME);
             $count_all = (int)$request->post('count_all', 1);
-            $product_sql = $card->product();
 
-            if ($type === \App\Card::TYPE_REPEAT) {
-                return DB::transaction(function () use ($product_sql, $card, $count_all) {
-                    /* @var \App\Card $card */
-                    $card = \App\Card::where('id', $card->id)->lockForUpdate()->firstOrFail();
-
+            return DB::transaction(function () use ($card, $cardNumber, $type, $count_all) {
+                /* @var \App\Card $card */
+                $card = \App\Card::where('id', $card->id)->lockForUpdate()->firstOrFail();
+                $card->card = $cardNumber;
+                $card->type = $type;
+                if ($card->type === \App\Card::TYPE_REPEAT) {
                     if ($count_all < $card->count_sold)
                         return Response::forbidden('可售总次数不能低于当前已售次数');
 
                     if ($count_all < 1 || $count_all > 10000000)
                         return Response::forbidden('可售总次数不能超过10000000');
 
-                    /* @var \App\Product $product */
-                    $product = $product_sql->lockForUpdate()->firstOrFail();
-                    $product->buy_max = 1;
-                    $product->count_all -= $card->count_all; // 删去原有的
-                    $product->count_all += $count_all; // 加上现在的
-                    $product->saveOrFail();
-
                     $card->count_all = $count_all;
-                    $card->saveOrFail();
-                    return Response::success();
-                });
-            } else {
-                return DB::transaction(function () use ($product_sql, $card, $count_all) {
-                    /* @var \App\Card $card */
-                    $card = \App\Card::where('id', $card->id)->lockForUpdate()->firstOrFail();
-                    /* @var \App\Product $product */
-                    $product = $product_sql->lockForUpdate()->firstOrFail();
-                    $product->count_all -= $card->count_all; // 删去原有的
-                    $product->count_all += 1; // 加上现在的
-                    $product->saveOrFail();
-
+                } else {
                     $card->count_all = 1;
-                    $card->saveOrFail();
-                    return Response::success();
-                });
-            }
+                }
+
+                $card->saveOrFail();
+
+                /* @var \App\Product $product */
+                $product = $card->product()->lockForUpdate()->firstOrFail();
+                if ($card->type === \App\Card::TYPE_REPEAT) {
+                    $product->buy_max = 1; // 重复销售卡密, 限制最大购买次数
+                }
+                $product->count_all -= $card->count_all; // 删去原有的
+                $product->count_all += $count_all; // 加上现在的
+                $product->saveOrFail();
+
+                return Response::success();
+            });
         }
         return Response::success();
     }
