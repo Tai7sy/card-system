@@ -75,6 +75,16 @@
           :active-value="1"
           :inactive-value="0">
         </el-switch>
+        <span class="tip" style="display: block; margin-top: -12px;">注意：需要买家额外填写收货邮箱</span>
+      </el-form-item>
+      <el-form-item class="item-container" v-if="form.mail_send_order">
+        <el-switch
+            v-model="form.mail_send_order_use_contact"
+            inactive-text="联系方式位邮箱时, 直接发送至联系方式邮箱"
+            :active-value="1"
+            :inactive-value="0">
+        </el-switch>
+        <span class="tip" style="display: block; margin-top: -12px;">无序额外填写收货邮箱, 直接发送至联系方式，如果联系方式不是邮箱则不发送</span>
       </el-form-item>
 
     </el-form>
@@ -107,6 +117,7 @@
           sendcloud_user: '',
           sendcloud_key: '',
           mail_send_order: 0,
+          mail_send_order_use_contact: 0,
         },
         formRules: {},
         testEmail: '',

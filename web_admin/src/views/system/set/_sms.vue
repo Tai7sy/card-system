@@ -34,7 +34,9 @@
             :active-value="1"
             :inactive-value="0">
         </el-switch>
+        <span class="tip" style="display: block; margin-top: -12px;">注意：需要买家额外填写收货手机号</span>
       </el-form-item>
+
       <el-form-item prop="sms_price" class="item-container">
         <span>短信单价</span>
         <el-input type="text" placeholder="请输入 API_KEY" v-model="form.sms_price"/>
@@ -150,7 +152,7 @@
         this.$refs['form'].validate(valid => {
           if (!valid) return;
           this.loading = true;
-          const data = Object.assign({},this.form);
+          const data = Object.assign({}, this.form);
           data.sms_price = parseInt(data.sms_price * 100);
           sms(data).then(() => {
             this.loading = false;
