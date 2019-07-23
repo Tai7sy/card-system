@@ -178,7 +178,8 @@ class System extends Controller
         ];
 
         $intConfig = [
-            'mail_send_order'
+            'mail_send_order',
+            'mail_send_order_use_contact'
         ];
         if ($request->isMethod('GET')) {
             $config = [];

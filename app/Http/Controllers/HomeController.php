@@ -41,6 +41,11 @@ class HomeController extends Controller
 
         if (System::_getInt('mail_send_order')) {
             $config['functions'][] = 'mail_send_order'; // 开启邮件功能
+
+            // 是否直接使用联系方式作为收货邮箱
+            if (System::_getInt('mail_send_order_use_contact')) {
+                $config['functions'][] = 'mail_send_order_use_contact';
+            }
         }
 
         if (System::_getInt('sms_send_order')) {
