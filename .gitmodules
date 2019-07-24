@@ -1,0 +1,3 @@
+[submodule "app/Library/Gateway"]
+	path = app/Library/Gateway
+	url = git@github.com:Tai7sy/card-gateway.git
