@@ -7,7 +7,7 @@ use App\Library\LogHelper;
 use App\Mail\OrderShipped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
-
+use Illuminate\Support\Facades\Log as LogWriter;
 
 class Order extends Model
 {
@@ -154,7 +154,7 @@ class Order extends Model
             $this->saveOrFail();
             // set to mail
             LogHelper::setLogFile('mail');
-            Log::error('Order.sendEmail error', [
+            LogWriter::error('Order.sendEmail error', [
                 'order_no' => $this->order_no,
                 'email' => $mail,
                 'cards' => $cards,
