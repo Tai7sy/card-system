@@ -9,16 +9,13 @@ use App\Library\Helper;
 use App\Library\LogHelper;
 use App\Product;
 use App\Library\Response;
-use App\Library\Pay\Pay as PayApi;
+use Gateway\Pay\Pay as PayApi;
 use App\Library\Geetest;
-use App\Mail\OrderShipped;
 use App\Mail\ProductCountWarn;
 use App\System;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -34,7 +31,7 @@ class Pay extends Controller
     }
 
     /**
-     * @var \APP\Library\Pay\ApiInterface
+     * @var \Gateway\Pay\ApiInterface
      */
     private $payApi = null;
 
