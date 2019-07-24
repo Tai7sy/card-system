@@ -1,7 +1,7 @@
 
 ### 关于
 
-> 当前版本: 2.91
+> 当前版本: 2.92
 
 > [安装教程 V2.X](https://github.com/Tai7sy/card-system/wiki/BT%E9%9D%A2%E6%9D%BF%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B---V2.X)
 
