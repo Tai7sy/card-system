@@ -9,7 +9,7 @@ use App\Library\Helper;
 use App\Library\LogHelper;
 use App\Product;
 use App\Library\Response;
-use Gateway\Pay\Pay as PayApi;
+use Gateway\Pay\Pay as GatewayPay;
 use App\Library\Geetest;
 use App\Mail\ProductCountWarn;
 use App\System;
@@ -48,7 +48,7 @@ class Pay extends Controller
     {
         try {
             // \Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step1');
-            (new PayApi)->goPay($payway, $order_no, $order_name, $order_name, $pay_money);
+            (new GatewayPay)->goPay($payway, $order_no, $order_name, $order_name, $pay_money);
             // \Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step2');
             return self::renderResultPage($request, [
                 'success' => false,
@@ -287,7 +287,7 @@ class Pay extends Controller
         $config['out_trade_no'] = $order_no;
 
         try {
-            $this->payApi = PayApi::getDriver($payway->id, $payway->driver);
+            $this->payApi = GatewayPay::getDriver($payway->id, $payway->driver);
         } catch (\Exception $e) {
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
             return $this->renderResultPage($request, ['msg' => '支付驱动未找到']);
@@ -408,7 +408,7 @@ class Pay extends Controller
 
 
         try {
-            $this->payApi = PayApi::getDriver($payway->id, $payway->driver);
+            $this->payApi = GatewayPay::getDriver($payway->id, $payway->driver);
         } catch (\Exception $e) {
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
             return $this->renderResultPage($request, [
@@ -474,7 +474,7 @@ class Pay extends Controller
         }
         $logTag .= ',' . $payway->driver;
         try {
-            $this->payApi = PayApi::getDriver($payway->id, $payway->driver);
+            $this->payApi = GatewayPay::getDriver($payway->id, $payway->driver);
         } catch (\Exception $e) {
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
             echo 'fail';
