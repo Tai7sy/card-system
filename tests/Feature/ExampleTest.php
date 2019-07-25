@@ -16,7 +16,7 @@ class ExampleTest extends TestCase
      */
     public function testBasicTest()
     {
-        $app = UserDomain::shorten1('http://www.baidu.com');
+        $app = strtoupper(str_random(16));
         var_dump($app);
     }
 }

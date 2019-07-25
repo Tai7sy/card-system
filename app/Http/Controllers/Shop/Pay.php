@@ -605,8 +605,7 @@ class Pay extends Controller
 
         if ($order->status === \App\Order::STATUS_UNPAY) {
             //未处理过此订单
-            \Log::debug('shipOrder.first_process:' . $order_no);
-            $order_id = $order->id;
+            Log::debug('shipOrder.first_process:' . $order_no);
             if (FundHelper::orderSuccess($order->id,
                 /**
                  * 此函数在 transition里工作
@@ -617,7 +616,7 @@ class Pay extends Controller
                  * @param \App\Order $locked_order
                  * @return int 返回 CONTINUE 会加余额等等操作
                  */
-                function ($locked_order) use ($order_id, $trade_no, &$order, &$product) {
+                function ($locked_order) use ($trade_no, &$order, &$product) {
                     $order = $locked_order;
                     if ($order->status !== \App\Order::STATUS_UNPAY) {
                         \Log::debug('Shop.Pay.shipOrder: .first_process:' . $order->order_no . ' already processed! #2');
@@ -638,10 +637,16 @@ class Pay extends Controller
                         return true;
                     }
 
-                    /** @var \App\Card[] $cards */
-                    $cards = Card::where('product_id', $order->product_id)
-                        ->whereRaw('`count_sold`<`count_all`')
-                        ->take($order->count)->lockForUpdate()->get();
+                    // API接口发货
+                    if ($product->delivery === \App\Product::DELIVERY_API) {
+                        // 这里通过API接口生成卡密
+                        $cards = $product->createApiCards($order);
+                    }else{
+                        /** @var \App\Card[] $cards */
+                        $cards = Card::where('product_id', $order->product_id)
+                            ->whereRaw('`count_sold`<`count_all`')
+                            ->take($order->count)->lockForUpdate()->get();
+                    }
                     // 这里注意 如果商品包含重复卡密, 则商品,每次限购1件
 
                     if (count($cards) !== $order->count) {
