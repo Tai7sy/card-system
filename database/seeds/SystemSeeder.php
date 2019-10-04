@@ -39,6 +39,7 @@ class SystemSeeder extends Seeder
 
             'storage_driver' => 'local',
 
+            'order_query_day' => '30',
             'order_clean_unpay_open' => '0',
             'order_clean_unpay_day' => '7',
 

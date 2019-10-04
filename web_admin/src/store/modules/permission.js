@@ -1,32 +1,19 @@
 import { asyncRouterMap, constantRouterMap } from '@/router/index';
 
 /**
- * 通过meta.role判断是否与当前用户权限匹配
- * @param roles
- * @param route
- */
-function hasPermission (roles, route) {
-  if (route.meta && route.meta.role) {
-    return roles.some(role => route.meta.role.indexOf(role) > -1)
-  } else {
-    return true
-  }
-}
-
-/**
  * 递归过滤异步路由表，返回符合用户角色权限的路由表
  * @param asyncRouterMap
- * @param roles
+ * @param {Array} permissions
+ * @param {String} prefix
  */
-function filterAsyncRouter (asyncRouterMap, roles) {
+function filterAsyncRouter (asyncRouterMap, permissions, prefix = '/') {
   return asyncRouterMap.filter(route => {
-    if (hasPermission(roles, route)) {
-      if (route.children && route.children.length) {
-        route.children = filterAsyncRouter(route.children, roles)
-      }
-      return true
+    const currentPath = (prefix + route.path).replace(/\/+/g, '/');
+    if (route.children && route.children.length) {
+      route.children = filterAsyncRouter(route.children, permissions, currentPath + '/');
+      return route.children.length > 0
     }
-    return false
+    return permissions.includes(currentPath)
   })
 }
 
@@ -44,16 +31,17 @@ const permission = {
   },
   actions: {
     GenerateRoutes ({ commit }, data) {
-      const user = data.user;
       return new Promise(resolve => {
         let accessedRouters;
-        if (user.role.indexOf('admin') > -1) {
-          console.log('admin route');
+        if (data.user.id === 1 || process.env.PROJECT === 'admin_free') {
+          console.log('super admin route');
           accessedRouters = asyncRouterMap
         } else {
           console.log('filter route');
-          accessedRouters = filterAsyncRouter(asyncRouterMap, user.roles)
+          accessedRouters = filterAsyncRouter(asyncRouterMap, data.permissions)
         }
+
+        accessedRouters.push({ path: '/*', redirect: '/admin/404', hidden: true }); // 404 放在最后
         commit('SET_ROUTERS', accessedRouters);
         console.log('SET_ROUTERS OK');
         resolve();

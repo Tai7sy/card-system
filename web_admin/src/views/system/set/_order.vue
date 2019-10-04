@@ -3,6 +3,11 @@
     <el-form ref="form" v-loading.body="loading" :model="form" :label-width="labelWidth" :rules="formRules">
       <h2 class="title">订单设置</h2>
 
+      <el-form-item prop="order_query_day" class="item-container">
+        <span>订单查询最长天数</span>
+        <el-input type="number" placeholder="请输入订单查询最长天数" v-model="form.order_query_day"/>
+        <span class="tip">买家将无法查询超过此天数的订单</span>
+      </el-form-item>
 
       <el-form-item class="item-container">
         <el-switch
@@ -47,10 +52,15 @@
         loading: false,
         labelWidth: '0px', // this.$store.state.app.isMobile ? '70px' : '90px',
         form: {
+          order_query_day: 30,
           order_clean_unpay_open: 0,
           order_clean_unpay_day: 7
         },
-        formRules: {}
+        formRules: {
+          order_query_day: [
+            { required: true, message: '请输入订单查询最长天数', trigger: 'blur' }
+          ]
+        }
       }
     },
     watch: {

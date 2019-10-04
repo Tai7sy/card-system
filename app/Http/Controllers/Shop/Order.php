@@ -23,7 +23,9 @@ class Order extends Controller
             }
         }
 
-        $query = \App\Order::where('created_at', '>=', (new Carbon)->addDay(-30));
+        $query = \App\Order::where('created_at',
+            '>=',
+            (new Carbon)->addDay(-\App\System::_getInt('order_query_day', 30)));
 
 
         $type = $request->post('type', '');
