@@ -47,10 +47,12 @@ import {
   MessageBox,
   Message,
   Notification,
+  Link
 } from 'element-ui';
 
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 
+Vue.use(Link);
 Vue.use(Pagination);
 Vue.use(Dialog);
 Vue.use(Dropdown);

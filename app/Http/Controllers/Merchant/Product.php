@@ -110,7 +110,7 @@ class Product extends Controller
 
         $product->category_id = $category->id;
         $product->save();
-        return Response::success();
+        return Response::success($category);
     }
 
     /**
