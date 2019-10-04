@@ -88,14 +88,26 @@ class Product extends Controller
     {
         $this->validate($request, [
             'id' => 'required|integer',
-            'category_id' => 'required|integer',
+            'category_id' => 'required',
         ]);
-        /* @var \App\Category $category */
-        $category = $this->authQuery($request, \App\Category::class)
-            ->findOrFail($request->post('category_id'));
+
         /* @var \App\Product $product */
         $product = $this->authQuery($request, \App\Product::class)
             ->findOrFail($request->post('id'));
+
+        $category_id = $request->input('category_id');
+        if (is_string($category_id) && @$category_id[0] === '+') {
+            $category = \App\Category::create([
+                'user_id' => $product->user_id,
+                'name' => substr($category_id, 1),
+                'enabled' => true
+            ]);
+        } else {
+            /* @var \App\Category $category */
+            $category = $this->authQuery($request, \App\Category::class)
+                ->findOrFail($category_id);
+        }
+
         $product->category_id = $category->id;
         $product->save();
         return Response::success();
@@ -110,7 +122,7 @@ class Product extends Controller
     {
         $this->validate($request, [
             'id' => 'sometimes|integer',
-            'category_id' => 'required|integer',
+            'category_id' => 'required',
             'description' => 'required|string',
             'instructions' => 'required|string',
             'fields' => 'required|string',
@@ -124,10 +136,20 @@ class Product extends Controller
             'enabled' => 'required|integer|between:0,1'
         ]);
 
-        $category_id = (int)$request->post('category_id');
-        if (!$this->authQuery($request, \App\Category::class)->where('id', $category_id)->exists()) {
-            return Response::fail('商品分类不存在');
+        $category_id = $request->post('category_id');
+        if (is_string($category_id) && @$category_id[0] === '+') {
+            $category_id = (\App\Category::create([
+                'user_id' => $this->getUserIdOrFail($request),
+                'name' => substr($category_id, 1),
+                'enabled' => true
+            ]))->id;
+        } else {
+            $category_id = @intval($category_id);
+            if (!$this->authQuery($request, \App\Category::class)->where('id', $category_id)->exists()) {
+                return Response::fail('商品分类不存在');
+            }
         }
+
         $name = $request->post('name');
         $description = $request->post('description');
         $instructions = $request->post('instructions');
