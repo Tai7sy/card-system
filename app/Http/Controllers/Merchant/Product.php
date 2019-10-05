@@ -137,15 +137,16 @@ class Product extends Controller
         ]);
 
         $category_id = $request->post('category_id');
-        if (is_string($category_id) && @$category_id[0] === '+') {
-            $category_id = (\App\Category::create([
+        $isCreateCategory = is_string($category_id) && @$category_id[0] === '+';
+        if ($isCreateCategory) {
+            $category = \App\Category::create([
                 'user_id' => $this->getUserIdOrFail($request),
                 'name' => substr($category_id, 1),
                 'enabled' => true
-            ]))->id;
+            ]);
         } else {
-            $category_id = @intval($category_id);
-            if (!$this->authQuery($request, \App\Category::class)->where('id', $category_id)->exists()) {
+            $category = $this->authQuery($request, \App\Category::class)->where('id', @intval($category_id))->first();
+            if (!$category) {
                 return Response::fail('商品分类不存在');
             }
         }
@@ -194,7 +195,7 @@ class Product extends Controller
             $product->user_id = $this->getUserIdOrFail($request);
         }
 
-        $product->category_id = $category_id;
+        $product->category_id = $category->id;
         $product->name = $name;
 
         $antiXss = new AntiXSS();
@@ -219,7 +220,12 @@ class Product extends Controller
 
         $product->inventory = (int)$request->post('inventory'); // 库存类型
         $product->saveOrFail();
-        return Response::success();
+
+        $response = [];
+        if($isCreateCategory){
+            $response['category'] = $category;
+        }
+        return Response::success($response);
     }
 
     function enable(Request $request)
