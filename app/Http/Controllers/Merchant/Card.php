@@ -242,7 +242,7 @@ class Card extends Controller
         } else {
             $card_arr = explode("\n", $cards);
             $card_count = count($card_arr);
-            $per_round = 500;
+            $per_round = 50000;
             if ($card_count > $per_round) {
                 return Response::fail('每次添加不能超过 ' . $per_round . ' 张');
             }
