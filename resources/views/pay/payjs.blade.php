@@ -53,7 +53,8 @@
 </div>
 
 <script>
-    var code_url = '<?php echo $qrcode ?>';
+    var code_url = decodeURIComponent('{!! urlencode($qrcode) !!}');
+
     var qrcode = new QRCode("qrcode", {
         text: code_url,
         width: 230,
@@ -79,9 +80,10 @@
 
     $(document).ready(function () {
         var time = 4000, interval;
+
         function getData() {
-            $.post('/api/qrcode/query/payjs', {
-                    id: '<?php echo $id?>',
+            $.post('/api/qrcode/query/{!! $pay_id !!}', {
+                    id: '{!! $id !!}',
                     t: Math.random()
                 },
                 function (r) {
@@ -93,9 +95,11 @@
                     }
                 }, 'json');
         }
+
         (function run() {
             interval = setInterval(getData, time);
         })();
-    });</script>
+    });
+</script>
 </body>
 </html>
