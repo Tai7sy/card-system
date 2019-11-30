@@ -103,7 +103,7 @@
         })();
     });
 
-    if (navigator.userAgent.match(/MQQBrowser/i) !== null) {
+    if (navigator.userAgent.toLowerCase().indexOf('qq/') > -1) {
         // 2019年4月18日 18:15:43 QQ内也不跳了, 妈的....
         // location.href = code_url;
     } else {
