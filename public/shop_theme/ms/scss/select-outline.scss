@@ -1,0 +1,152 @@
+
+@keyframes outline-flash {
+  0% {
+    opacity: 1;
+    outline-offset: 10px;
+  }
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+    outline-offset: 2px;
+  }
+}
+
+
+button:focus,
+a:focus,
+input:focus {
+  outline: 2px dashed #333;
+  outline-offset: 2px;
+  animation: outline-flash 300ms 10ms;
+}
+
+body.noOutline button:focus,
+body.noOutline a:focus,
+body.noOutline input:focus {
+  outline: none;
+  animation: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  /* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0;
+  /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+input[type=text],
+input[type=number] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type=text],
+input[type=email],
+input[type=tel] {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0 5px;
+  border-radius: 0;
+}
+
+[tabindex]:focus {
+  outline: 2px dashed #333;
+  outline-offset: 2px;
+  animation: outline-flash 300ms 10ms;
+}
+
+[tabindex].noOutline:focus {
+  outline: none;
+  animation: none;
+}
+
+body.noOutline [tabindex]:focus {
+  outline: none;
+  animation: none;
+}
+
+.vector-icon {
+  display: inline-block;
+}
+
+input[type=radio] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #666;
+  border-radius: 20px;
+  position: relative;
+}
+
+input[type=radio]:checked:after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  display: inline-block;
+  background-color: #666666;
+  border-radius: 8px;
+  top: 2px;
+  left: 2px;
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 90px;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 0;
+  vertical-align: middle;
+  border: 1px solid #cccccc;
+  background: #fff;
+  padding: 0 10px;
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 28px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 28px;
+  padding-right: 0 \9
+;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjlGMkJDMjEwMTZDOTExRTVCQTA4Q0MxQzkzQTkyNjhDIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjlGMkJDMjExMTZDOTExRTVCQTA4Q0MxQzkzQTkyNjhDIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MEVGNzY0RUIxNkM5MTFFNUJBMDhDQzFDOTNBOTI2OEMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MEVGNzY0RUMxNkM5MTFFNUJBMDhDQzFDOTNBOTI2OEMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7/fq47AAABg0lEQVR42uyZPUvDUBSGW5FOhQ6VIh1K6aAFnTp2KIQORXHRoR3dTLs5+ye0Y5xdi5OCaKUijk7+B8HBoUO1CDa+F95sQj804aa8Bx4IyT2H+3ByuTck6ft+YpljJbHkIUEJSlCCEpSgBCUoQQlKUIISlKAEJWhhrP4l2XXd0CfoeZ46GLbgKbgDuX+oZWrcgjMrXlFGBdTAA6iD1wXr5EEflEHKpg42wQsn9giKC9QoMrfMWk2bBN+AA55BiZ3cnCN/gzkl1nBY06pt4p2v5xMogAHYniFvi3IF5tZZy8p9cAgaXEfrlKxMWbsDjr1n7tD2jX4E9sAVyHLi1V/GVflsDVwzZxSXk8wYHIAeyIAbrqsgHN7LcMw++IzbUe0LtMAFSLOju2CH12k+a3GsnUe1KfENDsEHOAKXvG/2uHPQAZO4H7aNQBt0KZbidTsKubA7GIT5hXzMTpo4ic3XxJwRqVgQSf2jl6AEJShBCUpQghKUoAQlKEEJSlCCEow8fgQYAHxqRLwcR7KCAAAAAElFTkSuQmCC');
+}
+
+select:focus {
+  outline: 2px dashed #333;
+  outline-offset: 2px;
+  animation: outline-flash 300ms 10ms;
+}
+
+select.noOutline:focus {
+  outline: none;
+  animation: none;
+}
+
+select:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+body.noOutline select:focus {
+  outline: none;
+  animation: none;
+}
+
+.noOutline {
+  outline: none;
+}

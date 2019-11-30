@@ -1,29 +1,19 @@
-@import "./select-outline.css";
-
-html, body {
-  margin: 0;
-  padding: 0;
-  outline: none;
-  color: #333;
-  font-family: "Microsoft YaHei", "Hiragino Sans GB", serif;
-}
+@import "./scss/global";
+@import "./scss/select-outline";
+@import "./scss/modal";
+@import "./scss/page-shop";
+@import "./scss/page-checkout";
 
 
-a {
-  color: #0067b8;
-  text-decoration: none;
 
-  &:hover {
-    text-decoration: underline;
-  }
-}
+
 
 .header-store {
   background-color: #ffffff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 
   .header {
-    height: 70px;
+    height: 55px;
     width: 90%;
     max-width: 1180px;
     margin: 0 auto;
@@ -33,7 +23,7 @@ a {
   .header > * {
     display: inline-block;
     vertical-align: middle;
-    height: 70px;
+    height: 55px;
     font-size: 14px;
   }
 
@@ -52,11 +42,27 @@ a {
       display: inline-block;
       vertical-align: middle;
       position: relative;
-      padding: 0 25px;
-      line-height: 70px;
-
       & > a {
+        display: inline-block;
+        font-size: 15px;
+        color: #262626;
         user-select: none;
+        padding: 18px 12px;
+        text-decoration: none !important;
+        @media screen and (min-width: 860px) {
+          &:hover{
+            &:before {
+              background: currentColor;
+              content: "";
+              display: block;
+              bottom: 12px;
+              width: calc(100% - 24px);
+              height: 2px;
+              position: absolute;
+              box-sizing: border-box;
+            }
+          }
+        }
       }
     }
   }
@@ -65,13 +71,13 @@ a {
     display: none;
     position: absolute;
     width: 41px;
-    height: 50px;
+    height: 51px;
     top: 0;
     right: 0;
     text-align: center;
     background-color: #fff;
     line-height: 50px;
-
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 
     &.active {
       border-left: 1px solid rgba(0, 0, 0, 0.2);
@@ -95,18 +101,19 @@ a {
     background-color: #FFF;
     top: 51px;
     left: 0;
-    height: auto;
     padding: 4px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    height: 190px;
 
     ul.menu {
       margin: 0;
-      line-height: 32px;
+      line-height: 50px;
       height: auto;
 
       .menu-item {
         list-style: none;
-        padding: 4px 8px;
-        width: 100%;
+        padding: 4px 0 4px 25px;
         margin: 0;
 
         a {
@@ -116,16 +123,15 @@ a {
     }
   }
 
-
   @media only screen and (max-width: 767px) {
     .header {
       width: 100%;
       height: 50px;
+      padding: 0 12px;
     }
 
     .logo img {
-      padding-top: 8px !important;
-      height: 36px !important;
+      height: 42px;
     }
 
     .nav-buttons {
@@ -139,288 +145,6 @@ a {
 
 }
 
-.shop-ann {
-  width: 90%;
-  max-width: 1180px;
-  margin: 12px auto;
-
-  .ql-editor {
-    padding: 0 !important;
-  }
-}
-
-.shop-crumbs {
-  width: 90%;
-  max-width: 1180px;
-  margin: 0 auto;
-
-  .shop-crumbs-content {
-    line-height: 24px;
-    font-size: 12px;
-
-    a {
-      color: #515151;
-    }
-  }
-}
-
-.shop-body {
-  width: 90%;
-  max-width: 1180px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: row-reverse;
-
-  * {
-    box-sizing: border-box;
-  }
-
-  // 左边的内容
-  .pd-desc {
-    width: 44%;
-    max-width: 420px;
-    // background-color: rgba(255, 0, 0, 0.32);
-  }
-
-  // 中间空隙
-  .pd-gap {
-    width: 2%;
-    max-width: 26px;
-    vertical-align: top;
-  }
-
-  // 右边的内容
-  .pd-info {
-    width: 44%;
-    flex-grow: 1;
-    // background-color: rgba(0, 0, 255, 0.39);
 
 
-    // sh商品标题
-    .title-item {
-      padding: 30px 0 0;
 
-      h1, h2 {
-        font-size: 24px;
-        line-height: 30px;
-        font-weight: normal;
-      }
-    }
-
-    // 商品价格
-    .price-item {
-      height: 80px;
-      line-height: 80px;
-      position: relative;
-      border-bottom: 1px solid #c7c7c7;
-
-      .priceName {
-        display: inline-block;
-        line-height: 28px;
-        vertical-align: middle;
-        text-align: right;
-
-        .current {
-          display: block;
-          font-size: 14px;
-        }
-      }
-
-      .price {
-        display: inline-block;
-        vertical-align: middle;
-        line-height: 28px;
-        margin-left: 4px;
-
-        .current {
-          line-height: 28px;
-          display: block;
-          font-size: 24px;
-
-          b {
-            color: #da3b01;
-            font-weight: normal;
-          }
-        }
-      }
-    }
-
-    // 选择分类
-    .categorySelect {
-      .categorySelectTitle {
-        font-size: 16px;
-        padding: 24px 0 2.01680672%;
-        line-height: 16px;
-      }
-
-      a {
-        color: #666666;
-        text-decoration: none;
-        cursor: pointer;
-      }
-
-      li {
-        display: inline-block;
-        margin-right: 15px;
-        margin-bottom: 10px;
-
-        a {
-          border: 1px solid #cccccc;
-          display: inline-block;
-          // min-width: 94px;
-          padding: 10px;
-          -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-          vertical-align: middle;
-          font-size: 14px;
-          max-width: 100%;
-        }
-
-        &.active a {
-          border: 3px solid #3a9cd7;
-          padding: 8px;
-        }
-      }
-    }
-
-    // 选择商品
-    .productSelect {
-      .productSelectTitle {
-        font-size: 16px;
-        padding: 24px 0 2.01680672%;
-        line-height: 16px;
-      }
-
-      .options {
-        .option {
-          position: relative;
-          display: inline-block;
-          vertical-align: top;
-          font-size: 14px;
-          cursor: pointer;
-          color: #666;
-          -webkit-user-select: none;
-          user-select: none;
-          width: 49%;
-          margin-bottom: 10px;
-
-          a{
-            text-decoration: none;
-            color: #666;
-            line-height: 14px;
-            overflow: hidden;
-            width: 100%;
-            border: 1px solid #cccccc;
-            height: 40px;
-            padding: 0 10px;
-            display: flex;
-            align-items: center;
-          }
-
-          &.active a{
-            border: 3px solid #3a9cd7;
-            padding: 0 8px;
-          }
-
-          .p-texts{
-            line-height: 14px;
-            max-height: 32px;
-            overflow: hidden;
-            width: 100%;
-            .p-name{
-              text-align: center;
-              overflow: hidden;
-              display: inline;
-              vertical-align: middle;
-              line-height: 14px;
-              word-break: break-word;
-            }
-
-            .p-price{
-              display: block;
-              font-size: 12px;
-              vertical-align: middle;
-              line-height: 14px;
-            }
-          }
-        }
-
-        .option:nth-child(2n+1) {
-          margin-right: 2%;
-        }
-      }
-    }
-
-  }
-
-}
-
-.pd-desc-mobile {
-  display: none;
-}
-
-@media only screen and (max-width: 767px) {
-  .shop-body {
-    display: block;
-
-    .pd-info {
-      flex: none;
-      width: 100%;
-      max-width: none;
-    }
-
-    .pd-desc, .pd-gap {
-      display: none;
-    }
-  }
-
-  .pd-desc-mobile {
-    display: block;
-  }
-}
-
-.gt_popup {
-  z-index: 10
-}
-
-.btn-container-li {
-  font-size: 14px;
-  margin-bottom: 24px !important
-}
-
-.btn-container {
-  padding: 4px 8px;
-  margin-top: 8px
-}
-
-.button-select-item {
-  position: relative;
-  border-radius: 2px;
-  border: 1px solid transparent;
-  display: inline-block;
-  user-select: none;
-  cursor: pointer;
-  padding: 4px 8px;
-  margin: 0 12px 8px 0;
-  transition: all .3s ease;
-  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2);
-
-  &:hover {
-    box-shadow: 0 1px 4px 0 rgba(101, 143, 225, .3)
-  }
-
-  &.checked {
-    border: 1px solid #658fe1
-  }
-}
-
-
-.quill-html {
-  img {
-    max-width: 100%
-  }
-
-  p {
-    margin: 0 !important
-  }
-}

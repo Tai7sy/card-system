@@ -95,7 +95,7 @@
                 <input type="number" id="quantity" value="1" placeholder="请输入您需要购买的数量，必须为整数">
             </div>
         </li>
-        <li id="contact_info">
+        <li id="contact-box">
             <span class="form_title"><label for="contact">联系方式</label>
                 <span style="margin-left:5px;font-weight: lighter;color: #fe825a">（订单查询重要凭证）</span>
             </span>
