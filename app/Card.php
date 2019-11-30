@@ -35,6 +35,10 @@ class Card extends Model
         return $this->belongsTo(Product::class);
     }
 
+    function getCountAttribute()
+    {
+        return $this->count_all - $this->count_sold;
+    }
 
     /**
      * @param int $user_id

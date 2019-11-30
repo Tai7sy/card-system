@@ -182,13 +182,9 @@ class Product extends Controller
             /** @var \App\Product $product */
             $product = $this->authQuery($request, \App\Product::class)
                 ->findOrFail($request->post('id'));
-            if (\App\Card::whereProductId($product->id)
-                ->where('type', \App\Card::TYPE_REPEAT)
-                ->whereRaw('`count_all`>`count_sold`')
-                ->exists()) {
-                if ($buy_min !== 1) return Response::fail('该商品含有重复售卖的卡密, 最小购买量必须为1件');
-                if ($buy_max !== 1) return Response::fail('该商品含有重复售卖的卡密, 最大购买量必须为1件');
-            }
+
+
+
         } else {
             $product = new \App\Product;
             $product->count_sold = 0;

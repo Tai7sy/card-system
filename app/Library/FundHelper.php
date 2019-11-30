@@ -175,8 +175,8 @@ class FundHelper
                     return true;
                 }
 
-                $card_sent = $order->card_orders()->exists(); // 这里不能用 status, 因为 status 已经是 FROZEN 状态了
-                if ($card_sent) {
+                $is_already_income = $order->card_orders()->exists(); // 这里不能用 status, 因为 status 已经是 FROZEN 状态了
+                if ($is_already_income) {
                     $outerStatus = \App\Order::STATUS_SUCCESS; // 订单投诉前的状态是 成功状态
                     $statusTxt = '已发货';
                 } else {
@@ -197,7 +197,7 @@ class FundHelper
                 $fund_record->type = FundRecord::TYPE_IN;
                 $fund_record->remark = $order === $order ? '' : '关联订单#' . $order->order_no . ': ';
                 $fund_record->order_id = $order->id;
-                if ($card_sent) {
+                if ($is_already_income) {
                     // 这里状态上面已经判断过了, 一定是 STATUS_FROZEN 的
                     $user->m_frozen -= $order->income;
                     $user->saveOrFail();

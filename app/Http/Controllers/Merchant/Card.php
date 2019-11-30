@@ -234,7 +234,7 @@ class Card extends Controller
                 $card->saveOrFail();
                 /* @var \App\Product $product */
                 $product = $product_sql->lockForUpdate()->firstOrFail();
-                $product->buy_max = 1;
+
                 $product->count_all += $card->count_all;
                 $product->saveOrFail();
                 return Response::success();
@@ -260,24 +260,24 @@ class Card extends Controller
             $cards_to_insert = [];
             $card_count_real = 0;
             for ($i = 0; $i < $card_count; $i++) {
-                $card = trim($card_arr[$i]);
-                if (strlen($card) < 1)
+                $card_number = trim($card_arr[$i]);
+                if (strlen($card_number) < 1)
                     continue;
 
-                if (strlen($card) > 255)
-                    return Response::fail('第 ' . $i . ' 张卡密 ' . $card . ' 长度错误<br>卡密最大长度为255');
+                if (strlen($card_number) > 255)
+                    return Response::fail('第 ' . $i . ' 张卡密 ' . $card_number . ' 长度错误<br>卡密最大长度为255');
 
                 if ($is_check) {
-                    if (in_array($card, $cards_all)) {
+                    if (in_array($card_number, $cards_all)) {
                         continue;
                     }
-                    $cards_all[] = $card;
+                    $cards_all[] = $card_number;
                 }
 
                 $cards_to_insert[] = [
                     'user_id' => $user_id,
                     'product_id' => $product_id,
-                    'card' => $card,
+                    'card' => $card_number,
                     'type' => \App\Card::TYPE_ONETIME
                 ];
                 $card_count_real++;
@@ -335,9 +335,7 @@ class Card extends Controller
 
                 /* @var \App\Product $product */
                 $product = $card->product()->lockForUpdate()->firstOrFail();
-                if ($card->type === \App\Card::TYPE_REPEAT) {
-                    $product->buy_max = 1; // 重复销售卡密, 限制最大购买次数
-                }
+
                 $product->count_all -= $card->count_all; // 删去原有的
                 $product->count_all += $count_all; // 加上现在的
                 $product->saveOrFail();

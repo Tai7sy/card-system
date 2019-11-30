@@ -643,13 +643,28 @@ class Pay extends Controller
                         $cards = $product->createApiCards($order);
                     }else{
                         /** @var \App\Card[] $cards */
-                        $cards = Card::where('product_id', $order->product_id)
+                        $cards = Card::where('product_id', $product->retail_root->id)
                             ->whereRaw('`count_sold`<`count_all`')
                             ->take($order->count)->lockForUpdate()->get();
                     }
-                    // 这里注意 如果商品包含重复卡密, 则商品,每次限购1件
-
-                    if (count($cards) !== $order->count) {
+                    /** @var bool 卡密是否足够 */
+                    $cards_enough = false;
+                    if (count($cards) === $order->count) {
+                        $cards_enough = true;
+                    } else {
+                        $cards_enough = false;
+                        if (count($cards)) {
+                            foreach ($cards as $card) {
+                                if ($card->type === \App\Card::TYPE_REPEAT && $card->count >= $order->count) {
+                                    // 重复售卖的卡密, 单次只找一张满足数量的卡密
+                                    $cards = [$card];
+                                    $cards_enough = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if ($cards_enough === false) {
                         Log::alert('Shop.Pay.shipOrder: 订单:' . $order->order_no .
                             ', 购买数量:' . $order->count .
                             ', 卡数量:' . count($cards) . ' 卡密不足(已支付 未发货)');
@@ -665,10 +680,17 @@ class Pay extends Controller
                             $card_ids[] = $card->id;
                         }
                         $order->cards()->attach($card_ids); // 使用了 card_order 这个中间表
-                        Card::whereIn('id', $card_ids)->update([
-                            'status' => Card::STATUS_SOLD,
-                            'count_sold' => DB::raw('`count_sold`+1')
-                        ]);
+                        if (count($cards) === 1 && $cards[0]->type === \App\Card::TYPE_REPEAT) {
+                            \App\Card::where('id', $card_ids[0])->update([
+                                'status' => \App\Card::STATUS_SOLD,
+                                'count_sold' => DB::raw('`count_sold`+' . $order->count)
+                            ]);
+                        } else {
+                            \App\Card::whereIn('id', $card_ids)->update([
+                                'status' => \App\Card::STATUS_SOLD,
+                                'count_sold' => DB::raw('`count_sold`+1')
+                            ]);
+                        }
 
                         $order->status = \App\Order::STATUS_SUCCESS;
                         $order->saveOrFail();

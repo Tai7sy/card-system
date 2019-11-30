@@ -9,8 +9,6 @@ module.exports = merge(require('./webpack.config'), {
         beautify: false, // 最紧凑的输出
         comments: false, // 删除所有的注释
         compress: {
-          // 在UglifyJs删除没有用到的代码时不输出警告
-          warnings: false,
           // 删除所有的 `console` 语句,还可以兼容ie浏览器
           drop_console: true,
           drop_debugger: true,

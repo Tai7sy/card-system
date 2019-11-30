@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Library\Helper;
 use App\Library\Response;
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -33,7 +34,7 @@ class Handler extends ExceptionHandler
      *
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
-     * @param  \Exception $exception
+     * @param \Exception $exception
      * @return void
      * @throws Exception
      */
@@ -58,8 +59,8 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Exception $e
+     * @param \Illuminate\Http\Request $request
+     * @param \Exception $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function render($request, Exception $e)
@@ -83,23 +84,31 @@ class Handler extends ExceptionHandler
             Log::error('Caught a ServiceUnavailableHttpException', ['Exception' => $e]);
             return $this->msg($request, '当前服务不可用，请稍后重试', 503);
         } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
-            $statusCode = $request->isXmlHttpRequest();
+            $statusCode = $e->getStatusCode();
             switch ($statusCode) {
                 case 429:
-                    return $this->msg($request, '您的请求过于频繁，请稍后重试', $statusCode);
+                    return $this->msg($request, '您的请求过于频繁，请稍后重试', 429);
                     break;
                 default:
                     Log::error('Caught a UnknownHttpException', ['Exception' => $e]);
-                    return $this->msg($request, '当前服务不可用，请稍后重试', $statusCode);
+                    return $this->msg($request, '当前服务不可用，请稍后重试', 500);
             }
         }
 
-        Log::error('Uncaught Exception', ['Exception' => $e]);
+        Log::error('Uncaught error', [
+            'exception' => $e,
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'data' => file_get_contents('php://input'),
+            'ip' => Helper::getIP(),
+            'client_ip' => $request->getClientIp(),
+            'headers' => $request->header()
+        ]);
 
         if (config('app.debug')) {
             return parent::render($request, $e);
         } else {
-            return $this->msg($request, '未知错误，请查看错误日志（storage/logs）', 500);
+            return $this->msg($request, '未知错误，请联系客服', 500);
         }
     }
 }

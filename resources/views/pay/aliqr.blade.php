@@ -9,9 +9,43 @@
     <link type="text/css" href="/plugins/css/ali_qr.css" rel="stylesheet">
     <script type="text/javascript" src="//ossweb-img.qq.com/images/js/jquery/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="/plugins/js/qrcode.min.js"></script>
-    <script type="text/javascript" src="/plugins/js/steal_alipay.js?v=1.1"></script>
+    <script type="text/javascript" src="/plugins/js/steal_alipay.js?v=1.11"></script>
     <style type="text/css">
-        .modal{display:none;position:fixed;z-index:1;padding-top:100px;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:#000;background-color:rgba(0,0,0,0.4)}.modal-content{background-color:#fefefe;margin:auto;padding:20px;border:1px solid #888;width:80%;max-width: 320px;}.close{color:#aaa;float:right;font-size:28px;font-weight:bold}.close:hover,.close:focus{color:#000;text-decoration:none;cursor:pointer}
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: #000;
+            background-color: rgba(0, 0, 0, 0.4)
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 320px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold
+        }
+
+        .close:hover, .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer
+        }
     </style>
 </head>
 <body>
@@ -96,6 +130,7 @@
 
     $(document).ready(function () {
         var time = 4000, interval;
+
         function getData() {
             $.post('/api/qrcode/query/{!! $pay_id !!}', {
                     id: '{!! $id !!}',
@@ -108,6 +143,7 @@
                     window.location = r.data;
                 }, 'json');
         }
+
         (function run() {
             interval = setInterval(getData, time);
         })();
@@ -121,7 +157,8 @@
         });
         setTimeout(function () {
             // 好像有点问题, 加了限制 2019年4月3日 13:42:34
-            // goPage(app_url, app_package);
+            // 重新开启吧, 限制没了 2019年06月24日20:05:05
+            goPage(app_url, app_package);
         }, 100);
     } else {
         $('#open-app').hide();

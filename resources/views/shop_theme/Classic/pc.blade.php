@@ -102,7 +102,7 @@
                     <input type="number" id="quantity" value="1" title="购买数量">
                     <a class="spsm">[ <span id="invent" style="width: 110px"></span> ]</a>
                 </li>
-                <li id="contact_info">
+                <li id="contact-box">
                     <label for="contact" class="span_up">联系方式</label>
                     <input class="phone_num" id="contact" name="contact" type="text" placeholder="可以输入QQ、邮箱、手机号等等，用于查询订单">
                 </li>
