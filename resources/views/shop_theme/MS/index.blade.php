@@ -1,5 +1,5 @@
 <?php
-$version = '1.1';
+$version = '1.2';
 ?>
         <!DOCTYPE html>
 <html>
@@ -21,7 +21,15 @@ $version = '1.1';
 <section class="header-store">
     <div class="header">
         <!--导航-->
-        <div class="logo"><a href="#"><img src="{{ config('app.logo') }}" alt="" height="48"></a></div>
+        <div class="logo">
+            <a href="#">
+                @if(@strlen(config('app.logo')))
+                    <img src="{{ config('app.logo') }}" alt="" height="48">
+                @else
+                    <span>{{ config('app.name') }}</span>
+                @endif
+            </a>
+        </div>
 
         <div class="nav-buttons">
             <div class="button-container"><a href="#">首页</a></div>
@@ -192,32 +200,36 @@ $version = '1.1';
                         </div>
                         <p id="coupon-tip"></p>
                     </div>
-                    <p class="tip">
-                        <label>
-                            <input type="checkbox" id="send-sms"
-                                   onclick="$('#sms_to-box')[this.checked ? 'show' : 'hide']();calcTotalPrice();">
-                            <span>&nbsp;通过短信接收订单信息（￥{{ $config['sms_send_order']['sms_price']/100 }}）</span>
-                        </label>
-                    </p>
-                    <div class="li" id="sms_to-box">
-                        <label for="sms_to"><em>接收手机号</em></label>
-                        <div class="inputbox">
-                            <input id="sms_to" name="mobile" placeholder="请输入手机号，用于接收订单短信">
+                    @if(in_array('sms_send_order', $config['functions']))
+                        <p class="tip">
+                            <label>
+                                <input type="checkbox" id="send-sms"
+                                       onclick="$('#sms_to-box')[this.checked ? 'show' : 'hide']();calcTotalPrice();">
+                                <span>&nbsp;通过短信接收订单信息（￥{{ $config['sms_send_order']['sms_price']/100 }}）</span>
+                            </label>
+                        </p>
+                        <div class="li" id="sms_to-box">
+                            <label for="sms_to"><em>接收手机号</em></label>
+                            <div class="inputbox">
+                                <input id="sms_to" name="mobile" placeholder="请输入手机号，用于接收订单短信">
+                            </div>
                         </div>
-                    </div>
-                    <p class="tip">
-                        <label>
-                            <input type="checkbox" id="send-mail"
-                                   onclick="$('#mail_to-box')[this.checked ? 'show' : 'hide']();calcTotalPrice();">
-                            <span>&nbsp;通过邮件接收订单信息</span>
-                        </label>
-                    </p>
-                    <div class="li" id="mail_to-box">
-                        <label for="mail_to"><em>接收邮箱</em></label>
-                        <div class="inputbox">
-                            <input id="mail_to" name="email" placeholder="请输入邮箱，用于接收订单邮件">
+                    @endif
+                    @if(in_array('mail_send_order', $config['functions']))
+                        <p class="tip">
+                            <label>
+                                <input type="checkbox" id="send-mail"
+                                       onclick="$('#mail_to-box')[this.checked ? 'show' : 'hide']();calcTotalPrice();">
+                                <span>&nbsp;通过邮件接收订单信息</span>
+                            </label>
+                        </p>
+                        <div class="li" id="mail_to-box">
+                            <label for="mail_to"><em>接收邮箱</em></label>
+                            <div class="inputbox">
+                                <input id="mail_to" name="email" placeholder="请输入邮箱，用于接收订单邮件">
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </form>
                 <div class="moduleTitle bottomline"><span>2.付款方式</span></div>
                 <div class="paywayContainer">
