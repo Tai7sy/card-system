@@ -47,8 +47,10 @@ class Pay extends Controller
     public function goPay($request, $order_no, $order_name, $payway, $pay_money)
     {
         try {
+            $config = json_decode($payway->config, true);
+            $config['payway'] = $payway->way;
             // \Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step1');
-            (new GatewayPay)->goPay($payway, $order_no, $order_name, $order_name, $pay_money);
+            GatewayPay::getDriver($payway)->goPay($config, $order_no, $order_name, $order_name, $pay_money);
             // \Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step2');
             return self::renderResultPage($request, [
                 'success' => false,
@@ -287,7 +289,7 @@ class Pay extends Controller
         $config['out_trade_no'] = $order_no;
 
         try {
-            $this->payApi = GatewayPay::getDriver($payway->id, $payway->driver);
+            $this->payApi = GatewayPay::getDriver($payway);
         } catch (\Exception $e) {
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
             return $this->renderResultPage($request, ['msg' => '支付驱动未找到']);
@@ -379,6 +381,7 @@ class Pay extends Controller
     {
         $logTag = 'payReturn: ' . $pay_id;
         \Log::debug($logTag);
+        /** @var \App\Pay $payway */
         $payway = \App\Pay::where('id', $pay_id)->first();
         if (!$payway) {
             return $this->renderResultPage($request, [
@@ -408,7 +411,7 @@ class Pay extends Controller
 
 
         try {
-            $this->payApi = GatewayPay::getDriver($payway->id, $payway->driver);
+            $this->payApi = GatewayPay::getDriver($payway);
         } catch (\Exception $e) {
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
             return $this->renderResultPage($request, [
@@ -466,6 +469,7 @@ class Pay extends Controller
         $logTag = 'payNotify pay_id: ' . $pay_id;
         \Log::debug($logTag);
 
+        /** @var \App\Pay $payway */
         $payway = \App\Pay::where('id', $pay_id)->first();
         if (!$payway) {
             \Log::error($logTag . ' cannot find PayModel');
@@ -474,7 +478,7 @@ class Pay extends Controller
         }
         $logTag .= ',' . $payway->driver;
         try {
-            $this->payApi = GatewayPay::getDriver($payway->id, $payway->driver);
+            $this->payApi = GatewayPay::getDriver($payway);
         } catch (\Exception $e) {
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
             echo 'fail';

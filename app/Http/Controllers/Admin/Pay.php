@@ -97,6 +97,7 @@ class Pay extends Controller
             'driver' => 'required|string',
             'way' => 'required|string',
             'config' => 'required|string',
+            'fee_system' => 'required|numeric',
         ]);
         $id = (int)$request->post('id');
         $name = $request->post('name');

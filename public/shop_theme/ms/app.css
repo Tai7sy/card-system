@@ -990,6 +990,13 @@ body.noOutline select:focus {
 .header-store .logo img {
   padding-top: 12px;
 }
+.header-store .logo span {
+  white-space: nowrap;
+  display: inline-block;
+  line-height: 55px;
+  font-weight: lighter;
+  font-size: 23px;
+}
 .header-store .nav-buttons {
   margin-left: 24px;
 }

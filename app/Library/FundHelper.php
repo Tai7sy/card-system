@@ -7,6 +7,7 @@ use App\Order;
 use App\User;
 use App\FundRecord;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FundHelper
 {
