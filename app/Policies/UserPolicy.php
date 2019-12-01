@@ -1,2 +1,2 @@
 <?php
-namespace App\Policies; use App\User; use Illuminate\Auth\Access\HandlesAuthorization; class UserPolicy { use HandlesAuthorization; public function __construct() { } public function admin($spac34b1) { } public function merchant($spac34b1) { } public function before($spac34b1, $sp4c23a2) { return true; } }
+namespace App\Policies; use App\User; use Illuminate\Auth\Access\HandlesAuthorization; class UserPolicy { use HandlesAuthorization; public function __construct() { } public function admin($spb14cf0) { } public function merchant($spb14cf0) { } public function before($spb14cf0, $sp8abac7) { return true; } }
