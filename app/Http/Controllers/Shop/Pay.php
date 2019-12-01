@@ -647,7 +647,7 @@ class Pay extends Controller
                         $cards = $product->createApiCards($order);
                     }else{
                         /** @var \App\Card[] $cards */
-                        $cards = Card::where('product_id', $product->retail_root->id)
+                        $cards = Card::where('product_id', $order->product_id)
                             ->whereRaw('`count_sold`<`count_all`')
                             ->take($order->count)->lockForUpdate()->get();
                     }
