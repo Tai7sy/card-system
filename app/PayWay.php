@@ -47,7 +47,7 @@ class PayWay extends Model
             $weight = intval($item[1]);
 
             // 只要 enabled 的支付方式
-            if ($weight && $pays_map[$pay_id]->enabled > 0) {
+            if ($weight && isset($pays_map[$pay_id]) && $pays_map[$pay_id]->enabled > 0) {
                 $count += $weight;
                 $max = $base + $weight;
                 $map[] = [
