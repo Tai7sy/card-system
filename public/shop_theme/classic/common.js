@@ -282,7 +282,7 @@ function showProductInfo(product) {
             product.price_whole = JSON.parse(product.price_whole);
         }
 
-        if (product.price_whole.length) {
+        if (product.price_whole && product.price_whole.length) {
             var msg = '';
             product.price_whole.forEach(function (e) {
                 msg += '满' + e[0] + '件，单价<b>' + (e[1] / 100).toFixed(2) + '</b>元<br>';
@@ -535,7 +535,7 @@ function order(type) {
         '&contact_ext=' + encodeURIComponent(_calcContactExt()) +
         '&pay_id=' + $('input[name=payway]:checked').val() +
         '&customer=' + customer;
-    if (window.config['vcode']['buy']) {
+    if (window.config.captcha.scene.shop.buy) {
         for (var key in codeValidate) {
             if (codeValidate.hasOwnProperty(key)) {
                 orderUrl += '&' + key + '=' + encodeURIComponent(codeValidate[key]);
@@ -731,17 +731,17 @@ $(function () {
 
     $('#coupon').change(getCouponInfo);
 
-    if (window.config.vcode.buy) {
-        if (window.config.vcode.driver === 'geetest') {
-            var data = window.config.vcode['geetest'];
+    if (window.config.captcha.scene.shop.buy) {
+        if (window.config.captcha.driver === 'geetest') {
+            var gt_config = window.config.captcha.config;
             var gtButton = document.createElement('button');
             gtButton.setAttribute('id', 'gt-btn-verify');
             gtButton.style.display = 'none';
             document.body.appendChild(gtButton);
             initGeetest({
-                gt: data.gt,
-                challenge: data.challenge,
-                offline: !data.success, // 表示用户后台检测极验服务器是否宕机
+                gt: gt_config.gt,
+                challenge: gt_config.challenge,
+                offline: !gt_config.success, // 表示用户后台检测极验服务器是否宕机
                 product: 'bind', // 这里注意, 2.0请改成 popup
                 width: '300px',
                 https: true
@@ -768,9 +768,10 @@ $(function () {
                         return alert('请完成验证');
                     }
                     codeValidate = {
-                        geetest_challenge: result.geetest_challenge,
-                        geetest_validate: result.geetest_validate,
-                        geetest_seccode: result.geetest_seccode
+                        'captcha.a': gt_config.key,
+                        'captcha.b': result.geetest_challenge,
+                        'captcha.c': result.geetest_validate,
+                        'captcha.d': result.geetest_seccode
                     };
                     msg({
                         title: '验证完成',

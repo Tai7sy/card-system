@@ -9,7 +9,9 @@
             <div class="email-text" style="background:#fff;padding:20px 32px 0;">
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;margin-top: 4px;">尊敬的用户:</p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">
-                    {!! $card_msg !!}<br>{!! $cards_txt !!}</p>
+                    {!! $card_msg !!}<br>
+                    <code>{!! $cards_txt !!}</code>
+                </p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">感谢您的访问，祝您使用愉快！<br>此致</p>
             </div>
             <p style="color: #999999;font-size:13px;line-height:24px;text-align:right;padding:0 32px 16px">
