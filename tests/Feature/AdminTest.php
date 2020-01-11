@@ -13,16 +13,9 @@ class AdminTest extends TestCase
      *
      * @return void
      */
-    public function testLogin()
-    {
-    }
-
-    function testDashboard()
-    {
-    }
-
 
     function testAction()
     {
+        $this->assertTrue(true);
     }
 }

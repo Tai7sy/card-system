@@ -131,13 +131,11 @@ class Update extends Command
 
         $version = @json_decode(CurlRequest::get('https://raw.githubusercontent.com/Tai7sy/card-system/master/.version'), true);
 
-        if (!@$version['data']['version']) {
+        if (!@$version['version']) {
             $this->warn("检查更新失败!");
-            $this->warn("Error: " . ((@$version['message'] ?? $version) ?? 'Network error'));
+            $this->warn("Error: " . ($version ? json_encode($version) : 'Network error'));
             goto LABEL_EXIT;
         }
-
-        $version = $version['data'];
 
         $this->info('最新版本: ' . $version['version']);
         $this->info('版本说明: ' . (@$version['description'] ?? '无'));
