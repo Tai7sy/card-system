@@ -21,11 +21,11 @@ class Product extends Controller
                 $query->select(['id', 'name', 'password_open']);
             }]);
 
-        $searchType = $request->post('search', false);
-        $searchVal = $request->post('val', false);
+        $searchType = $request->input('search', false);
+        $searchVal = $request->input('val', false);
         if ($searchType && $searchVal) {
             if ($searchType == 'simple') {
-                if ($request->post('from') === 'card') {
+                if ($request->input('from') === 'card') {
                     $query->where('delivery', \App\Product::DELIVERY_AUTO); // 自动发货商品才能添加卡密
                 }
                 return Response::success($query->where('category_id', $searchVal)->get(['id', 'name']));
@@ -38,15 +38,15 @@ class Product extends Controller
             }
         }
 
-        $category_id = (int)$request->post('category_id');
+        $category_id = (int)$request->input('category_id');
         if ($category_id > 0) $query->where('category_id', $category_id);
 
-        $enabled = $request->post('enabled');
+        $enabled = $request->input('enabled');
         if (strlen($enabled))
             $query->whereIn('enabled', explode(',', $enabled));
 
-        $page = (int)$request->post('current_page', 1);
-        $pageSize = (int)$request->post('per_page', 20);
+        $page = (int)$request->input('current_page', 1);
+        $pageSize = (int)$request->input('per_page', 20);
         $list = $query->orderBy('sort')->paginate($pageSize, ['*'], 'page', $page);
 
         foreach ($list->items() as $product) {

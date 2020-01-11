@@ -11,17 +11,17 @@ class Log extends Controller
 {
     function get(Request $request)
     {
-        $user_id = $request->post('user_id');
-        $action = $request->post('action', \App\Log::ACTION_LOGIN);
+        $user_id = $request->input('user_id');
+        $action = $request->input('action', \App\Log::ACTION_LOGIN);
         $query = \App\Log::where('action', $action);
 
         $query->where('user_id', Auth::id());
 
-        $start_at = $request->post('start_at');
+        $start_at = $request->input('start_at');
         if (strlen($start_at))
             $query->where('created_at', '>=', $start_at . ' 00:00:00');
 
-        $end_at = $request->post('end_at');
+        $end_at = $request->input('end_at');
         if (strlen($end_at))
             $query->where('created_at', '<=', $end_at . ' 23:59:59');
 

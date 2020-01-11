@@ -21,8 +21,8 @@ class Coupon extends Controller
                 $query->select(['id', 'name']);
             }]);
 
-        $searchType = $request->post('search', false);
-        $searchVal = $request->post('val', false);
+        $searchType = $request->input('search', false);
+        $searchVal = $request->input('val', false);
         if ($searchType && $searchVal) {
             if ($searchType == 'id') {
                 $query->where('id', $searchVal);
@@ -30,19 +30,19 @@ class Coupon extends Controller
                 $query->where($searchType, 'like', '%' . $searchVal . '%');
             }
         }
-        $category_id = (int)$request->post('category_id');
-        $product_id = $request->post('product_id', -1);
+        $category_id = (int)$request->input('category_id');
+        $product_id = $request->input('product_id', -1);
 
         if ($category_id > 0) {
             if ($product_id > 0) $query->where('product_id', $product_id);
             else  $query->where('category_id', $category_id);
         }
 
-        $status = $request->post('status');
+        $status = $request->input('status');
         if (strlen($status))
             $query->whereIn('status', explode(',', $status));
 
-        $type = $request->post('type');
+        $type = $request->input('type');
         if (strlen($type))
             $query->whereIn('type', explode(',', $type));
 

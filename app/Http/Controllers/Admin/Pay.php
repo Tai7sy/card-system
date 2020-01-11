@@ -15,12 +15,12 @@ class Pay extends Controller
     {
         $query = \App\Pay::query();
 
-        $enabled = $request->post('enabled');
+        $enabled = $request->input('enabled');
         if (strlen($enabled))
             $query->whereIn('enabled', explode(',', $enabled));
 
-        $searchType = $request->post('search', false);
-        $searchVal = $request->post('val', false);
+        $searchType = $request->input('search', false);
+        $searchVal = $request->input('val', false);
         if ($searchType && $searchVal) {
             if ($searchType == 'simple') {
                 return Response::success($query->get(['id', 'name', 'enabled' ,'comment']));
@@ -110,7 +110,6 @@ class Pay extends Controller
         $pay->config = $request->post('config');
         $pay->enabled = (int)$request->post('enabled');
 
-        $pay->fee = $request->post('fee');
         $pay->fee_system = $request->post('fee_system');
         $pay->saveOrFail();
         return Response::success();

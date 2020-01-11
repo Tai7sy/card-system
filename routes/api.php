@@ -15,7 +15,7 @@ Route::group(['prefix' => 'admin'], function () {
     // 验证码
     Route::get('captcha', 'Controller@getCaptcha');
     // 登录
-    Route::post('auth/login', 'Auth\LoginController@loginAdmin');
+    Route::post('auth/login', 'Auth\LoginController@login');
     // 注销
     Route::delete('auth/token', 'Auth\LoginController@logout');
 });
@@ -27,8 +27,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.token']], function () 
     // 修改密码
     Route::post('info/password', 'Auth\ResetPasswordController@change');
 
-    Route::post('dashboard', 'Admin\Dashboard@index');
-
+    Route::get('dashboard', 'Admin\Dashboard@index');
 
     Route::any('system/info', 'Admin\System@info');
     Route::any('system/theme', 'Admin\System@theme');
@@ -41,7 +40,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.token']], function () 
     Route::post('system/email/test', 'Admin\System@emailTest');
     Route::post('system/order/clean', 'Admin\System@orderClean');
 
-    Route::post('pay', 'Admin\Pay@get');
+    Route::get('pay', 'Admin\Pay@get');
     Route::get('pay/stat', 'Admin\Pay@stat');
     Route::post('pay/sort', 'Admin\Pay@sort');
     Route::post('pay/fee_system', 'Admin\Pay@fee_system');
@@ -51,15 +50,20 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.token']], function () 
     Route::post('pay/enable', 'Admin\Pay@enable');
     Route::post('pay/delete', 'Admin\Pay@delete');
 
+    Route::get('payway', 'Admin\PayWay@get');
+    Route::post('payway/edit', 'Admin\PayWay@edit');
+    Route::post('payway/enable', 'Admin\PayWay@enable');
+    Route::post('payway/sort', 'Admin\PayWay@sort');
+    Route::post('payway/delete', 'Admin\PayWay@delete');
 
     // Merchant 复用     -------------------------------------------------------------------┐
-    Route::post('category', 'Merchant\Category@get');                     //    ┆
+    Route::get('category', 'Merchant\Category@get');                     //    ┆
     Route::post('category/sort', 'Merchant\Category@sort');               //    ┆
     Route::post('category/edit', 'Merchant\Category@edit');               //    ┆
     Route::post('category/enable', 'Merchant\Category@enable');           //    ┆
     Route::post('category/delete', 'Merchant\Category@delete');           //    ┆
 
-    Route::post('product', 'Merchant\Product@get');                       //    ┆
+    Route::get('product', 'Merchant\Product@get');                       //    ┆
     Route::post('product/sort', 'Merchant\Product@sort');                 //    ┆
     Route::post('product/set_count', 'Merchant\Product@set_count');       //    ┆
     Route::post('product/category', 'Merchant\Product@category_change');  //    ┆
@@ -69,7 +73,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.token']], function () 
     Route::post('product/count/sync', 'Merchant\Product@count_sync');     //    ┆
     Route::post('file/upload', 'Merchant\File@upload_merchant');          //    ┆
 
-    Route::post('card', 'Merchant\Card@get');                             //    ┆
+    Route::get('card', 'Merchant\Card@get');                             //    ┆
     Route::post('card/add', 'Merchant\Card@add');                         //    ┆
     Route::post('card/edit', 'Merchant\Card@edit');                       //    ┆
     Route::any('card/export', 'Merchant\Card@export');                   //    ┆
@@ -80,21 +84,21 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.token']], function () 
     Route::post('card/delete/all', 'Merchant\Card@deleteAll');            //    ┆
 
 
-    Route::post('coupon', 'Merchant\Coupon@get');                         //    ┆
+    Route::get('coupon', 'Merchant\Coupon@get');                         //    ┆
     Route::post('coupon/create', 'Merchant\Coupon@create');               //    ┆
     Route::post('coupon/edit', 'Merchant\Coupon@edit');                   //    ┆
     Route::post('coupon/enable', 'Merchant\Coupon@enable');               //    ┆
     Route::post('coupon/delete', 'Merchant\Coupon@delete');               //    ┆
 
 
-    Route::post('order', 'Merchant\Order@get');                           //    ┆
+    Route::get('order', 'Merchant\Order@get');                           //    ┆
     Route::get('order/export', 'Merchant\Order@export');                  //    ┆
-    Route::post('order/info', 'Merchant\Order@info');                     //    ┆
+    Route::get('order/info', 'Merchant\Order@info');                     //    ┆
     Route::post('order/remark', 'Merchant\Order@remark');                 //    ┆
     Route::post('order/set_send_status', 'Merchant\Order@set_send_status');//   ┆
     Route::post('order/ship', 'Merchant\Order@ship');                     //    ┆
 
-    Route::post('log', 'Merchant\Log@get');                               //    ┆
+    Route::get('log', 'Merchant\Log@get');                               //    ┆
     // Merchant 复用     -------------------------------------------------------------------┘
 
     Route::get('order/stat', 'Merchant\Order@stat');
@@ -117,7 +121,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.token']], function () 
 Route::any('admin/web/logs/{token}', 'Admin\Dashboard@logsView');
 
 Route::group(['prefix' => 'shop', 'middleware' => ['api']], function () {
-    Route::post('verify', 'Shop\VerifyCode@getVerify');
+    // 验证码
+    Route::get('captcha', 'Controller@getCaptcha');
 
     Route::post('product', 'Shop\Product@get');
     Route::post('product/password', 'Shop\Product@verifyPassword');

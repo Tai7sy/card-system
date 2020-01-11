@@ -17,8 +17,8 @@ class Category extends Controller
 
         $query = $this->authQuery($request, \App\Category::class);
 
-        $searchType = $request->post('search', false);
-        $searchVal = $request->post('val', false);
+        $searchType = $request->input('search', false);
+        $searchVal = $request->input('val', false);
         if ($searchType && $searchVal) {
             if ($searchType == 'simple') {
                 return Response::success($query->get(['id', 'name']));
@@ -29,7 +29,7 @@ class Category extends Controller
             }
         }
 
-        $enabled = $request->post('enabled');
+        $enabled = $request->input('enabled');
         if (strlen($enabled))
             $query->whereIn('enabled', explode(',', $enabled));
 

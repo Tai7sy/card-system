@@ -15,7 +15,7 @@ class QQWry
             $filename = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'qqwry.dat';
         }
         $this->fp = 0;
-        if (($this->fp = fopen($filename, 'rb')) !== false) {
+        if (($this->fp = @fopen($filename, 'rb')) !== false) {
             $this->firstIP = $this->getLong();
             $this->lastIP = $this->getLong();
             $this->totalIP = ($this->lastIP - $this->firstIP) / 7;

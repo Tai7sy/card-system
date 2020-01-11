@@ -10,14 +10,14 @@ class PayWay extends Controller
 {
     function get(Request $request)
     {
-        $page = (int)$request->post('current_page', 1);
-        $pageSize = (int)$request->post('per_page', 20);
+        $page = (int)$request->input('current_page', 1);
+        $pageSize = (int)$request->input('per_page', 20);
 
         $query = \App\PayWay::orderBy('sort')
             ->where('type', $request->input('type'));
 
-        $searchType = $request->post('search', false);
-        $searchVal = $request->post('val', false);
+        $searchType = $request->input('search', false);
+        $searchVal = $request->input('val', false);
         if ($searchType && $searchVal) {
             if ($searchType == 'simple') {
                 return Response::success($query->get(['id', 'name']));
@@ -28,7 +28,7 @@ class PayWay extends Controller
             }
         }
 
-        $enabled = $request->post('enabled');
+        $enabled = $request->input('enabled');
         if (strlen($enabled))
             $query->whereIn('enabled', explode(',', $enabled));
 

@@ -28,7 +28,7 @@
 
 <script>
   import NProgress from 'nprogress'
-  import { changePass } from '@/api/auth'
+  import { changePass } from '~/api/auth'
 
   export default {
     data () {

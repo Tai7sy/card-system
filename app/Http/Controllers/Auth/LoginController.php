@@ -25,27 +25,19 @@ class LoginController extends Controller
 
     /**
      * @param Request $request
-     * @param string $role
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response|void
      * @throws \Illuminate\Validation\ValidationException
      */
-    private function login(Request $request, $role)
+    public function login(Request $request)
     {
         $this->validate($request, [
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
-        if ($role === 'merchant') {
-            if (System::_getInt('vcode_login') === 1) {
-                $this->validateCaptcha($request);
-            }
-        } else {
-            if (System::_getInt('vcode_login_admin') === 1) {
-                $this->validateCaptcha($request);
-            }
+        if (System::_getInt('vcode_login_admin') === 1) {
+            $this->validateCaptcha($request);
         }
-
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
@@ -62,15 +54,6 @@ class LoginController extends Controller
         if (($token = Auth::attempt($request->only('email', 'password')))) {
             /** @var \App\User $user */
             $user = Auth::getUser();
-
-            if ($user->status === \App\User::STATUS_FROZEN) {
-                Auth::logout();
-                return response(['message' => strlen($user->frozen_reason) ? $user->frozen_reason : '您的账户已被冻结'], Response::HTTP_BAD_REQUEST);
-            }
-
-            if ($user->role !== $role) {
-                goto LOGIN_FAILED;
-            }
 
             $ip = $request->ip();
             $user->logs()->create([
@@ -93,16 +76,6 @@ class LoginController extends Controller
         return response(['message' => trans('auth.failed')], Response::HTTP_BAD_REQUEST);
     }
 
-    public function loginMerchant(Request $request)
-    {
-        return $this->login($request, 'merchant');
-    }
-
-    public function loginAdmin(Request $request)
-    {
-        return $this->login($request, 'admin');
-    }
-
     public function getUserInfo()
     {
         /** @var \App\User $user */
@@ -111,11 +84,6 @@ class LoginController extends Controller
         $user->append(['last_login_at']);
 
         $response = [];
-        if ($user->isAdmin()) {
-            $response['permissions'] = empty(@$user->api_config['permissions']) ? [] : $user->api_config['permissions'];
-        } else {
-            $user->setAttribute('verify', $user->verify);
-        }
         $response['user'] = $user;
 
         return response($response);
