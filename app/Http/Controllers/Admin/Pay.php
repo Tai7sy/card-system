@@ -13,7 +13,7 @@ class Pay extends Controller
 {
     function get(Request $request)
     {
-        $query = \App\Pay::orderBy('sort');
+        $query = \App\Pay::query();
 
         $enabled = $request->post('enabled');
         if (strlen($enabled))
@@ -23,7 +23,7 @@ class Pay extends Controller
         $searchVal = $request->post('val', false);
         if ($searchType && $searchVal) {
             if ($searchType == 'simple') {
-                return Response::success($query->get(['id', 'name']));
+                return Response::success($query->get(['id', 'name', 'enabled' ,'comment']));
             } elseif ($searchType == 'id') {
                 $query->where('id', $searchVal);
             } else {
@@ -90,37 +90,27 @@ class Pay extends Controller
      */
     function edit(Request $request)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'id' => 'required|integer',
             'name' => 'required|string',
-            'img' => 'required|string',
             'driver' => 'required|string',
             'way' => 'required|string',
             'config' => 'required|string',
             'fee_system' => 'required|numeric',
         ]);
-        $id = (int)$request->post('id');
-        $name = $request->post('name');
-        $img = $request->post('img');
-        $comment = $request->post('comment');
-        $driver = $request->post('driver');
-        $way = $request->post('way');
-        $config = $request->post('config');
-        $enabled = (int)$request->post('enabled');
 
-
-        $pay = \App\Pay::find($id);
+        $pay = \App\Pay::find((int)$request->post('id'));
         if (!$pay) {
             $pay = new \App\Pay;
         }
-        $pay->name = $name;
-        $pay->img = $img;
-        $pay->comment = $comment;
-        $pay->driver = $driver;
-        $pay->way = $way;
-        $pay->config = $config;
-        $pay->enabled = $enabled;
+        $pay->name = $request->post('name');
+        $pay->comment = $request->post('comment');
+        $pay->driver = $request->post('driver');
+        $pay->way = $request->post('way');
+        $pay->config = $request->post('config');
+        $pay->enabled = (int)$request->post('enabled');
 
+        $pay->fee = $request->post('fee');
         $pay->fee_system = $request->post('fee_system');
         $pay->saveOrFail();
         return Response::success();
@@ -135,20 +125,6 @@ class Pay extends Controller
         /* @var \App\Pay $pay */
         $pay = \App\Pay::findOrFail($id);
         $pay->comment = $request->post('comment');
-        $pay->save();
-        return Response::success();
-    }
-
-
-    function sort(Request $request)
-    {
-        $this->validate($request, [
-            'id' => 'required|integer',
-        ]);
-        $id = (int)$request->post('id');
-        /* @var \App\Pay $pay */
-        $pay = \App\Pay::findOrFail($id);
-        $pay->sort = (int)$request->post('sort', 1000);
         $pay->save();
         return Response::success();
     }
@@ -183,6 +159,8 @@ class Pay extends Controller
         \App\Pay::whereIn('id', explode(',', $ids))->update([
             'enabled' => $enabled
         ]);
+
+        \App\Pay::flushCache();
         return Response::success();
 
     }
@@ -195,11 +173,12 @@ class Pay extends Controller
     function delete(Request $request)
     {
         $this->validate($request, [
-            'id' => 'required|integer',
+            'ids' => 'required|string',
         ]);
-        $id = (int)$request->post('id');
+        $ids = $request->post('ids');
+        \App\Pay::whereIn('id', explode(',', $ids))->delete();
 
-        \App\Pay::whereId($id)->delete();
+        \App\Pay::flushCache();
         return Response::success();
     }
 }

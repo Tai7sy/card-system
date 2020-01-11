@@ -40,17 +40,17 @@ class Pay extends Controller
      * @param Request $request
      * @param string $order_no
      * @param string $order_name
-     * @param \App\Pay $payway
+     * @param \App\Pay $pay
      * @param int $pay_money
      * @return mixed
      */
-    public function goPay($request, $order_no, $order_name, $payway, $pay_money)
+    public function goPay($request, $order_no, $order_name, $pay, $pay_money)
     {
         try {
-            $config = json_decode($payway->config, true);
-            $config['payway'] = $payway->way;
+            $config = json_decode($pay->config, true);
+            $config['payway'] = $pay->way;
             // \Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step1');
-            GatewayPay::getDriver($payway)->goPay($config, $order_no, $order_name, $order_name, $pay_money);
+            GatewayPay::getDriver($pay)->goPay($config, $order_no, $order_name, $order_name, $pay_money);
             // \Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step2');
             return self::renderResultPage($request, [
                 'success' => false,
@@ -79,13 +79,8 @@ class Pay extends Controller
             ]);
         }
 
-        if ((int)System::_get('vcode_shop_buy') === 1) {
-            $ret = Geetest\API::verify($request->input('geetest_challenge'),
-                $request->input('geetest_validate'),
-                $request->input('geetest_seccode'));
-            if (!$ret) {
-                return self::renderResultPage($request, ['msg' => '滑动验证超时，请返回页面重试。']);
-            }
+        if (System::_getInt('vcode_shop_buy') === 1) {
+            $this->validateCaptcha($request);
         }
 
         $category_id = (int)$request->input('category_id');
@@ -137,6 +132,7 @@ class Pay extends Controller
         if ($product->count < $count)
             return self::renderResultPage($request, ['msg' => '该商品库存不足']);
 
+        /** @var \App\Pay $pay */
         $pay = \App\Pay::find($pay_id);
         if ($pay == null || !$pay->enabled) {
             return self::renderResultPage($request, ['msg' => '支付方式未找到，请重新选择']);
@@ -199,9 +195,16 @@ class Pay extends Controller
         // 商品成本价
         $cost = $count * $product->cost;
 
+        // if ($pay_money <= 0) {
+        //     return self::renderResultPage($request, ['msg' => '付款金额过小，请联系商家修改售价']);
+        // }
+        // if ($merchant_income < 0) {
+        //     return self::renderResultPage($request, ['msg' => '商家入账金额为负，请联系商家修改售价']);
+        // }
+
         $order_no = \App\Order::unique_no();  //商户订单号，网站订单系统中唯一订单号
 
-        try{
+        try {
             DB::transaction(function () use (
                 $product, $order_no, $used_coupon, $contact, $contact_ext, $customer,
                 $count, $cost, $price, $sms_price, $discount_fee, $pay_money, $pay, $system_fee, $merchant_income
@@ -216,7 +219,7 @@ class Pay extends Controller
                     $remark = null;
                 }
 
-                $order = \App\Order::create([
+                $order = new \App\Order([
                     'user_id' => $product->user_id,
                     'order_no' => $order_no,
                     'product_id' => $product->id,
@@ -228,7 +231,7 @@ class Pay extends Controller
                     'contact_ext' => $contact_ext,
                     'cost' => $cost,                    // 商户商品成本
                     'price' => $price,                  // 应付款总额(单价*数量)
-                    'sms_price' => $sms_price,
+                    'sms_price' => $sms_price,          // 短信费
                     'discount' => $discount_fee,        // 优惠金额
                     'paid' => $pay_money,               // 实际支付金额 (price - discount + 短信0.1)
                     'pay_id' => $pay->id,
@@ -240,18 +243,18 @@ class Pay extends Controller
                     'created_at' => Carbon::now(),
                 ]);
 
-                assert($order !== null);
+                $order->saveOrFail();
 
             });
-        }catch (\Throwable $e){
-            Log::error('Shop.Pay.buy 下单失败', ['Exception' => $e]);
+        } catch (\Throwable $e) {
+            Log::error('Shop.Pay.buy 下单失败', ['exception' => $e]);
             return self::renderResultPage($request, ['msg' => '发生错误，下单失败，请稍后重试']);
         }
 
         if ($pay_money === 0) {
             // 支付金额为0, 直接成功
             $this->shipOrder($request, $order_no, $pay_money, null);
-            return redirect('/pay/result/' . $order_no);
+            return route('pay.result', [$order_no], false);
         }
 
         $order_name = $order_no;  // 商品名改成单号
@@ -277,19 +280,19 @@ class Pay extends Controller
         }
 
         $logTag = 'pay: ' . $order->pay_id;
-        $payway = $order->pay;
-        if (!$payway) {
+        $pay = $order->pay;
+        if (!$pay) {
             \Log::error($logTag . ' cannot find Pay');
             return $this->renderResultPage($request, ['msg' => '支付方式未找到']);
         }
-        $logTag .= ',' . $payway->driver;
+        $logTag .= ',' . $pay->driver;
 
-        $config = json_decode($payway->config, true);
-        $config['payway'] = $payway->way;
+        $config = json_decode($pay->config, true);
+        $config['payway'] = $pay->way;
         $config['out_trade_no'] = $order_no;
 
         try {
-            $this->payApi = GatewayPay::getDriver($payway);
+            $this->payApi = GatewayPay::getDriver($pay);
         } catch (\Exception $e) {
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
             return $this->renderResultPage($request, ['msg' => '支付驱动未找到']);
@@ -328,7 +331,7 @@ class Pay extends Controller
         }
 
         $order_name = $order_no;  // 商品名改成单号
-        return $this->goPay($request, $order_no, $order_name, $payway, $order->paid);
+        return $this->goPay($request, $order_no, $order_name, $pay, $order->paid);
     }
 
     /**
@@ -345,12 +348,31 @@ class Pay extends Controller
         if ($order == null) {
             return self::renderResultPage($request, ['msg' => '订单未找到，请重试']);
         }
-        if ($order->product_id !== \App\Product::ID_API && $order->product == null) {
-            return self::renderResultPage($request, ['msg' => '商品未找到，请重试']);
+
+        // 超过 5 分钟就不准重新进入页面了, 但是已经在页面的是不影响支付的
+        if ($order->created_at < Carbon::now()->addMinutes(-5)) {
+            return $this->renderResultPage($request, ['msg' => '当前订单长时间未支付已作废, 请重新下单']);
         }
+
+        if ($order->product_id !== \App\Product::ID_API) {
+            $product = $order->product;
+            if ($product == null) {
+                return self::renderResultPage($request, ['msg' => '商品未找到，请重试']);
+            }
+            if ($product->count < $order->count) {
+                return self::renderResultPage($request, ['msg' => '该商品库存不足']);
+            }
+        }
+
+        if (strpos($pay_file, '..')) {
+            return $this->msg('你玩你妈呢');
+        }
+
         return view('pay/' . $pay_file, [
             'pay_id' => $order->pay_id,
-            'name' => $order->product->name . ' x ' . $order->count . '件',
+            'name' => $order->product_id === \App\Product::ID_API ?
+                $order->api_out_no :
+                ($order->product->name . ' x ' . $order->count . '件'),
             'amount' => $order->paid,
             'qrcode' => $request->get('url'),
             'id' => $order_no
@@ -373,45 +395,45 @@ class Pay extends Controller
      * 支付回调 - 前台返回 (二维码查询也是这个接口)
      * @param Request $request
      * @param string $pay_id
-     * @param string $out_trade_no 可选参数, <br>
+     * @param string $order_no 可选参数, <br>
      * 若设置(二维码查询/Aliwap/Alipay), 会检验是否已经发货(若发货, 直接返回, 不进行verify了, 效率高一些)
      * @return mixed
      */
-    function payReturn(Request $request, $pay_id, $out_trade_no = '')
+    function payReturn(Request $request, $pay_id, $order_no = '')
     {
         $logTag = 'payReturn: ' . $pay_id;
         \Log::debug($logTag);
-        /** @var \App\Pay $payway */
-        $payway = \App\Pay::where('id', $pay_id)->first();
-        if (!$payway) {
+        /** @var \App\Pay $pay */
+        $pay = \App\Pay::where('id', $pay_id)->first();
+        if (!$pay) {
             return $this->renderResultPage($request, [
                 'success' => 0,
                 'msg' => '支付方式错误'
             ]);
         }
-        $logTag .= ',' . $payway->driver;
+        $logTag .= ',' . $pay->driver;
 
         // check if already processed
-        if (strlen($out_trade_no) > 0) {
-            $order = \App\Order::whereOrderNo($out_trade_no)->first();
+        if (strlen($order_no) > 0) {
+            $order = \App\Order::whereOrderNo($order_no)->firstOrFail();
             if ($order && ($order->status === \App\Order::STATUS_PAID || $order->status === \App\Order::STATUS_SUCCESS)) {
                 \Log::notice($logTag . ' already success' . "\n\n");
                 if ($request->ajax()) {
                     return self::renderResultPage($request, [
                         'success' => 1,
-                        'data' => '/pay/result/' . $out_trade_no
+                        'data' => '/pay/result/' . $order_no
                     ], [
                         'order' => $order
                     ]);
                 } else {
-                    return redirect('/pay/result/' . $out_trade_no);
+                    return redirect('/pay/result/' . $order_no);
                 }
             }
         }
 
 
         try {
-            $this->payApi = GatewayPay::getDriver($payway);
+            $this->payApi = GatewayPay::getDriver($pay);
         } catch (\Exception $e) {
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
             return $this->renderResultPage($request, [
@@ -420,43 +442,43 @@ class Pay extends Controller
             ]);
         }
 
-        $config = json_decode($payway->config, true);
-        $config['out_trade_no'] = $out_trade_no; // (order_no)可选参数
-        $config['payway'] = $payway->way;
-        \Log::debug($logTag . ' will verify');
+        $config = json_decode($pay->config, true);
+        $config['out_trade_no'] = $order_no; // (out_trade_no) 可选参数 (对于支付宝内部来说, 我们的 order_no 是外部)
+        $config['payway'] = $pay->way;
+        Log::debug($logTag . ' will verify');
 
-        if ($this->payApi->verify($config, function ($order_no, $amount, $trade_no) use ($request, $logTag, &$out_trade_no) {
+        // 这里调用支付API主动查询是否成功, 这时候传入 $order_no, 支付驱动负责检查
+        if ($this->payApi->verify($config, function ($order_no_, $amount, $trade_no) use ($request, $logTag, &$order_no) {
             /**
-             * @var string $order_no 本系统内订单号
+             * @var string $order_no_ 本系统内订单号
              * @var int $amount 实际支付金额 单价(分)
-             * @var string $trade_no 外部系统订单号
+             * @var string $trade_no 外部支付渠道系统订单号
              */
-            $out_trade_no = $order_no;
+            $order_no = $order_no_;
             try {
-                \Log::debug($logTag . " shipOrder start, order_no: $order_no, amount: $amount, trade_no: $trade_no");
+                Log::debug($logTag . " shipOrder start, order_no: $order_no, amount: $amount, trade_no: $trade_no");
                 $this->shipOrder($request, $order_no, $amount, $trade_no);
-                \Log::debug($logTag . ' shipOrder end, order_no: ' . $order_no);
+                Log::debug($logTag . ' shipOrder end, order_no: ' . $order_no);
             } catch (\Exception $e) {
-                \Log::error($logTag . ' shipOrder Exception: ' . $e->getMessage());
+                Log::error($logTag . ' shipOrder Exception: ' . $e->getMessage(), ['exception' => $e]);
             }
         })) {
-            \Log::debug($logTag . ' verify finished: 1' . "\n\n");
+            Log::debug($logTag . ' verify finished: 1' . "\n\n");
             if ($request->ajax()) {
                 return self::renderResultPage($request, [
                     'success' => 1,
-                    'data' => '/pay/result/' . $out_trade_no  // (order_no)
+                    'data' => '/pay/result/' . $order_no
                 ]);
             } else {
-                return redirect('/pay/result/' . $out_trade_no);  // (order_no)
+                return redirect('/pay/result/' . $order_no);
             }
         } else {
-            \Log::debug($logTag . ' verify finished: 0' . "\n\n");
+            Log::debug($logTag . ' verify finished: 0' . "\n\n");
             return $this->renderResultPage($request, [
                 'success' => 0,
                 'msg' => '支付验证失败，您可以稍后查看支付状态。'
             ]);
         }
-
     }
 
     /**
@@ -467,38 +489,38 @@ class Pay extends Controller
     function payNotify(Request $request, $pay_id)
     {
         $logTag = 'payNotify pay_id: ' . $pay_id;
-        \Log::debug($logTag);
+        Log::debug($logTag);
 
-        /** @var \App\Pay $payway */
-        $payway = \App\Pay::where('id', $pay_id)->first();
-        if (!$payway) {
-            \Log::error($logTag . ' cannot find PayModel');
+        /** @var \App\Pay $pay */
+        $pay = \App\Pay::where('id', $pay_id)->first();
+        if (!$pay) {
+            Log::error($logTag . ' cannot find PayModel');
             echo 'fail';
             exit;
         }
-        $logTag .= ',' . $payway->driver;
+        $logTag .= ',' . $pay->driver;
         try {
-            $this->payApi = GatewayPay::getDriver($payway);
+            $this->payApi = GatewayPay::getDriver($pay);
         } catch (\Exception $e) {
-            \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
+            Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
             echo 'fail';
             exit;
         }
 
-        $config = json_decode($payway->config, true);
-        $config['payway'] = $payway->way;
+        $config = json_decode($pay->config, true);
+        $config['payway'] = $pay->way;
         $config['isNotify'] = true;
-        \Log::debug($logTag . ' will verify');
+        Log::debug($logTag . ' will verify');
         $ret = $this->payApi->verify($config, function ($order_no, $amount, $trade_no) use ($request, $logTag) {
             try {
-                \Log::debug($logTag . " shipOrder start, order_no: $order_no, amount: $amount, trade_no: $trade_no");
+                Log::debug($logTag . " shipOrder start, order_no: $order_no, amount: $amount, trade_no: $trade_no");
                 $this->shipOrder($request, $order_no, $amount, $trade_no);
-                \Log::debug($logTag . ' shipOrder end, order_no: ' . $order_no);
+                Log::debug($logTag . ' shipOrder end, order_no: ' . $order_no);
             } catch (\Exception $e) {
-                \Log::error($logTag . ' shipOrder Exception: ' . $e->getMessage());
+                Log::error($logTag . ' shipOrder Exception: ' . $e->getMessage());
             }
         });
-        \Log::debug($logTag . ' notify finished: ' . (int)$ret . "\n\n");
+        Log::debug($logTag . ' notify finished: ' . (int)$ret . "\n\n");
         exit;
     }
 
@@ -520,11 +542,16 @@ class Pay extends Controller
         if ($order->status === \App\Order::STATUS_PAID) {
             // 处于已支付 (不是 SUCCESS) , 说明没货了
             $qq = $order->user->qq;
-            if ($order->product->delivery === \App\Product::DELIVERY_MANUAL) {
-                $msg = '您购买的为手动充值商品，请耐心等待处理';
+            if ($order->product) {
+                if ($order->product->delivery === \App\Product::DELIVERY_MANUAL) {
+                    $msg = '您购买的为手动充值商品，请耐心等待处理';
+                } else {
+                    $msg = '商家库存不足，因此没有自动发货，请联系商家客服发货';
+                }
             } else {
-                $msg = '商家库存不足，因此没有自动发货，请联系商家客服发货';
+                $msg = '卖家已删除此商品，请联系客服退款';
             }
+
             if ($qq) {
                 $msg .= '<br><a href="http://wpa.qq.com/msgrd?v=3&uin=' . $qq . '&site=qq&menu=yes" target="_blank">客服QQ:' . $qq . '</a>';
             }
@@ -535,14 +562,14 @@ class Pay extends Controller
             ], [
                 'order' => $order
             ]);
-        } elseif ($order->status === \App\Order::STATUS_SUCCESS) {
+        } elseif ($order->status >= \App\Order::STATUS_SUCCESS) {
             // 说明已经 notify 过了, 订单已经成功, 直接取出card 渲染页面
             return self::showOrderResult($request, $order);
         }
 
         return self::renderResultPage($request, [
             'success' => false,
-            'msg' => $order->remark ? '失败原因:<br>' . $order->remark : '订单支付失败，请重试'
+            'msg' => $order->remark ? '失败原因:<br>' . $order->remark : '订单未支付成功<br>如果您已经支付请耐心等待或联系客服解决'
         ], [
             'order' => $order
         ]);
@@ -590,13 +617,13 @@ class Pay extends Controller
         $order = \App\Order::whereOrderNo($order_no)->first();
         if ($order === null) {
 
-            \Log::error('shipOrder: No query results for model [App\Order:' . $order_no . ',trade_no:' . $trade_no . ',amount:' . $amount . ']. die(\'success\');');
+            Log::error('shipOrder: No query results for model [App\Order:' . $order_no . ',trade_no:' . $trade_no . ',amount:' . $amount . ']. die(\'success\');');
             die('success');
         }
 
         // 注意 一些支付方式 实际到账金额 可能略大于 订单金额, 所以这里只验证少的, 少了就禁止掉
         if ($order->paid > $amount) {
-            \Log::alert('shipOrder, price may error, order_no:' . $order_no .
+            Log::alert('shipOrder, price may error, order_no:' . $order_no .
                 ', paid:' . $order->paid . ', $amount get:' . $amount);
             $order->remark = '支付金额(' . sprintf('%0.2f', $amount / 100) .
                 ') 小于 订单金额(' . sprintf('%0.2f', $order->paid / 100) . ')';
@@ -645,7 +672,7 @@ class Pay extends Controller
                     if ($product->delivery === \App\Product::DELIVERY_API) {
                         // 这里通过API接口生成卡密
                         $cards = $product->createApiCards($order);
-                    }else{
+                    } else {
                         /** @var \App\Card[] $cards */
                         $cards = Card::where('product_id', $order->product_id)
                             ->whereRaw('`count_sold`<`count_all`')
@@ -656,7 +683,6 @@ class Pay extends Controller
                     if (count($cards) === $order->count) {
                         $cards_enough = true;
                     } else {
-                        $cards_enough = false;
                         if (count($cards)) {
                             foreach ($cards as $card) {
                                 if ($card->type === \App\Card::TYPE_REPEAT && $card->count >= $order->count) {
@@ -684,6 +710,7 @@ class Pay extends Controller
                             $card_ids[] = $card->id;
                         }
                         $order->cards()->attach($card_ids); // 使用了 card_order 这个中间表
+
                         if (count($cards) === 1 && $cards[0]->type === \App\Card::TYPE_REPEAT) {
                             \App\Card::where('id', $card_ids[0])->update([
                                 'status' => \App\Card::STATUS_SOLD,
@@ -702,7 +729,7 @@ class Pay extends Controller
                         $product->count_sold += $order->count;
                         $product->saveOrFail();
 
-                        return FundHelper::ACTION_CONTINUE;
+                        return FundHelper::ACTION_CONTINUE; // 只有返回这个结果, 才会最终入账
                     }
                 })
             ) {
@@ -730,7 +757,7 @@ class Pay extends Controller
                 // 需要发货到邮箱
                 if (System::_getInt('mail_send_order')) {
                     $mail = @json_decode($order->contact_ext, true)['_mail'];
-                    if($mail){
+                    if ($mail) {
                         $order->sendEmail($mail);
                     }
                 }
@@ -738,14 +765,19 @@ class Pay extends Controller
                 // 需要发送到手机
                 if ($order->status === \App\Order::STATUS_SUCCESS && System::_getInt('sms_send_order')) {
                     $mobile = @json_decode($order->contact_ext, true)['_mobile'];
-                    if($mobile){
+                    if ($mobile) {
                         $order->sendSms($mobile);
                     }
                 }
             } else {
-                // 数据库报错 or 已经处理过(status !== UN_PAY)
-                // 数据库报错的话 orderSuccess 里面写过详细log了
-                // throw new \Exception('merchant operate exception!');
+                if ($order->status !== \App\Order::STATUS_UNPAY) {
+                    // 已经处理过  already processed 不用管
+                } else {
+                    // 数据库报错的话 orderSuccess 里面写过详细log了
+                    // throw new \Exception('merchant operate exception!');
+                    Log::error('Pay.shipOrder.orderSuccess Failed.');
+                    return FALSE;
+                }
             }
 
         } else {

@@ -5,9 +5,10 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
@@ -49,6 +50,37 @@ class User extends Authenticatable
     const STATUS_OK = 0;
     const STATUS_FROZEN = 1;
 
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
+    /**
+     * Sends the password reset notification.
+     *
+     * @param string $token
+     *
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        throw new \Exception('unimplemented in free version');
+    }
 
     function getMBalanceAttribute()
     {
@@ -71,11 +103,18 @@ class User extends Authenticatable
      */
     function getShopThemeAttribute()
     {
-        if ($this->theme_config) {
+        if ($this->theme_config && isset($this->theme_config['theme'])) {
             $ret = \App\ShopTheme::whereName($this->theme_config['theme'])->first();
             if ($ret) return $ret;
         }
         return \App\ShopTheme::defaultTheme();
+    }
+
+    function getLastLoginAtAttribute()
+    {
+        /** @var \App\Log $last_login_log */
+        $last_login_log = $this->logs()->where('action', \App\Log::ACTION_LOGIN)->orderBy('id', 'DESC')->first();
+        return $last_login_log ? ($last_login_log->address ?? $last_login_log->ip) : null;
     }
 
     function categories()

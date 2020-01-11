@@ -55,109 +55,112 @@ class HomeController extends Controller
             ];
         }
 
-        $config['shop'] = [
-            'name' => config('app.name'),
-            'qq' => System::_get('shop_qq'),
-            'ann' => System::_get('shop_ann'),
-            'ann_pop' => System::_get('shop_ann_pop'),
-            'inventory' => System::_getInt('shop_inventory')
-        ];
-
-
-        if ($product) {
-            // 如果是产品连接 (那么一定有分类)
-            $category->setVisible(['id', 'name', 'password_open']);
-            if ($category->password_open) {
-                $category->setAttribute('password', $category->getTmpPassword());
-                $category->addVisible(['password']);
-            }
-            $product->setForShop($user);
-
-            $config['categories'] = [$category];
-            $config['product'] = $product;
-            $name = $product->name . ' - ' . $config['name'];
-            $description = $product->description;
-            if (@$description[0] === '{') {
-                $matches = [];
-                preg_match_all('/"insert":"(.+?)"/', $description, $matches);
-                $description = str_replace('\n', ' ', @join(' ', $matches[1]));
-            }
-        } elseif ($category) {
-            // 如果是分类连接
-            $category->setVisible(['id', 'name', 'password_open']);
-
-            $config['categories'] = [$category];
-            $config['product'] = null;
-            $name = $category->name . ' - ' . $config['name'];
-            $description = $category->name;
-        } else {
-            // 啥也不是. 默认的店铺连接
-            $categories = Category::where('user_id', $user->id)
-                ->orderBy('sort')
-                ->where('enabled', 1)
-                ->get();
-
-            foreach ($categories as $category) {
-                $category->setVisible(['id', 'name', 'password_open']);
-            }
-
-            $config['categories'] = $categories;
-
-            $name = $config['name'];
-            $description = $config['shop']['ann'];
-            if (@$description[0] === '{') {
-                $matches = [];
-                preg_match_all('/"insert":"(.+?)"/', $description, $matches);
-                $description = str_replace('\n', ' ', @join(' ', $matches[1]));
-            }
-        }
-
-
-        $config['vcode'] = [
+        $config['captcha'] = [
             'driver' => System::_get('vcode_driver'),
-            'buy' => (int)System::_get('vcode_shop_buy'),
-            'search' => (int)System::_get('vcode_shop_search')
+            'config' => [],
+            'scene' => [
+                'shop' => [
+                    'buy' => System::_getInt('vcode_shop_buy'),
+                    'search' => System::_getInt('vcode_shop_search'),
+                ]
+            ]
         ];
-        if ($config['vcode']['driver'] === 'geetest' &&
-            (
-                $config['vcode'] ||
-                $config['search']
-            )
-        ) {
-            $config['vcode']['geetest'] = Geetest\API::get();
+        if ($config['captcha']['driver'] === 'geetest') {
+            $config['captcha']['config'] = Geetest\API::get();
         }
-
-        // bit operate   pc & mobile = result_enabled
-        $config['pays'] = Pay::whereRaw('enabled&' .
-            (Helper::is_mobile() ? Pay::ENABLED_MOBILE : Pay::ENABLED_PC) . '!=0')
-            ->orderBy('sort')
-            ->get(['id', 'name', 'img']);
-
 
         $customer = Cookie::get('customer');
         $cookie = Cookie::make('customer',
             strlen($customer) !== 32 ? md5(str_random(16)) : $customer,
             43200, null, null, false, false); // 30 days
 
-
         /* @var $shop_theme \App\ShopTheme */
         $shop_theme = null;
         if (isset($_GET['theme'])) {
             $shop_theme = \App\ShopTheme::whereName($_GET['theme'])->first();
         }
-        if (!$shop_theme) {
-            $shop_theme = \App\ShopTheme::defaultTheme();
-        }
 
-        $config['theme'] = $user->theme_config && isset($user->theme_config[$shop_theme->name]) ?
-            $user->theme_config[$shop_theme->name] :
-            $shop_theme->config;
+        if ($user) {
+            $config['shop'] = [
+                'name' => config('app.name'),
+                'qq' => System::_get('shop_qq'),
+                'ann' => System::_get('shop_ann'),
+                'ann_pop' => System::_get('shop_ann_pop'),
+                'inventory' => System::_getInt('shop_inventory')
+            ];
+
+            if ($product) {
+                // 如果是产品连接 (那么一定有分类)
+                $category->setVisible(['id', 'name', 'password_open']);
+                if ($category->password_open) {
+                    $category->setAttribute('password', $category->getTmpPassword());
+                    $category->addVisible(['password']);
+                }
+                $product->setForShop($user);
+
+                $config['categories'] = [$category];
+                $config['product'] = $product;
+                $name = $product->name . ' - ' . $config['name'];
+                $description = $product->description;
+                if (@$description[0] === '{') {
+                    $matches = [];
+                    preg_match_all('/"insert":"(.+?)"/', $description, $matches);
+                    $description = str_replace('\n', ' ', @join(' ', $matches[1]));
+                }
+            } elseif ($category) {
+                // 如果是分类连接
+                $category->setVisible(['id', 'name', 'password_open']);
+
+                $config['categories'] = [$category];
+                $config['product'] = null;
+                $name = $category->name . ' - ' . $config['name'];
+                $description = $category->name;
+            } else {
+                // 啥也不是. 默认的店铺连接
+                $categories = Category::where('user_id', $user->id)
+                    ->orderBy('sort')
+                    ->where('enabled', 1)
+                    ->get();
+
+                foreach ($categories as $category) {
+                    $category->setVisible(['id', 'name', 'password_open']);
+                }
+
+                $config['categories'] = $categories;
+
+                $name = $config['name'];
+                $description = $config['shop']['ann'];
+                if (@$description[0] === '{') {
+                    $matches = [];
+                    preg_match_all('/"insert":"(.+?)"/', $description, $matches);
+                    $description = str_replace('\n', ' ', @join(' ', $matches[1]));
+                }
+            }
+
+            $config['pays'] = \App\PayWay::gets($user, function ($query) {
+                /** @var \App\PayWay $query */
+                $query->where('type', \App\PayWay::TYPE_SHOP)
+                    ->whereRaw('enabled&' . (Helper::is_mobile() ? \App\PayWay::ENABLED_MOBILE : \App\PayWay::ENABLED_PC) . '!=0');
+            });
+
+            if (!$shop_theme) {
+                $shop_theme = \App\ShopTheme::defaultTheme();
+            }
+
+            $config['theme'] = $user->theme_config && isset($user->theme_config[$shop_theme->name]) ?
+                $user->theme_config[$shop_theme->name] :
+                $shop_theme->config;
+
+            $keywords = preg_replace('/[、，；。！？]/', ', ', $name);
+        }else{
+            throw new \Exception('不可能到这');
+        }
 
         if (isset($config['theme']['background']) && $config['theme']['background'] === '内置1') {
             $config['theme']['background'] = Helper::b1_rand_background();
         }
 
-        if ($product === null) {
+        if ($user && $product === null) {
             // 不是商品链接
             if (@$config['theme']['list_type'] === 'list') {
                 foreach ($config['categories'] as $tmp) {
@@ -183,7 +186,7 @@ class HomeController extends Controller
         return response()->view('shop_theme.' . $shop_theme->name . '.index', [
             'name' => $name,
             'title' => config('app.title'),
-            'keywords' => preg_replace('/[、，；。！？]/', ', ', $name),
+            'keywords' => $keywords,
             'description' => $description,
             'js_tj' => System::_get('js_tj'),
             'js_kf' => System::_get('js_kf'),
@@ -192,24 +195,24 @@ class HomeController extends Controller
     }
 
 
-    private function _shop_404()
+    public function shop_default(Request $request)
     {
         $this->checkIsInMaintain();
 
-        // TODO 这里订单查询有问题, 需要重写
-        return view('message', [
-            'title' => '404 NotFound',
-            'message' => '该链接不存在<br>
-<a style="font-size: 18px" href="/s/#/record">查询订单</a>'
-        ]);
-    }
-
-    public function shop_default(Request $request)
-    {
         $tab = $request->get('tab', '');
         return response()->redirectTo('/?theme=Material#/record?tab=' . $tab);
     }
 
+    private function _shop_404()
+    {
+        $this->checkIsInMaintain();
+
+        return view('message', [
+            'title' => '404 NotFound',
+            'message' => '该链接不存在<br>
+<a style="font-size: 18px" href="/?theme=Material#/record">查询订单</a>'
+        ]);
+    }
 
     public function shop_category($en_category_id)
     {
@@ -251,11 +254,18 @@ class HomeController extends Controller
         if ($product->password_open && $product->password !== $request->input('p')) {
             return view('message', [
                 'title' => '当前商品需要密码',
-                'message' => ($request->has('p') ? '密码错误，请重新输入' : '请输入密码') . '<br>
+                'message' => ($request->has('p') ? '密码错误，请重新输入' : '请输入商品密码') . '<br>
+<style type="text/css">
+.content{ width: 100%;}
+.password{display: block;margin: 8px auto;font-size: 14px;width: 90%;max-width: 340px;height: 30px;border: 1px solid #666; outline: none;padding: 0 10px;vertical-align: top;border-radius: 0;}
+.confirm-btn{display: inline-block;width: 136px;height: 35px;line-height: 35px;border: none;text-align: center;font-size: 14px;text-decoration: none;cursor: pointer;margin-bottom: 15px;}
+</style>
 <div style="font-size: 14px">
-<input id="password" type="password" style="display: block; margin: 8px 0 8px 0">
-<button onclick="location.href=location.href.split(\'?\')[0]+\'?p=\'+encodeURI(document.getElementById(\'password\').value)">确认</button>
-</div>
+<input id="password" type="password" class="password">
+<button class="confirm-btn" onclick="location.href=location.href.split(\'?\')[0]+\'?p=\'+encodeURI(document.getElementById(\'password\').value)" style="">确认</button>
+</div><br>
+<a style="font-size: 18px" href="/s#/record">查询订单</a>&nbsp;&nbsp;
+<a style="font-size: 18px" href="/s#/report">投诉订单</a>\'
 '
             ]);
         }
@@ -277,17 +287,23 @@ class HomeController extends Controller
         $config = [];
         $config['url'] = config('app.url');
 
+        $config['captcha'] = [
+            'driver' => System::_get('vcode_driver'),
+            'config' => [],
+            'scene' => [
+                'auth' => [
+                    'login' => System::_getInt('vcode_login_admin'),
+                ]
+            ]
+        ];
+        if ($config['captcha']['driver'] === 'geetest') {
+            $config['captcha']['config'] = Geetest\API::get();
+        }
+
         if (System::_getInt('product_manual')) {
             $config['functions'] = ['product_manual']; // 开启手动发货功能
         }
 
-        $config['vcode'] = [
-            'driver' => System::_get('vcode_driver'),
-            'login' => (int)System::_get('vcode_login'),
-        ];
-        if ($config['vcode']['driver'] === 'geetest') {
-            $config['vcode']['geetest'] = Geetest\API::get();
-        }
         return view('admin', [
             'config' => $config
         ]);

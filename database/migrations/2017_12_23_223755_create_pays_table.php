@@ -16,8 +16,6 @@ class CreatePaysTable extends Migration
         Schema::create('pays', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->integer('sort')->default(1000);
-            $table->string('img');
             $table->string('driver');
             $table->string('way');
             $table->text('config');

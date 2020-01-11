@@ -1,0 +1,124 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Library\Response;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+
+class PayWay extends Controller
+{
+    function get(Request $request)
+    {
+        $page = (int)$request->post('current_page', 1);
+        $pageSize = (int)$request->post('per_page', 20);
+
+        $query = \App\PayWay::orderBy('sort')
+            ->where('type', $request->input('type'));
+
+        $searchType = $request->post('search', false);
+        $searchVal = $request->post('val', false);
+        if ($searchType && $searchVal) {
+            if ($searchType == 'simple') {
+                return Response::success($query->get(['id', 'name']));
+            } elseif ($searchType == 'id') {
+                $query->where('id', $searchVal);
+            } else {
+                $query->where($searchType, 'like', '%' . $searchVal . '%');
+            }
+        }
+
+        $enabled = $request->post('enabled');
+        if (strlen($enabled))
+            $query->whereIn('enabled', explode(',', $enabled));
+
+        $list = $query->paginate($pageSize, ['*'], 'page', $page);
+        return Response::success($list);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
+     */
+    function edit(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required|integer',
+            'type' => 'required|integer|between:1,2',
+            'name' => 'required|string',
+            'sort' => 'required|integer',
+            'channels' => 'required|string',
+            'enabled' => 'required|integer|between:0,3'
+        ]);
+        $id = (int)$request->post('id');
+
+        /** @var \App\PayWay $payway */
+        $payway = \App\PayWay::find($id);
+        if (!$payway) {
+            if (\App\PayWay::where('name', $request->post('name'))->exists()) {
+                return Response::fail('名称已经存在');
+            }
+            $payway = new \App\PayWay;
+        } else {
+            if (\App\PayWay::where('name', $request->post('name'))->where('id', '!=', $payway->id)->exists()) {
+                return Response::fail('名称已经存在');
+            }
+        }
+        $payway->type = (int)$request->post('type');
+        $payway->name = $request->post('name');
+        $payway->sort = (int)$request->post('sort');
+        $payway->img = $request->post('img');
+        $payway->channels = @json_decode($request->post('channels')) ?? [];
+        $payway->comment = $request->post('comment');
+        $payway->enabled = (int)$request->post('enabled');
+        $payway->saveOrFail();
+        return Response::success();
+    }
+
+    function enable(Request $request)
+    {
+        $this->validate($request, [
+            'ids' => 'required|string',
+            'enabled' => 'required|integer|between:0,3'
+        ]);
+        $ids = $request->post('ids');
+        $enabled = (int)$request->post('enabled');
+
+        \App\PayWay::whereIn('id', explode(',', $ids))
+            ->update(['enabled' => $enabled]);
+
+        return Response::success();
+    }
+
+
+    function sort(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required|integer',
+        ]);
+        $id = (int)$request->post('id');
+        /* @var \App\PayWay $payway */
+        $payway = \App\PayWay::findOrFail($id);
+        $payway->sort = (int)$request->post('sort');
+        $payway->save();
+        return Response::success();
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    function delete(Request $request)
+    {
+        $this->validate($request, [
+            'ids' => 'required|string'
+        ]);
+
+        $ids = $request->post('ids');
+
+        \App\PayWay::whereIn('id', explode(',', $ids))->delete();
+        return Response::success();
+    }
+}

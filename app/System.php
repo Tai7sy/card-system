@@ -16,9 +16,9 @@ class System extends Model
     public static function _init()
     {
         // Log::debug('SystemSetting._init');
-        static::$systems = Cache::remember('settings.all', 1, function () {
+        static::$systems = Cache::remember('settings.all', 10, function () {
             // Log::debug('SystemSetting._init.fetch from database');
-            $systems = System::query()->get()->toArray();
+            $systems = self::query()->get()->toArray();
             foreach ($systems as $system) {
                 static::$systems[$system['name']] = $system['value'];
             }
@@ -60,7 +60,7 @@ class System extends Model
             $v->save();
         } else {
             try {
-                System::query()->insert([
+                System::query()->create([
                     'name' => $name,
                     'value' => $value
                 ]);
@@ -76,7 +76,7 @@ class System extends Model
      */
     public static function flushCache()
     {
-        Log::debug('SystemSetting.flushCache');
+        // Log::debug('SystemSetting.flushCache');
         Cache::forget('settings.all');
     }
 
@@ -94,6 +94,10 @@ class System extends Model
         });
 
         static::created(function () {
+            self::flushCache();
+        });
+
+        static::deleted(function () {
             self::flushCache();
         });
     }

@@ -2,6 +2,8 @@
 
 namespace App\Library\Geetest;
 
+use App\Library\Helper;
+use Hashids\Hashids;
 use Illuminate\Support\Facades\Session;
 
 
@@ -19,27 +21,24 @@ class API
         $id = config('services.geetest.id');
         $key = config('services.geetest.key');
         if (!strlen($id) || !strlen($key)) {
-            return null;
+            return ['message' => 'geetest error: no config'];
         }
         $GtSdk = new Lib($id, $key);
         $user_id = time() . rand(1, 10000);
-        $status = $GtSdk->pre_process($user_id);
-        $ret = json_decode($GtSdk->get_response_str());
+        $gt_server_status = $GtSdk->pre_process($user_id);
+        $ret = json_decode($GtSdk->get_response_str(), true);
 
-
-        Session::put('gt_server', $status);
-        Session::put('gt_user_id', $user_id);
-        /*session_start();
-        $_SESSION['gtserver'] = $status;
-        $_SESSION['user_id'] = $user_id;*/
+        $ret['key'] = Helper::id_encode($user_id, 0xDEE, $gt_server_status);
         return $ret;
     }
 
-    public static function verify($geetest_challenge, $geetest_validate, $geetest_seccode)
+    public static function verify($params, $geetest_challenge, $geetest_validate, $geetest_seccode)
     {
         $GtSdk = new Lib(config('services.geetest.id'), config('services.geetest.key'));
-        $user_id = Session::get('gt_user_id');// session_start(); $_SESSION['gt_user_id'];
-        if (Session::get('gt_server') == 1) {
+        Helper::id_decode($params, 0xDEE, $decodeParams);
+        $user_id = $decodeParams[1];
+        $gt_server_status = $decodeParams[4];
+        if ($gt_server_status === 1) {
             $result = $GtSdk->success_validate($geetest_challenge, $geetest_validate, $geetest_seccode, $user_id);
             if ($result) {
                 return true;

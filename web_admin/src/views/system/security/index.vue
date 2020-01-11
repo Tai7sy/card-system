@@ -14,8 +14,8 @@
         </el-input>
       </el-form-item>
 
-      <el-form-item label="新密码" prop="checkPass">
-        <el-input type="password" placeholder="请再次输入新密码" v-model="form.checkPass">
+      <el-form-item label="新密码" prop="password_confirmation">
+        <el-input type="password" placeholder="请再次输入新密码" v-model="form.password_confirmation">
         </el-input>
       </el-form-item>
 
@@ -28,46 +28,48 @@
 
 <script>
   import NProgress from 'nprogress'
-  import { changePass } from '@/api/login'
+  import { changePass } from '@/api/auth'
 
   export default {
     data () {
-      const validatePass = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请输入新密码'));
-        } else {
-          if (this.form.checkPass !== '') {
-            this.$refs.form.validateField('checkPass');
-          }
-          callback();
-        }
-      };
-      const validatePass2 = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请再次输入新密码'));
-        } else if (value !== this.form.password) {
-          callback(new Error('两次输入密码不一致!'));
-        } else {
-          callback();
-        }
-      };
       return {
         loading: false,
         form: {
           old: '',
           password: '',
-          checkPass: ''
+          password_confirmation: ''
         },
         formRules: {
           old: [
             { required: true, message: '请输入旧密码', trigger: 'blur' }
           ],
           password: [
-            { required: true, validator: validatePass, trigger: 'blur' },
+            {
+              required: true, validator: (rule, value, callback) => {
+                if (value === '') {
+                  callback(new Error('请输入密码'));
+                } else {
+                  if (this.form.password_confirmation !== '') {
+                    this.$refs.form.validateField('password_confirmation');
+                  }
+                  callback();
+                }
+              }, trigger: 'blur'
+            },
             { min: 6, max: 16, message: '长度在 6 到 16 个字符', trigger: 'blur' }
           ],
-          checkPass: [
-            { required: true, validator: validatePass2, trigger: 'blur' },
+          password_confirmation: [
+            {
+              required: true, validator: (rule, value, callback) => {
+                if (value === '') {
+                  callback(new Error('请再次输入密码'));
+                } else if (value !== this.form.password) {
+                  callback(new Error('两次输入密码不一致!'));
+                } else {
+                  callback();
+                }
+              }, trigger: 'blur'
+            },
             { min: 6, max: 16, message: '长度在 6 到 16 个字符', trigger: 'blur' }
           ],
         }

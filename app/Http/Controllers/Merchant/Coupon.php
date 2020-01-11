@@ -49,8 +49,8 @@ class Coupon extends Controller
 
         $query->orderByRaw('expire_at DESC,category_id,product_id,type,status');
 
-        $page = $request->post('current_page', 1);
-        $pageSize = $request->post('per_page', 20);
+        $page = (int)$request->input('current_page', 1);
+        $pageSize = (int)$request->input('per_page', 20);
         $list = $query->paginate($pageSize, ['*'], 'page', $page);
         return Response::success($list);
     }

@@ -25,8 +25,8 @@ class Log extends Controller
         if (strlen($end_at))
             $query->where('created_at', '<=', $end_at . ' 23:59:59');
 
-        $page = $request->post('current_page', 1);
-        $pageSize = $request->post('per_page', 20);
+        $page = (int)$request->input('current_page', 1);
+        $pageSize = (int)$request->input('per_page', 20);
         $list = $query->orderBy('created_at', 'DESC')
             ->paginate($pageSize, ['*'], 'page', $page);
 

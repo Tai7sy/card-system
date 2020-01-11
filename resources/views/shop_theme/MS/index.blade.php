@@ -1,5 +1,5 @@
 <?php
-$version = '1.2';
+$version = '1.3';
 ?>
         <!DOCTYPE html>
 <html>
@@ -13,7 +13,7 @@ $version = '1.2';
     <link href="/shop_theme/ms/app.css?v={!! $version !!}" rel="stylesheet" type="text/css">
     <link href="/plugins/css/quill.snow.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="/plugins/js/quill.min.js"></script>
-    @if($config['vcode']['buy'] && $config['vcode']['driver'] === 'geetest')
+    @if(@$config['captcha']['scene']['shop']['buy'] && $config['captcha']['driver'] === 'geetest')
         <script type="text/javascript" src="/plugins/js/gt.js"></script>
     @endif
 </head>
@@ -296,7 +296,7 @@ $version = '1.2';
 </div>
 
 <script type=text/javascript>var config = @json($config);</script>
-<script type=text/javascript src="/shop_theme/ms/app.js?v={!! $version !!}"></script>
+<script type=text/javascript src="/shop_theme/ms/app.min.js?v={!! $version !!}"></script>
 {!! $js_tj !!} {!! $js_kf !!}
 <div id="message-template" style="display: none">
     <div class="modal-background" id="{id}">

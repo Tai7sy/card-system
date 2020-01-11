@@ -8,63 +8,54 @@ class PayTableSeeder extends Seeder
     private function initPay(){
         $pay = new \App\Pay;
         $pay->name = '支付宝';
-        $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'Fakala';
         $pay->way = 'alipay';
-        $pay->comment = 'alipay、alipaywap、wx、wxwap、qq、qqwap';
+        $pay->comment = '安发卡支付渠道';
         $pay->config = '{
   "gateway": "https://www.327ka.com",
   "api_id": "your api_id",
   "api_key": "your api_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_PC;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '支付宝';
-        $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'Fakala';
         $pay->way = 'alipaywap';
-        $pay->comment = 'alipay、alipaywap、wx、wxwap、qq、qqwap';
+        $pay->comment = '安发卡支付渠道';
         $pay->config = '{
   "gateway": "https://www.327ka.com",
   "api_id": "your api_id",
   "api_key": "your api_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_MOBILE;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '微信';
-        $pay->img = '/plugins/images/wx.png';
         $pay->driver = 'Fakala';
         $pay->way = 'wx';
-        $pay->comment = 'alipay、alipaywap、wx、wxwap、qq、qqwap';
+        $pay->comment = '安发卡支付渠道';
         $pay->config = '{
   "gateway": "https://www.327ka.com",
   "api_id": "your api_id",
   "api_key": "your api_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_PC;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '微信';
-        $pay->img = '/plugins/images/wx.png';
         $pay->driver = 'Fakala';
         $pay->way = 'wxwap';
-        $pay->comment = 'alipay、alipaywap、wx、wxwap、qq、qqwap';
+        $pay->comment = '安发卡支付渠道';
         $pay->config = '{
   "gateway": "https://www.327ka.com",
   "api_id": "your api_id",
   "api_key": "your api_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_MOBILE;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '支付宝';
-        $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'Alipay';
         $pay->way = 'pc';
         $pay->comment = '支付宝 - 即时到账套餐(企业)V2';
@@ -72,12 +63,10 @@ class PayTableSeeder extends Seeder
   "partner": "partner",
   "key": "key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '支付宝';
-        $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'Aliwap';
         $pay->way = 'wap';
         $pay->comment = '支付宝 - 高级手机网站支付V4';
@@ -85,13 +74,11 @@ class PayTableSeeder extends Seeder
   "partner": "partner",
   "key": "key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
 
         $pay = new \App\Pay;
         $pay->name = '支付宝扫码';
-        $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'AliAop';
         $pay->way = 'f2f';
         $pay->comment = '支付宝 - 当面付';
@@ -100,12 +87,10 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '支付宝';
-        $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'AliAop';
         $pay->way = 'pc';
         $pay->comment = '支付宝 - 电脑网站支付 (新)';
@@ -114,12 +99,10 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '手机支付宝';
-        $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'AliAop';
         $pay->way = 'mobile';
         $pay->comment = '支付宝 - 手机网站支付 (新)';
@@ -128,13 +111,11 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
 
         $pay = new \App\Pay;
         $pay->name = '微信扫码';
-        $pay->img = '/plugins/images/wx.png';
         $pay->driver = 'WeChat';
         $pay->way = 'NATIVE';
         $pay->comment = '微信支付 - 扫码';
@@ -144,12 +125,23 @@ class PayTableSeeder extends Seeder
   "MCHID": "商户ID",
   "KEY": "KEY"
 }';
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
+        $pay->save();
+
+        $pay = new \App\Pay;
+        $pay->name = '微信扫码';
+        $pay->driver = 'WeChat';
+        $pay->way = 'JSAPI';
+        $pay->comment = '微信支付 - 扫码';
+        $pay->config = '{
+  "APPID": "APPID",
+  "APPSECRET": "APPSECRET",
+  "MCHID": "商户ID",
+  "KEY": "KEY"
+}';
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '微信H5';
-        $pay->img = '/plugins/images/wx.png';
         $pay->driver = 'WeChat';
         $pay->way = 'MWEB';
         $pay->comment = '微信支付 - H5 (需要开通权限)';
@@ -159,12 +151,10 @@ class PayTableSeeder extends Seeder
   "MCHID": "商户ID",
   "KEY": "KEY"
 }';
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '手机QQ';
-        $pay->img = '/plugins/images/qq.png';
         $pay->driver = 'QPay';
         $pay->way = 'NATIVE';
         $pay->comment = '手机QQ - 扫码';
@@ -172,12 +162,10 @@ class PayTableSeeder extends Seeder
   "mch_id": "mch_id",
   "mch_key": "mch_key"
 }';
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '支付宝';
-        $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'Youzan';
         $pay->way = 'alipay';
         $pay->comment = '有赞支付 - 支付宝';
@@ -186,12 +174,10 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '微信';
-        $pay->img = '/plugins/images/wx.png';
         $pay->driver = 'Youzan';
         $pay->way = 'wechat';
         $pay->comment = '有赞支付 - 微信';
@@ -200,12 +186,10 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '手机QQ';
-        $pay->img = '/plugins/images/qq.png';
         $pay->driver = 'Youzan';
         $pay->way = 'qq';
         $pay->comment = '有赞支付 - 手机QQ';
@@ -214,12 +198,10 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '支付宝';
-        $pay->img = '/plugins/images/ali.png';
         $pay->driver = 'CodePay';
         $pay->way = 'alipay';
         $pay->comment = '码支付 - 支付宝';
@@ -228,12 +210,10 @@ class PayTableSeeder extends Seeder
   "key": "key"
 }';
         $pay->fee_system = 0;
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '微信';
-        $pay->img = '/plugins/images/wx.png';
         $pay->driver = 'CodePay';
         $pay->way = 'weixin';
         $pay->comment = '码支付 - 微信';
@@ -242,12 +222,10 @@ class PayTableSeeder extends Seeder
   "key": "key"
 }';
         $pay->fee_system = 0;
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
         $pay = new \App\Pay;
         $pay->name = '手机QQ';
-        $pay->img = '/plugins/images/qq.png';
         $pay->driver = 'CodePay';
         $pay->way = 'qq';
         $pay->comment = '码支付 - 手机QQ';
@@ -256,9 +234,43 @@ class PayTableSeeder extends Seeder
   "key": "key"
 }';
         $pay->fee_system = 0;
-        $pay->enabled = \App\Pay::ENABLED_DISABLED;
         $pay->save();
 
+
+        $payway = new \App\PayWay;
+        $payway->name = '前台支付方式-支付宝';
+        $payway->img = '/plugins/images/ali.png';
+        $payway->enabled = \App\PayWay::ENABLED_PC;
+        $payway->channels = [[\App\Pay::where('driver', 'AliAop')->where('way', 'pc')->first()->id, 1]];
+        $payway->saveOrFail();
+
+        $payway = new \App\PayWay;
+        $payway->name = '前台支付方式-支付宝手机';
+        $payway->img = '/plugins/images/ali.png';
+        $payway->enabled = \App\PayWay::ENABLED_MOBILE;
+        $payway->channels = [[\App\Pay::where('driver', 'AliAop')->where('way', 'mobile')->first()->id, 1]];
+        $payway->saveOrFail();
+
+        $payway = new \App\PayWay;
+        $payway->name = '前台支付方式-微信';
+        $payway->img = '/plugins/images/wx.png';
+        $payway->enabled = \App\PayWay::ENABLED_PC;
+        $payway->channels = [[\App\Pay::where('driver', 'WeChat')->where('way', 'NATIVE')->first()->id, 1]];
+        $payway->saveOrFail();
+
+        $payway = new \App\PayWay;
+        $payway->name = '前台支付方式-微信手机';
+        $payway->img = '/plugins/images/wx.png';
+        $payway->enabled = \App\PayWay::ENABLED_MOBILE;
+        $payway->channels = [[\App\Pay::where('driver', 'WeChat')->where('way', 'JSAPI')->first()->id, 1]];
+        $payway->saveOrFail();
+
+        $payway = new \App\PayWay;
+        $payway->name = '前台支付方式-QQ';
+        $payway->img = '/plugins/images/qq.png';
+        $payway->enabled = \App\PayWay::ENABLED_ALL;
+        $payway->channels = [[\App\Pay::where('driver', 'QPay')->first()->id, 1]];
+        $payway->saveOrFail();
     }
     public function run()
     {

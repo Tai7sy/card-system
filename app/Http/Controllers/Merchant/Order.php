@@ -178,8 +178,8 @@ class Order extends Controller
             return response()->make($order_txt, 200, $headers);
         }
 
-        $page = $request->input('current_page', 1);
-        $pageSize = $request->input('per_page', 20);
+        $page = (int)$request->input('current_page', 1);
+        $pageSize = (int)$request->input('per_page', 20);
 
         $list = $query->paginate($pageSize, ['*'], 'page', $page);
 

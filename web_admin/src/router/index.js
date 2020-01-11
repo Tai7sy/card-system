@@ -2,10 +2,11 @@ import Vue from 'vue';
 import Router from 'vue-router';
 
 import Layout from '@/views/layout/Layout.vue';
-
+import PageAuth from '~admin/views/auth/auth-index'
+import PageLogin from '~admin/views/auth/auth-login'
 import View404 from '~admin/views/404'
 import ViewAbout from '~admin/views/about'
-import ViewPayList from '~admin/views/pay/list'
+import ViewPayList from '~admin/views/pay/pay-index'
 import ViewLog from '~merchant/views/log/list'
 import ViewCategoryList from '~merchant/views/category/list'
 import ViewProductAdd from '~merchant/views/product/add'
@@ -32,7 +33,12 @@ Vue.use(Router);
  * meta : `{ role: ['admin'] }`  will control the page role
  **/
 const constantRouterMap = [
-  { path: '/admin/login', name: '登录', component: _import('login/login'), hidden: true },
+  {
+    path: '/admin/auth', name: '认证', component: PageAuth, hidden: true,
+    children: [
+      { path: 'login', name: 'auth.login', meta: { title: '后台登录' }, component: PageLogin },
+    ]
+  },
   { path: '/admin/404', name: '404 Not Found', component: View404, hidden: true },
   { path: '/admin/', redirect: '/admin/dashboard/index', hidden: true },
   {

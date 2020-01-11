@@ -11,14 +11,21 @@
 |
 */
 
-Route::post('admin/login', 'Admin\Login@login')->middleware('api');
-Route::post('admin/login/logout', 'Admin\Login@logout')->middleware('api');
-Route::post('admin/login/verify', 'Admin\Login@getVerify')->middleware('api');
+Route::group(['prefix' => 'admin'], function () {
+    // 验证码
+    Route::get('captcha', 'Controller@getCaptcha');
+    // 登录
+    Route::post('auth/login', 'Auth\LoginController@loginAdmin');
+    // 注销
+    Route::delete('auth/token', 'Auth\LoginController@logout');
+});
 
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['auth.token']], function () {
 
-    Route::post('login/info', 'Admin\Login@info');
-    Route::post('login/password', 'Admin\Login@changePassword');
+    // 获取登录信息
+    Route::get('info', 'Auth\LoginController@getUserInfo');
+    // 修改密码
+    Route::post('info/password', 'Auth\ResetPasswordController@change');
 
     Route::post('dashboard', 'Admin\Dashboard@index');
 
@@ -98,14 +105,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'api']], function ()
 
     // 清理缓存 (opcache)
     Route::post('web/cache/clear', 'Admin\Dashboard@clearCache');
-    // 查看 storage/logs
-    Route::get('web/logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+
+    Route::get('web/logs/token', 'Admin\Dashboard@logsToken');
 
     // 尝试更新
     Route::get('version', 'Admin\Dashboard@version');
     Route::get('version/check_update','Admin\Dashboard@checkUpdate');
 });
 
+// 查看 storage/logs
+Route::any('admin/web/logs/{token}', 'Admin\Dashboard@logsView');
 
 Route::group(['prefix' => 'shop', 'middleware' => ['api']], function () {
     Route::post('verify', 'Shop\VerifyCode@getVerify');

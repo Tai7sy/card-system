@@ -9,9 +9,7 @@ import NProgress from 'nprogress'; // Progress 进度条
 import 'nprogress/nprogress.css'; // Progress 进度条 样式
 import 'normalize.css/normalize.css'; // normalize.css 样式格式化
 import 'quill/dist/quill.snow.css'
-import $ from 'jquery'
 import errLog from '@/store/errLog'; // error log组件
-import { getToken, removeToken } from '~/utils/auth'
 import '~/utils/helper'
 import '~/utils/filters'
 import '~/utils/trick'
@@ -29,48 +27,50 @@ window.Vuex = require('vuex');
 window.$http = axios;
 window.$router = router;
 window.$store = store;
-window.$ = $;
-window.jQuery = $;
 window.plugins = [];
 window.NProgress = NProgress;
 
 
-const whiteList = ['/admin/login', '/admin/register', '/admin/forget', '/admin/reset']; // 不重定向白名单
+const whiteList = ['404', 'auth.login']; // 不重定向白名单
 router.beforeEach((to, from, next) => {
   NProgress.start();
-  if (getToken()) {
-    if (to.path === '/admin/login') {
-      next({ path: '/admin/dashboard' });
+  if (store.state.user.token) {
+    if (to.name === 'auth.login') {
+      next({ name: '概览' });
     } else {
-      if (store.getters.role.length === 0) {
+      if (!store.getters.userInfo || !store.getters.userInfo.id) {
+        // 没有登录过的状态, 则获取一下登录信息
         store.dispatch('GetInfo').then(res => {
-          store.dispatch('GenerateRoutes', res.data).then(() => {
+          store.dispatch('GenerateRoutes', res).then(() => {
             router.addRoutes(store.getters.addRouters);
             // console.log('router.addRoutes ok');
             next({ ...to }); // hack方法 确保addRoutes已完成
           })
         }).catch(e => {
-          console.log('login get info error');
-          console.log(e);
-          removeToken();
-          router.push({ path: '/admin/login' });
+          console.log('get userInfo failed, redirect to login page', e);
+          store.commit('SET_TOKEN', null);
+          router.push({ name: 'auth.login' });
         })
       } else {
         next();
       }
     }
   } else {
-    if (whiteList.indexOf(to.path) !== -1 || to.path.substr(0, 8) === '/admin/reset') {
+    if (whiteList.indexOf(to.name) !== -1) {
       next()
     } else {
-      next('/admin/login?to=' + to.path);
+      next({ name: 'auth.login', params: { to: to.path } });
       NProgress.done();
     }
   }
 });
 
 router.afterEach(e => {
-  document.title = e.name;
+  if (e.meta && e.meta.title) {
+    document.title = e.meta.title;
+  } else {
+    document.title = e.name;
+  }
   NProgress.done();
 });
 

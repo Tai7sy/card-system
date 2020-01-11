@@ -21,7 +21,7 @@ class ConfigServiceProvider extends ServiceProvider
         try {
             config()->set([
                 'app.project' => 'card_free',
-                'app.version' => '2.95e',
+                'app.version' => '2.96',
 
                 'app.name' => System::_get('app_name'),
                 'app.title' => System::_get('app_title'),
@@ -63,8 +63,8 @@ class ConfigServiceProvider extends ServiceProvider
                 'filesystems.disks.oss.bucket' => System::_get('storage_oss_bucket'),
                 'filesystems.disks.oss.endpoint' => System::_get('storage_oss_endpoint'),
                 'filesystems.disks.oss.cdnDomain' => System::_get('storage_oss_cdn_domain'),
-                'filesystems.disks.oss.ssl' => (int)System::_get('storage_oss_is_ssl') === 1,
-                'filesystems.disks.oss.isCName' => (int)System::_get('storage_oss_is_cname') === 1,
+                'filesystems.disks.oss.ssl' => System::_getInt('storage_oss_is_ssl') === 1,
+                'filesystems.disks.oss.isCName' => System::_getInt('storage_oss_is_cname') === 1,
 
                 'filesystems.disks.qiniu.access_key' => System::_get('storage_qiniu_access_key'),
                 'filesystems.disks.qiniu.secret_key' => System::_get('storage_qiniu_secret_key'),

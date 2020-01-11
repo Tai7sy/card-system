@@ -108,8 +108,22 @@ class Update extends Command
             define('MY_PROXY_PASS', $proxy_auth);
         }
 
-        \Artisan::call('cache:clear');
-        \Artisan::call('config:clear');
+        // /www/server/php/72/bin/php /www/wwwroot/demo.fakaxitong.com/artisan
+
+        if (getenv('_')) {
+            $artisan = '"' . getenv('_') . '" "' . $_SERVER['PHP_SELF'] . '" ';
+        } else {
+            if (PHP_OS === 'WINNT') {
+                $php = dirname(php_ini_loaded_file()) . DIRECTORY_SEPARATOR . 'php.exe';
+            } else {
+                $php = dirname(php_ini_loaded_file()) . DIRECTORY_SEPARATOR . 'php';
+            }
+            $artisan = '"' . $php . '" "' . $_SERVER['PHP_SELF'] . '" ';
+        }
+
+        exec($artisan . ' cache:clear');
+        exec($artisan . ' config:clear');
+
         echo "\n";
 
         $this->comment('检查更新中...');
@@ -117,23 +131,28 @@ class Update extends Command
 
         $version = @json_decode(CurlRequest::get('https://raw.githubusercontent.com/Tai7sy/card-system/master/.version'), true);
 
-        if (!@$version['version']) {
+        if (!@$version['data']['version']) {
             $this->warn("检查更新失败!");
-            $this->warn("Error: " . ($version ? json_encode($version) : 'Network error'));
+            $this->warn("Error: " . ((@$version['message'] ?? $version) ?? 'Network error'));
             goto LABEL_EXIT;
         }
 
-        if (config('app.version') >= $version['version']) {
-            $this->comment('您的版本已是最新!');
-            goto LABEL_EXIT;
-        }
+        $version = $version['data'];
 
         $this->info('最新版本: ' . $version['version']);
         $this->info('版本说明: ' . (@$version['description'] ?? '无'));
 
-        $answer = strtolower($this->ask('是否现在更新 (yes/no)', 'no'));
-        if ($answer !== 'yes') {
-            goto LABEL_EXIT;
+        if (config('app.version') >= $version['version']) {
+            $this->comment('您的版本已是最新!');
+            $answer = strtolower($this->ask('是否再次更新 (yes/no)', 'no'));
+            if ($answer !== 'yes') {
+                goto LABEL_EXIT;
+            }
+        } else {
+            $answer = strtolower($this->ask('是否现在更新 (yes/no)', 'no'));
+            if ($answer !== 'yes') {
+                goto LABEL_EXIT;
+            }
         }
 
         // 检查目录权限
@@ -203,7 +222,7 @@ class Update extends Command
 
 
         $this->comment('正在关闭主站...');
-        \Artisan::call('down');
+        exec($artisan . ' down');
 
         sleep(5);
         $this->comment(' --> 正在清理旧文件...');
@@ -222,17 +241,27 @@ class Update extends Command
 
         // merge and override
         $this->comment(' --> 正在复制新文件...');
+
+        // 更新逻辑 这些文件不覆盖
+        \File::delete($tmp_path . DIRECTORY_SEPARATOR . 'card_dist' . DIRECTORY_SEPARATOR
+            . 'public' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'logo.png');
+        \File::delete($tmp_path . DIRECTORY_SEPARATOR . 'card_dist' . DIRECTORY_SEPARATOR
+            . 'public' . DIRECTORY_SEPARATOR . '.htaccess');
+        \File::delete($tmp_path . DIRECTORY_SEPARATOR . 'card_dist' . DIRECTORY_SEPARATOR
+            . 'public' . DIRECTORY_SEPARATOR . 'web.config');
+        \File::delete($tmp_path . DIRECTORY_SEPARATOR . 'card_dist' . DIRECTORY_SEPARATOR
+            . 'public' . DIRECTORY_SEPARATOR . 'nginx.conf');
+        \File::delete($tmp_path . DIRECTORY_SEPARATOR . 'card_dist' . DIRECTORY_SEPARATOR
+            . 'public' . DIRECTORY_SEPARATOR . 'robots.txt');
         \File::copyDirectory($tmp_path . DIRECTORY_SEPARATOR . 'card_system_free_dist', $base_path);
 
-
         $this->comment(' --> 正在创建缓存...');
-        \Artisan::call('cache:clear');
-        \Artisan::call('route:cache');
-        \Artisan::call('config:cache');
+        exec($artisan . ' cache:clear');
+        exec($artisan . ' route:cache');
+        exec($artisan . ' config:cache');
 
         $this->comment(' --> 正在更新数据库...');
-        \Artisan::call('migrate');
-
+        exec($artisan . ' migrate');
 
         if (PHP_OS === 'WINNT') {
             echo "\n";
@@ -248,8 +277,8 @@ class Update extends Command
         }
 
         $this->comment('正在启用主站...');
-        \Artisan::call('up');
-        \Artisan::call('queue:restart'); // 重启队列
+        exec($artisan . ' up');
+        exec($artisan . ' queue:restart'); // 重启队列
 
         $isSuccess = true;
 

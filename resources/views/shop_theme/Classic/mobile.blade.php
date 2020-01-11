@@ -12,7 +12,7 @@
     <link href="/shop_theme/classic/iconfont.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="/plugins/css/quill.snow.css">
     <script type="text/javascript" src="/plugins/js/quill.min.js"></script>
-    @if($config['vcode']['buy'] && $config['vcode']['driver'] === 'geetest')
+    @if(@$config['captcha']['scene']['shop']['buy'] && $config['captcha']['driver'] === 'geetest')
         <script type="text/javascript" src="/plugins/js/gt.js"></script>
     @endif
     <link href="/shop_theme/classic/mobile.min.css?v={!! $version !!}" rel="stylesheet" type="text/css">

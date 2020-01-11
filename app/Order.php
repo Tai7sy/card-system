@@ -130,14 +130,13 @@ class Order extends Model
                 }else{
                     // 发货了一部分 (应该不会到这里, 卡密不够不会发货)
                     $card_msg = '订单#' . $this->order_no . '&nbsp;已支付，目前库存不足，您还有' . ($this->count - count($this->cards)) . '件未发货，请联系商家客服发货<br>已发货商品见下方：<br>';
-                    $card_msg .= '<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $this->user->qq . '&site=qq&menu=yes" target="_blank">商家客服QQ:' . $this->user->qq . '</a><br>';
                 }
             }
         }else{
             $card_msg = '订单#' . $this->order_no . '&nbsp;已支付，目前库存不足，您购买的' . ($this->count - count($this->cards)) . '件未发货，请联系商家客服发货<br>';
-            $card_msg .= '<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $this->user->qq . '&site=qq&menu=yes" target="_blank">商家客服QQ:' . $this->user->qq . '</a><br>';
         }
-
+        $card_msg .= '<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $this->user->qq . '&site=qq&menu=yes" target="_blank">商家客服QQ:' . $this->user->qq . '</a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        $card_msg .= '<a href="'. config('app.url') . route('pay.result', [$this->order_no]) .'" target="_blank">查看订单详情</a><br>';
         return $card_msg;
     }
 

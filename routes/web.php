@@ -38,7 +38,7 @@ Route::any('/pay/notify/{pay_id}', 'Shop\Pay@payNotify');
 Route::get('/qrcode/pay/{order_no}/{pay_file}', 'Shop\Pay@qrcode');
 
 // 渲染支付结果页面
-Route::get('/pay/result/{order_no}', 'Shop\Pay@result');
+Route::get('/pay/result/{order_no}', 'Shop\Pay@result')->name('pay.result');
 
 // 后台
 Route::get('/admin', 'HomeController@admin');

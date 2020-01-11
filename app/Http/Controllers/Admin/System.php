@@ -139,7 +139,7 @@ class System extends Controller
             'vcode_geetest_key',
         ];
         $intConfig = [
-            'vcode_login',
+            'vcode_login_admin',
             'vcode_shop_buy',
             'vcode_shop_search'
         ];

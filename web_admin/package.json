@@ -12,7 +12,6 @@
     "core-js": "^2.6.10",
     "echarts": "^4.5.0",
     "element-ui": "^2.13.0",
-    "jquery": "^3.4.1",
     "js-cookie": "^2.2.1",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",

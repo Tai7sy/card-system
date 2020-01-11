@@ -20,7 +20,7 @@ class CreateFilesTable extends Migration
             $table->string('driver');
             $table->string('path');
             $table->string('url');
-            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 

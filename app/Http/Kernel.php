@@ -30,8 +30,8 @@ class Kernel extends HttpKernel
     protected $middlewareGroups = [
         'web' => [
             // Cookie
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            // \App\Http\Middleware\EncryptCookies::class,
+            // \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
 
             // Session
             // \Illuminate\Session\Middleware\StartSession::class,
@@ -44,13 +44,8 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\Session\Middleware\AuthenticateSession::class, // 认证, 密码修改会自动退出
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            'throttle:120,1',
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            'throttle:60,1',
+            'bindings',
         ],
     ];
 
@@ -64,6 +59,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'auth.token' => \App\Http\Middleware\AuthenticateToken::class,  // jwt 2020-01-01 改为此方式
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,

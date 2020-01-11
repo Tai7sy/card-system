@@ -12,8 +12,8 @@ class Category extends Controller
 {
     function get(Request $request)
     {
-        $page = $request->post('current_page', 1);
-        $pageSize = $request->post('per_page', 20);
+        $page = (int)$request->input('current_page', 1);
+        $pageSize = (int)$request->input('per_page', 20);
 
         $query = $this->authQuery($request, \App\Category::class);
 

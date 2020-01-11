@@ -204,27 +204,30 @@ class Helper
     const ID_TYPE_USER = 0;
     const ID_TYPE_CATEGORY = 1;
     const ID_TYPE_PRODUCT = 2;
+    const ID_TYPE_AFFILIATE = 3;
 
     /**
      * 加密ID
-     * @param $id
-     * @param $type
+     * @param int $id
+     * @param int $type
+     * @param array $args 其他数据, 可选
      * @return string
      */
-    public static function id_encode($id, $type)
+    public static function id_encode($id, $type, ...$args)
     {
         $hashids = new Hashids(config('app.key'), 8, 'abcdefghijklmnopqrstuvwxyz1234567890');
         // lite_hash 保证了 encode_id 分布的随机性
-        return @$hashids->encode(self::lite_hash($id), $id, self::lite_hash($type), $type);
+        return @$hashids->encode(self::lite_hash($id), $id, self::lite_hash($type), $type, ...$args);
     }
 
     /**
      * 解密ID
      * @param $en_id
      * @param $type
+     * @param array|bool $decode
      * @return int
      */
-    public static function id_decode($en_id, $type)
+    public static function id_decode($en_id, $type, &$decode = false)
     {
         if (strlen($en_id) < 8) { // 兼容旧版本
             $hashids = new Hashids(config('app.key'));
@@ -235,9 +238,14 @@ class Helper
             }
         }
         $hashids = new Hashids(config('app.key'), 8, 'abcdefghijklmnopqrstuvwxyz1234567890');
-        return intval(@$hashids->decode($en_id)[1]);
+        $decode = @$hashids->decode($en_id) ?? [];
+        return intval($decode[1]);
     }
 
+    /**
+     * is_mobile
+     * @return boolean
+     */
     public static function is_mobile()
     {
         //判断手机发送的客户端标志
@@ -307,6 +315,6 @@ class Helper
                 '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz799gvb3j21hc0u0qdt.jpg',
             ];
         }
-        return $arr[rand(0, count($arr))];
+        return $arr[rand(0, count($arr) - 1)];
     }
 }

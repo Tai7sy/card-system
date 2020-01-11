@@ -83,7 +83,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'zh_CN',
 
     /*
     |--------------------------------------------------------------------------
@@ -173,6 +173,13 @@ return [
          * Package Service Providers...
          */
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+        Naux\Mail\SendCloudServiceProvider::class,
+        Jacobcyl\AliOSS\AliOssServiceProvider::class,
+        zgldh\QiniuStorage\QiniuFilesystemServiceProvider::class,
+        Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        Mews\Captcha\CaptchaServiceProvider::class,
+
         /*
          * Application Service Providers...
          */
@@ -182,12 +189,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\ConfigServiceProvider::class,
-
-        // SendCloud
-        Naux\Mail\SendCloudServiceProvider::class,
-        Jacobcyl\AliOSS\AliOssServiceProvider::class,
-        zgldh\QiniuStorage\QiniuFilesystemServiceProvider::class,
-        Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class
     ],
 
     /*
@@ -236,6 +237,8 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'Captcha' => Mews\Captcha\Facades\Captcha::class,
     ],
 
 ];

@@ -4,21 +4,28 @@
     <level-bar></level-bar>
     <nav-tabs></nav-tabs>
     <error-log v-if="log.length>0" class="errLog-container" :logsList="log"></error-log>
-    <el-dropdown class="avatar-container" trigger="click" :show-timeout="0" :hide-timeout="0">
-      <div class="avatar-wrapper">
-        <img class="user-avatar" :src="require('~/assets/header.png')">
-        <i class="el-icon-caret-bottom"></i>
-      </div>
-      <el-dropdown-menu class="user-dropdown" slot="dropdown">
-        <router-link class='inlineBlock' to="/admin/system/set">
-          <el-dropdown-item>网站设置</el-dropdown-item>
-        </router-link>
-        <router-link class='inlineBlock' to="/admin/system/security">
-          <el-dropdown-item>修改密码</el-dropdown-item>
-        </router-link>
-        <el-dropdown-item divided><span @click="logout" style="display:block;">退出</span></el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown>
+
+    <div class="toolbar">
+      <el-dropdown class="toolbar-icon" trigger="click" :show-timeout="0" :hide-timeout="0">
+        <div class="avatar-wrapper">
+          <img class="user-avatar" :src="require('~/assets/header.png')">
+          <i class="el-icon-caret-bottom"></i>
+        </div>
+        <el-dropdown-menu class="user-dropdown" slot="dropdown">
+          <router-link class='inlineBlock' to="/admin/system/set">
+            <el-dropdown-item>网站设置</el-dropdown-item>
+          </router-link>
+          <router-link class='inlineBlock' to="/admin/system/security">
+            <el-dropdown-item>修改密码</el-dropdown-item>
+          </router-link>
+          <el-dropdown-item divided>
+          <span @click="logout" style="display:block;">
+            退出<icon name="sign-out-alt"/>
+          </span>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+    </div>
   </el-menu>
 </template>
 
@@ -37,7 +44,7 @@
       Hamburger,
       ErrorLog
     },
-    data () {
+    data() {
       return {
         log: errLogStore.state.errLog
       }
@@ -48,10 +55,10 @@
       ])
     },
     methods: {
-      toggleSideBar () {
+      toggleSideBar() {
         this.$store.dispatch('ToggleSideBar')
       },
-      logout () {
+      logout() {
         this.$store.dispatch('Logout').then(() => {
           location.reload(); // 为了重新实例化vue-router对象 避免bug
         });
@@ -87,35 +94,69 @@
       color: red;
     }
 
-    .avatar-container {
-      height: 50px;
+    .toolbar {
+      float: right;
       display: inline-block;
-      position: absolute;
-      right: 35px;
+      margin-right: 8px;
+      height: 48px;
+      padding: 8px 0;
 
-      .avatar-wrapper {
+      .toolbar-icon {
+        margin-right: 8px;
         cursor: pointer;
-        margin-top: 5px;
-        position: relative;
+        width: 38px;
+        height: 38px;
+        overflow: hidden;
 
-        .user-avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
-        }
-
-        .el-icon-caret-bottom {
-          position: absolute;
-          right: -20px;
-          top: 25px;
-          font-size: 12px;
+        &:last-child {
+          margin-right: 0;
         }
       }
+
+      .user-avatar {
+        width: 100%;
+        height: 100%;
+        padding: 4px;
+        border-radius: 2px;
+      }
     }
+
   }
+
   .user-dropdown {
     transform: none !important;
     transition: none !important;
+    margin-top: 4px !important;
+    padding: 8px 0;
+    min-width: 200px;
+    // box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.08);
+    // border: 1px solid #e0e0e0;
+    // border-radius: 2px !important;
+    // background: #fff !important;
+
+    svg {
+      float: right;
+      display: inline-block;
+      margin: 12px 0;
+      color: #cfd8dc;
+      min-width: 16px;
+      text-align: center;
+      width: 12px;
+      height: 12px;
+    }
+
+    .el-dropdown-menu__item {
+      font-size: 13px;
+    }
+
+    a:hover {
+      text-decoration: unset;
+    }
+
+    // .el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover {
+    //   background: #fafafa;
+    //   color: #263238;
+    // }
   }
 </style>
 

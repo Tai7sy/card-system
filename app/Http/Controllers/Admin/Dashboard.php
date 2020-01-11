@@ -7,6 +7,8 @@ use App\Library\Response;
 use App\Order;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class Dashboard extends Controller
 {
@@ -66,7 +68,7 @@ class Dashboard extends Controller
             ->where('status', Order::STATUS_PAID)->count();
         // 订单状态为 已支付 = 已支付未发货
 
-        $dashboard['login'] = \App\Log::where('action', \App\Log::ACTION_LOGIN)->latest()->firstOrFail();
+        $dashboard['login'] = \App\Log::where('action', \App\Log::ACTION_LOGIN)->latest()->first();
 
         return Response::success($dashboard);
     }
@@ -93,6 +95,30 @@ class Dashboard extends Controller
             'version' => config('app.version')
         ]);
     }
+
+    /**
+     * 获取查看日志的Token
+     */
+    function logsToken()
+    {
+        $token = md5(random_bytes(128));
+        Cache::put($token, Auth::getUser(), 15);
+        return response(['token' => $token]);
+    }
+
+    /**
+     * 查看日志
+     */
+    function logsView(Request $request, $token)
+    {
+        if (($user = Cache::get($token))) {
+            Cache::put($token, $user, 15);
+            return (new \Rap2hpoutre\LaravelLogViewer\LogViewerController)->index();
+        } else {
+            throw new \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException('logs-token');
+        }
+    }
+
 
     function checkUpdate()
     {

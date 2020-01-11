@@ -24,7 +24,7 @@
 
       <el-form-item class="item-container">
         <el-switch
-          v-model="form.vcode_login"
+          v-model="form.vcode_login_admin"
           inactive-text="后台登录验证码"
           :active-value="1"
           :inactive-value="0">
@@ -71,7 +71,7 @@
           vcode_driver: 'geetest',
           vcode_geetest_id: '',
           vcode_geetest_key: '',
-          vcode_login: 0,
+          vcode_login_admin: 0,
           vcode_shop_buy: 0,
           vcode_shop_search: 0
         },
