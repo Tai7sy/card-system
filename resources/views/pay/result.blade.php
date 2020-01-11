@@ -10,7 +10,7 @@ if (!isset($result['success'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
@@ -62,7 +62,7 @@ if (!isset($result['success'])) {
             document.getElementById('instructions').innerHTML = renderDescription({!! $product['instructions'] !!});
         </script>
     @endif
-    <a style="float:right" href="/">首页</a>
+    <a style="float:right" href="javascript:window.close()">关闭</a>
     <br/>
 </div>
 </body>
