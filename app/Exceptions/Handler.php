@@ -68,7 +68,7 @@ class Handler extends ExceptionHandler
 
         if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
             return $this->msg($request, trans('exception.resource_not_found'), 404);
-        } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException) {
+        } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException || $e instanceof \Illuminate\Auth\AuthenticationException) {
             Log::error('Caught a UnauthorizedHttpException', ['exception' => $e]);
             return $this->msg($request, trans('exception.please_login'), 401);
         } elseif ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
