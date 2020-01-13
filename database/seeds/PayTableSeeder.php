@@ -5,55 +5,8 @@ use Illuminate\Database\Seeder;
 class PayTableSeeder extends Seeder
 {
 
-    private function initPay(){
-        $pay = new \App\Pay;
-        $pay->name = '支付宝';
-        $pay->driver = 'Fakala';
-        $pay->way = 'alipay';
-        $pay->comment = '安发卡支付渠道';
-        $pay->config = '{
-  "gateway": "https://www.327ka.com",
-  "api_id": "your api_id",
-  "api_key": "your api_key"
-}';
-        $pay->save();
-
-        $pay = new \App\Pay;
-        $pay->name = '支付宝';
-        $pay->driver = 'Fakala';
-        $pay->way = 'alipaywap';
-        $pay->comment = '安发卡支付渠道';
-        $pay->config = '{
-  "gateway": "https://www.327ka.com",
-  "api_id": "your api_id",
-  "api_key": "your api_key"
-}';
-        $pay->save();
-
-        $pay = new \App\Pay;
-        $pay->name = '微信';
-        $pay->driver = 'Fakala';
-        $pay->way = 'wx';
-        $pay->comment = '安发卡支付渠道';
-        $pay->config = '{
-  "gateway": "https://www.327ka.com",
-  "api_id": "your api_id",
-  "api_key": "your api_key"
-}';
-        $pay->save();
-
-        $pay = new \App\Pay;
-        $pay->name = '微信';
-        $pay->driver = 'Fakala';
-        $pay->way = 'wxwap';
-        $pay->comment = '安发卡支付渠道';
-        $pay->config = '{
-  "gateway": "https://www.327ka.com",
-  "api_id": "your api_id",
-  "api_key": "your api_key"
-}';
-        $pay->save();
-
+    private function initPay()
+    {
         $pay = new \App\Pay;
         $pay->name = '支付宝';
         $pay->driver = 'Alipay';
@@ -63,6 +16,7 @@ class PayTableSeeder extends Seeder
   "partner": "partner",
   "key": "key"
 }';
+        $pay->enabled = true;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -74,6 +28,7 @@ class PayTableSeeder extends Seeder
   "partner": "partner",
   "key": "key"
 }';
+        $pay->enabled = true;
         $pay->save();
 
 
@@ -87,6 +42,7 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
+        $pay->enabled = true;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -99,6 +55,7 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
+        $pay->enabled = true;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -111,6 +68,7 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
+        $pay->enabled = true;
         $pay->save();
 
 
@@ -125,6 +83,7 @@ class PayTableSeeder extends Seeder
   "MCHID": "商户ID",
   "KEY": "KEY"
 }';
+        $pay->enabled = true;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -138,6 +97,7 @@ class PayTableSeeder extends Seeder
   "MCHID": "商户ID",
   "KEY": "KEY"
 }';
+        $pay->enabled = true;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -151,6 +111,7 @@ class PayTableSeeder extends Seeder
   "MCHID": "商户ID",
   "KEY": "KEY"
 }';
+        $pay->enabled = true;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -162,6 +123,7 @@ class PayTableSeeder extends Seeder
   "mch_id": "mch_id",
   "mch_key": "mch_key"
 }';
+        $pay->enabled = true;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -174,6 +136,7 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
+        $pay->enabled = true;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -186,6 +149,7 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
+        $pay->enabled = true;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -198,6 +162,7 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
+        $pay->enabled = true;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -209,6 +174,7 @@ class PayTableSeeder extends Seeder
   "id": "id",
   "key": "key"
 }';
+        $pay->enabled = true;
         $pay->fee_system = 0;
         $pay->save();
 
@@ -221,6 +187,7 @@ class PayTableSeeder extends Seeder
   "id": "id",
   "key": "key"
 }';
+        $pay->enabled = true;
         $pay->fee_system = 0;
         $pay->save();
 
@@ -233,9 +200,9 @@ class PayTableSeeder extends Seeder
   "id": "id",
   "key": "key"
 }';
+        $pay->enabled = true;
         $pay->fee_system = 0;
         $pay->save();
-
 
         $payway = new \App\PayWay;
         $payway->name = '前台支付方式-支付宝';
@@ -272,6 +239,7 @@ class PayTableSeeder extends Seeder
         $payway->channels = [[\App\Pay::where('driver', 'QPay')->first()->id, 1]];
         $payway->saveOrFail();
     }
+
     public function run()
     {
         self::initPay();
