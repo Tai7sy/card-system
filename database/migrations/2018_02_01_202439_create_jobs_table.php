@@ -1,2 +1,36 @@
 <?php
-use Illuminate\Support\Facades\Schema; use Illuminate\Database\Schema\Blueprint; use Illuminate\Database\Migrations\Migration; class CreateJobsTable extends Migration { public function up() { Schema::create('jobs', function (Blueprint $sp2bac3d) { $sp2bac3d->bigIncrements('id'); $sp2bac3d->string('queue', 128)->index(); $sp2bac3d->longText('payload'); $sp2bac3d->unsignedTinyInteger('attempts'); $sp2bac3d->unsignedInteger('reserved_at')->nullable(); $sp2bac3d->unsignedInteger('available_at'); $sp2bac3d->unsignedInteger('created_at'); }); } public function down() { Schema::dropIfExists('jobs'); } }
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateJobsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('queue',128)->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('jobs');
+    }
+}

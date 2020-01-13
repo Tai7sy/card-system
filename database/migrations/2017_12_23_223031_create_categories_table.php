@@ -1,2 +1,37 @@
 <?php
-use Illuminate\Support\Facades\Schema; use Illuminate\Database\Schema\Blueprint; use Illuminate\Database\Migrations\Migration; class CreateCategoriesTable extends Migration { public function up() { Schema::create('categories', function (Blueprint $sp2bac3d) { $sp2bac3d->increments('id'); $sp2bac3d->integer('user_id')->index(); $sp2bac3d->text('name'); $sp2bac3d->integer('sort')->default(1000); $sp2bac3d->string('password')->nullable(); $sp2bac3d->boolean('password_open')->default(false); $sp2bac3d->boolean('enabled'); $sp2bac3d->timestamps(); }); } public function down() { Schema::dropIfExists('categories'); } }
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateCategoriesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('categories', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('user_id')->index();
+            $table->text('name');
+            $table->integer('sort')->default(1000);
+            $table->string('password')->nullable();
+            $table->boolean('password_open')->default(false);
+            $table->boolean('enabled');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('categories');
+    }
+}

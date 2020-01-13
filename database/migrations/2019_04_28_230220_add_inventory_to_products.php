@@ -1,2 +1,46 @@
 <?php
-use Illuminate\Support\Facades\Schema; use Illuminate\Database\Schema\Blueprint; use Illuminate\Database\Migrations\Migration; class AddInventoryToProducts extends Migration { public function up() { if (!Schema::hasColumn('products', 'inventory')) { Schema::table('products', function (Blueprint $sp2bac3d) { $sp2bac3d->tinyInteger('inventory')->default(\App\User::INVENTORY_AUTO)->after('enabled'); $sp2bac3d->tinyInteger('fee_type')->default(\App\User::FEE_TYPE_AUTO)->after('inventory'); }); } } public function down() { foreach (array('inventory', 'fee_type') as $sp8984ed) { try { Schema::table('products', function (Blueprint $sp2bac3d) use($sp8984ed) { $sp2bac3d->dropColumn($sp8984ed); }); } catch (\Throwable $spf95c2c) { } } } }
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class AddInventoryToProducts extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        if (!Schema::hasColumn('products', 'inventory')) {
+
+            Schema::table('products', function (Blueprint $table) {
+                $table->tinyInteger('inventory')->default(\App\User::INVENTORY_AUTO)->after('enabled'); // 商品库存状态 默认跟随店铺
+                $table->tinyInteger('fee_type')->default(\App\User::FEE_TYPE_AUTO)->after('inventory');// 商品手续费状态 默认跟随店铺
+
+            });
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        foreach ([
+                     'inventory',
+                     'fee_type'
+                 ] as $column) {
+            try {
+                Schema::table('products', function (Blueprint $table) use ($column) {
+                    $table->dropColumn($column);
+                });
+            } catch (\Throwable $e) {
+            }
+        }
+
+    }
+}

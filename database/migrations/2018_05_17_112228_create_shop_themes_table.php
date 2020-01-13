@@ -1,2 +1,37 @@
 <?php
-use Illuminate\Support\Facades\Schema; use Illuminate\Database\Schema\Blueprint; use Illuminate\Database\Migrations\Migration; class CreateShopThemesTable extends Migration { public function up() { Schema::create('shop_themes', function (Blueprint $sp2bac3d) { $sp2bac3d->increments('id'); $sp2bac3d->string('name', 128)->unique(); $sp2bac3d->string('description')->nullable(); $sp2bac3d->text('options')->nullable(); $sp2bac3d->text('config')->nullable(); $sp2bac3d->boolean('enabled')->default(true); }); \App\ShopTheme::freshList(); } public function down() { Schema::dropIfExists('shop_themes'); } }
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateShopThemesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('shop_themes', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name', 128)->unique();
+            $table->string('description')->nullable();
+            $table->text('options')->nullable();
+            $table->text('config')->nullable();
+            $table->boolean('enabled')->default(true);
+        });
+
+        \App\ShopTheme::freshList();
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('shop_themes');
+    }
+}
