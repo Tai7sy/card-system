@@ -1,8 +1,8 @@
 <h1 align="center">CardSystem</h1>
 <p align="center">
-<a href="https://github.com/Tai7sy/card-system/releases"><img src="https://img.shields.io/badge/version-3.0-blue" alt="License"></a>
-<img alt="PHP from Packagist badge" src="https://img.shields.io/badge/php-%3E%3D7.0.0-green">
-<a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"></a>
+<a href="https://github.com/Tai7sy/card-system/releases"><img src="https://img.shields.io/badge/version-3.0-blue.svg?style=flat-square" alt="License"></a>
+<img alt="PHP from Packagist badge" src="https://img.shields.io/badge/php-%3E%3D7.0.0-green.svg?style=flat-square">
+<a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat-square" alt="License"></a>
 <a href="https://travis-ci.org/Tai7sy/card-system"><img src="https://img.shields.io/travis/Tai7sy/card-system.svg?style=flat-square" alt="Travis"></a>
 <br><br>
 <a href="https://github.com/Tai7sy/card-system/wiki/%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B---BT%E9%9D%A2%E6%9D%BF">安装文档</a>&nbsp;&nbsp;
