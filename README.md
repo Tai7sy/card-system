@@ -4,7 +4,6 @@
 <img alt="PHP from Packagist badge" src="https://img.shields.io/badge/php-%3E%3D7.0.0-green">
 <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"></a>
 <a href="https://travis-ci.org/Tai7sy/card-system"><img src="https://img.shields.io/travis/Tai7sy/card-system.svg?style=flat-square" alt="Travis"></a>
-<img alt="Libraries.io dependency status for GitHub repo" src="https://img.shields.io/librariesio/github/Tai7sy/card-system">
 <br><br>
 <a href="https://github.com/Tai7sy/card-system/wiki/%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B---BT%E9%9D%A2%E6%9D%BF">安装文档</a>&nbsp;&nbsp;
 <a href="https://github.com/Tai7sy/card-system/wiki/%E6%9B%B4%E6%96%B0%E6%95%99%E7%A8%8B">更新文档</a>

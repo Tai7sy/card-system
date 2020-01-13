@@ -1,2 +1,22 @@
 <?php
-use Faker\Generator as Faker; $sp890538->define(App\Order::class, function (Faker $spe6eed0) { $sp4b6ac9 = date('YmdHis') . mt_rand(10000, 99999); while (\App\Order::whereOrderNo($sp4b6ac9)->exists()) { $sp4b6ac9 = date('YmdHis') . mt_rand(10000, 99999); } $sp9fbdc0 = random_int(0, 1) ? $spe6eed0->email : 'user01@qq.com'; $sp6f4ec1 = 1000; $spa4b6bf = random_int(0, 1) * 100; $sp85cc64 = $sp6f4ec1 - $spa4b6bf; return array('user_id' => 2, 'order_no' => $sp4b6ac9, 'product_id' => 1, 'count' => 1); });
+
+use Faker\Generator as Faker;
+
+$factory->define(App\Order::class, function (Faker $faker) {
+    $order_no = date('YmdHis') . mt_rand(10000, 99999);
+    while (\App\Order::whereOrderNo($order_no)->exists()) {
+        $order_no = date('YmdHis') . mt_rand(10000, 99999);
+    }
+
+    $email = random_int(0,1) ? $faker->email : 'user01@qq.com';
+
+    $price = 1000;
+    $discount = random_int(0,1) * 100;
+    $paid = $price - $discount;
+    return [
+        'user_id' => 2,
+        'order_no' => $order_no,
+        'product_id' => 1,
+        'count' => 1
+    ];
+});
