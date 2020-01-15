@@ -109,9 +109,10 @@ class Order extends Model
 
     /**
      * 获取发货的提示
+     * @param bool $is_mail
      * @return string
      */
-    function getSendMessage()
+    function getSendMessage($is_mail = false)
     {
         // 发了货的
         if (count($this->cards)) {
@@ -135,8 +136,10 @@ class Order extends Model
         }else{
             $card_msg = '订单#' . $this->order_no . '&nbsp;已支付，目前库存不足，您购买的' . ($this->count - count($this->cards)) . '件未发货，请联系商家客服发货<br>';
         }
-        $card_msg .= '<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $this->user->qq . '&site=qq&menu=yes" target="_blank">商家客服QQ:' . $this->user->qq . '</a>&nbsp;&nbsp;&nbsp;&nbsp;';
-        $card_msg .= '<a href="'. config('app.url') . route('pay.result', [$this->order_no]) .'" target="_blank">查看订单详情</a><br>';
+        $card_msg .= '<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $this->user->qq . '&site=qq&menu=yes" target="_blank">商家QQ:' . $this->user->qq . '</a>';
+        if ($is_mail) {
+            $card_msg .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="' . config('app.url') . route('pay.result', [$this->order_no]) . '" target="_blank">查看订单详情</a><br>';
+        }
         return $card_msg;
     }
 
@@ -151,7 +154,7 @@ class Order extends Model
         $cards = $this->getCardsArray();
 
         try {
-            Mail::to($mail)->Queue(new OrderShipped($this, $this->getSendMessage(), join('<br>', $cards)));
+            Mail::to($mail)->Queue(new OrderShipped($this, $this->getSendMessage(true), join('<br>', $cards)));
             $this->send_status = \App\Order::SEND_STATUS_EMAIL_SUCCESS;
             $this->saveOrFail();
         } catch (\Throwable $e) {
