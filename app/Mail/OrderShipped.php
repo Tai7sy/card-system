@@ -12,7 +12,8 @@ class OrderShipped extends Mailable
     use Queueable, SerializesModels;
 
 
-    public $order;
+    public $order_no;
+    public $order_url;
     public $card_msg;
     public $cards_txt;
 
@@ -25,7 +26,8 @@ class OrderShipped extends Mailable
      */
     public function __construct($order, $card_msg, $cards_txt)
     {
-        $this->order = $order;
+        $this->order_no = $order->order_no;
+        $this->order_url = config('app.url') . route('pay.result', [$order->order_no], false);
         $this->card_msg = $card_msg;
         $this->cards_txt = $cards_txt;
     }
@@ -37,7 +39,7 @@ class OrderShipped extends Mailable
      */
     public function build()
     {
-        return $this->subject('订单提醒(#' . $this->order->order_no . ')-' . config('app.name'))
+        return $this->subject('订单提醒(#' . $this->order_no . ')-' . config('app.name'))
             ->view('emails.order');
     }
 }

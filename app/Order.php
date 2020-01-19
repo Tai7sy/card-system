@@ -109,10 +109,9 @@ class Order extends Model
 
     /**
      * 获取发货的提示
-     * @param bool $is_mail
      * @return string
      */
-    function getSendMessage($is_mail = false)
+    function getSendMessage()
     {
         // 发了货的
         if (count($this->cards)) {
@@ -128,33 +127,32 @@ class Order extends Model
                 ) {
                     // 重复卖 or 手动发货
                     $card_msg = '订单#' . $this->order_no . '&nbsp;已支付，您购买的内容如下：';
-                }else{
+                } else {
                     // 发货了一部分 (应该不会到这里, 卡密不够不会发货)
-                    $card_msg = '订单#' . $this->order_no . '&nbsp;已支付，目前库存不足，您还有' . ($this->count - count($this->cards)) . '件未发货，请联系商家客服发货<br>已发货商品见下方：<br>';
+                    $card_msg = '订单#' . $this->order_no . '&nbsp;已支付，目前库存不足，您还有' . ($this->count - count($this->cards)) . '件未发货，请联系商家客服发货，';
+                    $card_msg .= '商家客服QQ：<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $this->user->qq . '&site=qq&menu=yes" target="_blank">' . $this->user->qq . '</a><br>';
+                    $card_msg .= '已发货商品见下方：';
                 }
             }
-        }else{
+        } else {
             $card_msg = '订单#' . $this->order_no . '&nbsp;已支付，目前库存不足，您购买的' . ($this->count - count($this->cards)) . '件未发货，请联系商家客服发货<br>';
-        }
-        $card_msg .= '<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $this->user->qq . '&site=qq&menu=yes" target="_blank">商家QQ:' . $this->user->qq . '</a>';
-        if ($is_mail) {
-            $card_msg .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="' . config('app.url') . route('pay.result', [$this->order_no]) . '" target="_blank">查看订单详情</a><br>';
+            $card_msg .= '商家客服QQ：<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $this->user->qq . '&site=qq&menu=yes" target="_blank">' . $this->user->qq . '</a>';
         }
         return $card_msg;
     }
 
     function sendEmail($mail = false)
     {
-        if($mail === false){
+        if ($mail === false) {
             $mail = @json_decode($this->contact_ext)['_mail'];
         }
-        if(!$mail || !@filter_var($mail, FILTER_VALIDATE_EMAIL)){
+        if (!$mail || !@filter_var($mail, FILTER_VALIDATE_EMAIL)) {
             return;
         }
         $cards = $this->getCardsArray();
 
         try {
-            Mail::to($mail)->Queue(new OrderShipped($this, $this->getSendMessage(true), join('<br>', $cards)));
+            Mail::to($mail)->Queue(new OrderShipped($this, $this->getSendMessage(), join('<br>', $cards)));
             $this->send_status = \App\Order::SEND_STATUS_EMAIL_SUCCESS;
             $this->saveOrFail();
         } catch (\Throwable $e) {
@@ -176,10 +174,10 @@ class Order extends Model
 
     function sendSms($mobile = false)
     {
-        if($mobile === false){
+        if ($mobile === false) {
             $mobile = @json_decode($this->contact_ext)['_mobile'];
         }
-        if(!$mobile || strlen($mobile) !== 11){
+        if (!$mobile || strlen($mobile) !== 11) {
             return;
         }
         OrderSms::dispatch($mobile, $this);
