@@ -23,7 +23,6 @@
     "laravel/tinker": "~1.0",
     "mews/captcha": "^2.3",
     "naux/sendcloud": "^1.1",
-    "overtrue/laravel-wechat": "^4.0",
     "predis/predis": "^1.0",
     "rap2hpoutre/laravel-log-viewer": "^0.13.0",
     "tymon/jwt-auth": "1.0.0-rc.5",
