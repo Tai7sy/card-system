@@ -10,7 +10,8 @@
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;margin-top: 4px;">尊敬的用户:</p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">
                     {!! $card_msg !!}<br>
-                    <code>{!! $cards_txt !!}</code>
+                    <code>{!! $cards_txt !!}</code><br>
+                    <a href="{!! $order_url !!}" target="_blank">查看订单详情</a>
                 </p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">感谢您的访问，祝您使用愉快！<br>此致</p>
             </div>
