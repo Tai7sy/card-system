@@ -5,14 +5,11 @@
         <div class="email-title"
              style="-webkit-box-shadow: 10px 10px 10px rgba(0,0,0,.13);box-shadow: 10px 10px 10px rgba(0,0,0,.13);">
             <h1 style="color:#fff;background: #51a0e3;line-height:70px;font-size:24px;font-weight:normal;padding-left:40px;margin:0">
-                订单提醒</h1>
+                测试邮件</h1>
             <div class="email-text" style="background:#fff;padding:20px 32px 0;">
-                <p style="color: #6e6e6e;font-size:13px;line-height:24px;margin-top: 4px;">尊敬的用户:</p>
+                <p style="color: #6e6e6e;font-size:13px;line-height:24px;margin-top: 4px;">管理员:</p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">
-                    {!! $card_msg !!}<br>
-                    <code>{!! $cards_txt !!}</code><br>
-                    <a href="{!! $order_url !!}" target="_blank">查看订单详情</a>
-                </p>
+                    如果您收到了此邮件，代表您的邮件发送测试成功。</p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">感谢您的访问，祝您使用愉快！<br>此致</p>
             </div>
             <p style="color: #999999;font-size:13px;line-height:24px;text-align:right;padding:0 32px 16px">
