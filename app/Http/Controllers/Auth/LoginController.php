@@ -55,7 +55,7 @@ class LoginController extends Controller
             /** @var \App\User $user */
             $user = Auth::getUser();
 
-            $ip = $request->ip();
+            $ip = Helper::getIP() ?? $request->ip();
             $user->logs()->create([
                 'action' => \App\Log::ACTION_LOGIN,
                 'ip' => $ip,

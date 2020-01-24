@@ -25,6 +25,16 @@ module.exports = {
   transpileDependencies: [
     /\bvue-awesome\b/
   ],
+  css: {
+    loaderOptions: {
+      postcss:{
+        config: {
+          // web_common 里面的postcss配置寻找路径
+          path: path.resolve(__dirname)
+        }
+      }
+    }
+  },
   chainWebpack: config => {
     if (process.env.NODE_ENV === 'development') {
       config.plugin('html').tap(args => {
@@ -35,28 +45,6 @@ module.exports = {
   },
   configureWebpack: config => {
     // console.log(JSON.stringify(config, null, 2));
-    // process.exit();
-
-    function filter_loader (rules) {
-      rules.forEach(rule => {
-        if (rule.use) {
-          rule.use.forEach(use => {
-            if (use.loader === 'postcss-loader') {
-              Object.assign(use.options, {
-                config: {
-                  path: path.resolve(__dirname)
-                }
-              });
-            }
-          })
-        }
-        if (rule.oneOf) {
-          filter_loader(rule.oneOf)
-        }
-      });
-    }
-
-    filter_loader(config.module.rules);
     // process.exit();
     return require(path.resolve(__dirname, 'build/webpack.' + (process.env.NODE_ENV === 'production' ? 'prod' : 'dev') + '.conf.js'))
   },
