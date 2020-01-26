@@ -36,7 +36,7 @@ class AuthenticateToken extends BaseMiddleware
             return false;
         }
 
-        return false;
+        return true;
     }
 
 
