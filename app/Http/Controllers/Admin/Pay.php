@@ -51,9 +51,9 @@ class Pay extends Controller
 
         $day = (int)$request->input('day');
         if ($day === 30) {
-            $before = Carbon::now()->addMonths(-1);
+            $start_at = Carbon::now()->addMonths(-1)->toDateString() . ' 00:00:00';
         } else {
-            $before = Carbon::now()->addDays(-$day);
+            $start_at = Carbon::now()->addDays(-$day)->toDateString() . ' 00:00:00';
         }
 
         $list = $this->authQuery($request, \App\Order::class)
@@ -62,7 +62,7 @@ class Pay extends Controller
                 $query->where('status', \App\Order::STATUS_PAID)
                     ->orWhere('status', \App\Order::STATUS_SUCCESS);
             })
-            ->where('paid_at', '>=', $before)
+            ->where('paid_at', '>=', $start_at)
             ->with(['pay' => function ($query) {
                 /** @var \Illuminate\Database\Eloquent\Builder $query */
                 $query->select(['id', 'name']);

@@ -203,9 +203,9 @@ class Order extends Controller
 
         $day = (int)$request->input('day');
         if ($day === 30) {
-            $before = Carbon::now()->addMonths(-1);
+            $start_at = Carbon::now()->addMonths(-1)->toDateString() . ' 00:00:00';
         } else {
-            $before = Carbon::now()->addDays(-$day);
+            $start_at = Carbon::now()->addDays(-$day)->toDateString() . ' 00:00:00';
         }
 
         $list = $this->authQuery($request, \App\Order::class)
@@ -214,7 +214,7 @@ class Order extends Controller
                 $query->where('status', \App\Order::STATUS_PAID)
                     ->orWhere('status', \App\Order::STATUS_SUCCESS);
             })
-            ->where('paid_at', '>=', $before)
+            ->where('paid_at', '>=', $start_at)
             ->groupBy('date')->orderBy('date', 'DESC')
             /** 这里按照付款 统计金额 */
             ->selectRaw('DATE(`paid_at`) as "date",COUNT(*) as "count",SUM(`paid`) as "paid",SUM(`paid`-`sms_price`-`cost`-`fee`) as "profit"')
@@ -381,7 +381,7 @@ class Order extends Controller
             // 需要发货到邮箱
             if (System::_getInt('mail_send_order')) {
                 $mail = @json_decode($order->contact_ext, true)['_mail'];
-                if($mail){
+                if ($mail) {
                     $order->sendEmail($mail);
                 }
             }
@@ -389,7 +389,7 @@ class Order extends Controller
             // 需要发送到手机
             if ($order->status === \App\Order::STATUS_SUCCESS && System::_getInt('sms_send_order')) {
                 $mobile = @json_decode($order->contact_ext, true)['_mobile'];
-                if($mobile){
+                if ($mobile) {
                     $order->sendSms($mobile);
                 }
             }

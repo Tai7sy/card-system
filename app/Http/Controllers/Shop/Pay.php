@@ -387,19 +387,23 @@ class Pay extends Controller
      */
     function qrQuery(Request $request, $pay_id)
     {
-        $order_no_outer = $request->input('id', '');
-        return self::payReturn($request, $pay_id, $order_no_outer);
+        $order_no_outer = $request->input('id'); // 订单号
+        if (isset($order_no_outer{5})) {
+            return self::payReturn($request, $pay_id, $order_no_outer);
+        } else {
+            return Response::fail('order_no error');
+        }
     }
 
     /**
      * 支付回调 - 前台返回 (二维码查询也是这个接口)
      * @param Request $request
      * @param string $pay_id
-     * @param string $order_no 可选参数, <br>
+     * @param string|null $order_no 可选参数, <br>
      * 若设置(二维码查询/Aliwap/Alipay), 会检验是否已经发货(若发货, 直接返回, 不进行verify了, 效率高一些)
      * @return mixed
      */
-    function payReturn(Request $request, $pay_id, $order_no = '')
+    function payReturn(Request $request, $pay_id, $order_no = null)
     {
         $logTag = 'payReturn: ' . $pay_id;
         \Log::debug($logTag);
@@ -414,7 +418,8 @@ class Pay extends Controller
         $logTag .= ',' . $pay->driver;
 
         // check if already processed
-        if (strlen($order_no) > 0) {
+        if ($order_no && isset($order_no{5})) {
+            // 如果订单号传递了
             $order = \App\Order::whereOrderNo($order_no)->firstOrFail();
             if ($order && ($order->status === \App\Order::STATUS_PAID || $order->status === \App\Order::STATUS_SUCCESS)) {
                 \Log::notice($logTag . ' already success' . "\n\n");
