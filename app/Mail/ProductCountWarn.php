@@ -11,6 +11,13 @@ class ProductCountWarn extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /** 重试 3 次. */
+    public $tries = 3;
+
+    /** 超时时间。 */
+    public $timeout = 20;
+
+
     public $product = null;
     public $product_count = null;
 

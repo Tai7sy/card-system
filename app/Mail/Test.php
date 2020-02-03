@@ -11,6 +11,13 @@ class Test extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /** 重试 3 次. */
+    public $tries = 3;
+
+    /** 超时时间。 */
+    public $timeout = 20;
+
+
     /**
      * Create a new message instance.
      *
