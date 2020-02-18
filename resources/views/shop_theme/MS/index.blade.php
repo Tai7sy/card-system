@@ -65,7 +65,7 @@ $version = '1.3';
 <div id="page-1">
     <div class="shop-ann" id="ann">
         <div>
-            商家名稱:&nbsp;{{ $config['shop']['name'] }}，商家ＱＱ:&nbsp;{{ $config['shop']['qq'] }}
+            商家名稱:&nbsp;{{ $config['shop']['name'] }}，商家客服:&nbsp;{{ $config['shop']['qq'] }}
         </div>
         <p class="container ql-editor quill-html"></p>
     </div>
