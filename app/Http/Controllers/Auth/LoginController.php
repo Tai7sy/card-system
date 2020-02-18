@@ -82,6 +82,7 @@ class LoginController extends Controller
         $user = Auth::getUser();
         $user->addHidden(['created_at', 'updated_at']);
         $user->append(['last_login_at']);
+        $user->setAttribute('shop_name', config('app.name'));
 
         $response = [];
         $response['user'] = $user;
