@@ -40,7 +40,7 @@ class Order extends Controller
                 return Response::success();
             $query->where('contact', $contact);
         } else {
-            return Response::fail('请选择查询类型');
+            return Response::fail(trans('shop.search_type.required'));
         }
 
 

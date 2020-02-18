@@ -12,14 +12,14 @@ class Product extends Controller
     function get(Request $request)
     {
         $category_id = (int)$request->post('category_id');
-        if (!$category_id) return Response::forbidden('请选择商品分类');
+        if (!$category_id) return Response::forbidden(trans('shop.category.required'));
 
         $category = \App\Category::where('id', $category_id)
             ->first();
-        if (!$category) return Response::forbidden('商品分类未找到');
+        if (!$category) return Response::forbidden(trans('shop.category.not_found'));
 
         if ($category->password_open && $request->post('password') !== $category->password) {
-            return Response::fail('分类密码输入错误');
+            return Response::fail(trans('shop.category.password_error'));
         }
 
         $products = \App\Product::where('category_id', $category_id)
@@ -36,13 +36,13 @@ class Product extends Controller
     function verifyPassword(Request $request)
     {
         $product_id = (int)$request->post('product_id');
-        if (!$product_id) return Response::forbidden('请选择商品');
+        if (!$product_id) return Response::forbidden(trans('shop.product.required'));
 
         $product = \App\Product::where('id', $product_id)->first();
-        if (!$product) return Response::forbidden('商品未找到');
+        if (!$product) return Response::forbidden(trans('shop.product.not_found'));
 
         if ($product->password_open && $request->post('password') !== $product->password) {
-            return Response::fail('商品密码输入错误');
+            return Response::fail(trans('shop.product.password_error'));
         }
         return Response::success();
     }
