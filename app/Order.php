@@ -113,30 +113,30 @@ class Order extends Model
      */
     function getSendMessage()
     {
-        // 发了货的
+        // 發了貨的
         if (count($this->cards)) {
 
-            // 正常情况, 发货数量 == 订单购买数量
+            // 正常情況, 發貨數量 == 訂單購買數量
             if (count($this->cards) == $this->count) {
-                $card_msg = '订单#' . $this->order_no . '&nbsp;已支付，您购买的内容如下：';
+                $card_msg = '訂單#' . $this->order_no . '&nbsp;已支付，您購買的內容如下：';
             } else {
-                // 如果数量不对
+                // 如果數量不對
                 if (
-                    $this->cards[0]->type === \App\Card::TYPE_REPEAT ||  // 卡密是重复卖的, 发少了正常, 这种情况 count($this->cards) === 1
-                    @$this->product->delivery === \App\Product::DELIVERY_MANUAL // 手动发货(手动发货的时候, 卡密可能只是一段话, 买多个发同一个)
+                    $this->cards[0]->type === \App\Card::TYPE_REPEAT ||  // 卡密是重復賣的, 發少了正常, 這種情況 count($this->cards) === 1
+                    @$this->product->delivery === \App\Product::DELIVERY_MANUAL // 手動發貨(手動發貨的時候, 卡密可能只是一段話, 買多個發同一個)
                 ) {
-                    // 重复卖 or 手动发货
-                    $card_msg = '订单#' . $this->order_no . '&nbsp;已支付，您购买的内容如下：';
+                    // 重復賣 or 手動發貨
+                    $card_msg = '訂單#' . $this->order_no . '&nbsp;已支付，您購買的內容如下：';
                 } else {
-                    // 发货了一部分 (应该不会到这里, 卡密不够不会发货)
-                    $card_msg = '订单#' . $this->order_no . '&nbsp;已支付，目前库存不足，您还有' . ($this->count - count($this->cards)) . '件未发货，请联系商家客服发货，';
-                    $card_msg .= '商家客服QQ：<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $this->user->qq . '&site=qq&menu=yes" target="_blank">' . $this->user->qq . '</a><br>';
-                    $card_msg .= '已发货商品见下方：';
+                    // 發貨了一部分 (應該不會到這里, 卡密不夠不會發貨)
+                    $card_msg = '訂單#' . $this->order_no . '&nbsp;已支付，目前庫存不足，您還有' . ($this->count - count($this->cards)) . '件未發貨，請聯系商家客服發貨，';
+                    $card_msg .= '商家客服：' . $this->user->qq . '<br>';
+                    $card_msg .= '已發貨商品見下方：';
                 }
             }
         } else {
-            $card_msg = '订单#' . $this->order_no . '&nbsp;已支付，目前库存不足，您购买的' . ($this->count - count($this->cards)) . '件未发货，请联系商家客服发货<br>';
-            $card_msg .= '商家客服QQ：<a href="http://wpa.qq.com/msgrd?v=3&uin=' . $this->user->qq . '&site=qq&menu=yes" target="_blank">' . $this->user->qq . '</a>';
+            $card_msg = '訂單#' . $this->order_no . '&nbsp;已支付，目前庫存不足，您購買的' . ($this->count - count($this->cards)) . '件未發貨，請聯系商家客服發貨<br>';
+            $card_msg .= '商家客服：' . $this->user->qq;
         }
         return $card_msg;
     }
