@@ -1,6 +1,6 @@
 function msg(options) {
     if (!options.btn) {
-        options.btn = ['确定', '取消'];
+        options.btn = ['確定', '取消'];
     }
     swal({
         type: options.type,
@@ -30,9 +30,9 @@ function showToast(type, content) {
 
 function showShopInfo() {
     swal({
-        title: '店铺信息',
+        title: '店鋪信息',
         html: $('#shop_html').html(),
-        confirmButtonText: '关闭'
+        confirmButtonText: '關閉'
     })
 }
 
@@ -40,15 +40,15 @@ function showAnn() {
     swal({
         title: '商家公告',
         html: $('#ann').html(),
-        confirmButtonText: '关闭'
+        confirmButtonText: '關閉'
     })
 }
 
 function showPfyh() {
     swal({
-        title: '批发优惠',
+        title: '批發優惠',
         html: $('#discount-tip').html(),
-        confirmButtonText: '关闭'
+        confirmButtonText: '關閉'
     })
 }
 
@@ -78,7 +78,7 @@ function passwordDialog(title, then) {
             autocapitalize: 'off',
             autocorrect: 'off'
         },
-        confirmButtonText: '确定',
+        confirmButtonText: '確定',
         showCancelButton: true,
         cancelButtonText: '取消',
         allowOutsideClick: false,
@@ -92,7 +92,7 @@ function passwordDialog(title, then) {
 
 $(function () {
     if (!config.shop) {
-        // 只显示三个按钮
+        // 只顯示三個按鈕
         $('.top_bg>.top').hide();
         $('.top_bg ~ div').hide()
     }
@@ -107,7 +107,7 @@ $(function () {
         $(this).siblings('li').find('input').attr('checked', false);
     });
 
-    // 选中第一个
+    // 選中第一個
 
     $('#browser_shadow').click(function () {
         $(this).hide();
@@ -116,7 +116,7 @@ $(function () {
     if (device.isQQ()) {
         if ($('li.qq').length > 0) {
             $('li.qq:first').trigger('click');
-            // QQ内可以跳转支付宝和微信
+            // QQ內可以跳轉支付寶和微信
             // $('li[class!=qq]>span').addClass('disabled');
         } else {
             // $('#browser_shadow').show();
@@ -142,7 +142,7 @@ $(function () {
 
 
 /**
- * 浏览器探测
+ * 瀏覽器探測
  */
 function detectBrowser($that) {
     var li_id = $that.attr('class');

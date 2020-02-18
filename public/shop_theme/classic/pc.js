@@ -8,7 +8,7 @@ function msg(options) {
         icon = 2;
     }
     if (!options.btn) {
-        options.btn = ['确定'];
+        options.btn = ['確定'];
     }
     layer.open({
         title: options.title,
@@ -37,7 +37,7 @@ function showToast(type, content) {
     }
     layer.open({
         content: content,
-        btn: ['确定'],
+        btn: ['確定'],
         icon: icon
     });
 }
@@ -54,7 +54,7 @@ function showOrderTip(tip, then) {
     layer.open({
         title: '提示',
         content: tip,
-        btn: ['已付款, 查询订单', '返回'],
+        btn: ['已付款, 查詢訂單', '返回'],
         yes: function (index) {
             then && then();
             layer.close(index);
@@ -80,7 +80,7 @@ function passwordDialog(title, then) {
 
 $(function () {
     if (!config.shop) {
-        // 只显示三个按钮
+        // 只顯示三個按鈕
         $('.nyroModal').hide();
     }
 
@@ -120,7 +120,7 @@ $(function () {
 
 
     /**
-     * 显示批发优惠价格
+     * 顯示批發優惠價格
      */
     $('#discount-btn').hover(
         function () {
@@ -130,7 +130,7 @@ $(function () {
             });
             $(this).attr("data-index", index);
         },
-        //4.关闭显示
+        //4.關閉顯示
         function () {
             layer.close($(this).attr("data-index"));
         }

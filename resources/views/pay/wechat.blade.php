@@ -20,19 +20,19 @@
         <div class="amount">￥{{ sprintf('%0.2f',$amount/100) }}</div>
         <div class="qr-image" id="qrcode"></div>
         <div id="open-app-container">
-            <span style="display: block;margin-top: 24px">请截屏此界面或保存二维码，打开微信扫码，选择相册图片</span>
+            <span style="display: block;margin-top: 24px">請截屏此界面或保存二維碼，打開微信掃碼，選擇相冊圖片</span>
             <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 8px" id="open-app"
-               href="weixin://">点击打开微信</a>
+               href="weixin://">點擊打開微信</a>
         </div>
         <div class="detail" id="orderDetail">
             <dl class="detail-ct" style="display: none;">
                 <dt>商品</dt>
                 <dd id="storeName">{{ $name }}</dd>
-                <!--dt>说明</dt>
-                <dd id="productName">用户充值</dd-->
-                <dt>订单号</dt>
+                <!--dt>說明</dt>
+                <dd id="productName">用戶充值</dd-->
+                <dt>訂單號</dt>
                 <dd id="billId">{{ $id }}</dd>
-                <dt>时间</dt>
+                <dt>時間</dt>
                 <dd id="createTime"><?php echo date('Y-m-d H:i:s')?></dd>
             </dl>
             <a href="javascript:void(0)" class="arrow"><i class="ico-arrow"></i></a>
@@ -42,8 +42,8 @@
             <span class="dec dec-right"></span>
             <div class="ico-scan"></div>
             <div class="tip-text">
-                <p>请使用微信扫一扫</p>
-                <p>扫描二维码完成支付</p>
+                <p>請使用微信掃一掃</p>
+                <p>掃描二維碼完成支付</p>
             </div>
         </div>
         <div class="tip-text">
@@ -51,7 +51,7 @@
     </div>
     <div class="foot">
         <div class="inner">
-            <p><?php echo SYS_NAME ?>, 有疑问请联系客服</p>
+            <p><?php echo SYS_NAME ?>, 有疑問請聯系客服</p>
         </div>
     </div>
 </div>
@@ -60,20 +60,20 @@
     var code_url = decodeURIComponent('{!! urlencode($qrcode) !!}');
 
     if (navigator.userAgent.match(/MicroMessenger/i) !== null && code_url.indexOf('http') === 0) {
-        // 当前在微信内, URL直接跳转
+        // 當前在微信內, URL直接跳轉
         location.href = code_url;
     } else if (code_url === 'query') {
-        // 支付成功跳转页面, 用这个页面来轮训
+        // 支付成功跳轉頁面, 用這個頁面來輪訓
         $('.tip>.ico-scan').remove();
-        $('.tip>.tip-text').html('<p>订单已支付, 正在处理...</p>');
+        $('.tip>.tip-text').html('<p>訂單已支付, 正在處理...</p>');
         $('#open-app-container').html('<p></p>');
         $('#orderDetail>.detail-ct').show();
         $('#orderDetail>.arrow').remove();
     }
     else if (navigator.userAgent.match(/MicroMessenger/i) !== null && code_url.indexOf('weixin://') === -1) {
-        // 当前在微信内, code_url是JSAPI参数
+        // 當前在微信內, code_url是JSAPI參數
         $('.tip>.ico-scan').remove();
-        $('.tip>.tip-text').html('<p>请在弹出的窗口完成支付</p>');
+        $('.tip>.tip-text').html('<p>請在彈出的窗口完成支付</p>');
         $('#open-app-container').html('<p></p>');
         $('#orderDetail>.detail-ct').show();
         $('#orderDetail>.arrow').remove();
@@ -83,12 +83,12 @@
                 'getBrandWCPayRequest', JSON.parse(code_url),
                 function (res) {
                     if (res.err_msg === 'get_brand_wcpay_request:fail') {
-                        $('.tip>.tip-text').html('<p>支付失败</p><p>' + res.err_desc + '</p>');
+                        $('.tip>.tip-text').html('<p>支付失敗</p><p>' + res.err_desc + '</p>');
                         alert(res.err_desc)
                     } else if (res.err_msg === 'get_brand_wcpay_request:ok') {
-                        //使用以上方式判断前端返回,微信团队郑重提示：
-                        //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
-                        $('.tip>.tip-text').html('<p>订单已支付, 正在处理...</p>');
+                        //使用以上方式判斷前端返回,微信團隊鄭重提示：
+                        //res.err_msg將在用戶支付成功后返回ok，但并不保證它絕對可靠。
+                        $('.tip>.tip-text').html('<p>訂單已支付, 正在處理...</p>');
                     }
                 });
         }
@@ -104,7 +104,7 @@
             onBridgeReady();
         }
     } else {
-        // 普通扫码
+        // 普通掃碼
         new QRCode('qrcode', {
             text: code_url,
             width: 230,
@@ -112,12 +112,12 @@
             colorDark: "#000000",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H,
-            title: '请使用微信扫一扫'
+            title: '請使用微信掃一掃'
         });
     }
 
 
-    // 订单详情
+    // 訂單詳情
     var orderDetail = $('#orderDetail');
     orderDetail.find('.arrow').click(function (event) {
         if (orderDetail.hasClass('detail-open')) {
@@ -142,7 +142,7 @@
                 function (r) {
                     clearInterval(interval);
                     $('.qr-image').remove();
-                    $('.tip').html('<p style="font-size:24px">已支付，正在处理...</p>');
+                    $('.tip').html('<p style="font-size:24px">已支付，正在處理...</p>');
                     window.location = r.data;
                 }, 'json');
         }
@@ -154,7 +154,7 @@
 
     // call app
     if (navigator.userAgent.match(/(iPhone|iPod|Android|ios|SymbianOS)/i) !== null) {
-        // 想跳转微信, 真的跳不过去啊, 傻吊微信
+        // 想跳轉微信, 真的跳不過去啊, 傻吊微信
     } else {
         $('#open-app-container').hide();
     }

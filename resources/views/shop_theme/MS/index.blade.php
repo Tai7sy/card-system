@@ -20,7 +20,7 @@ $version = '1.3';
 <body>
 <section class="header-store">
     <div class="header">
-        <!--导航-->
+        <!--導航-->
         <div class="logo">
             <a href="#">
                 @if(@strlen(config('app.logo')))
@@ -32,14 +32,14 @@ $version = '1.3';
         </div>
 
         <div class="nav-buttons">
-            <div class="button-container"><a href="#">首页</a></div>
-            <div class="button-container"><a target="_blank" href="/s#/record">查询订单</a></div>
+            <div class="button-container"><a href="#">首頁</a></div>
+            <div class="button-container"><a target="_blank" href="/s#/record">查詢訂單</a></div>
             @if(config('app.project') === 'card')
-                <div class="button-container"><a target="_blank" href="/s#/report">投诉订单</a></div>
+                <div class="button-container"><a target="_blank" href="/s#/report">投訴訂單</a></div>
             @endif
         </div>
 
-        <!--手机菜单按钮-->
+        <!--手機菜單按鈕-->
         <div class="nav-mobile-menu-btn">
             <div class="icon-menu">
                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -49,13 +49,13 @@ $version = '1.3';
                 </svg>
             </div>
         </div>
-        <!--手机菜单-->
+        <!--手機菜單-->
         <div class="nav-mobile-menu">
             <ul class="menu">
-                <li class="menu-item"><a href="#">首页</a></li>
-                <li class="menu-item"><a target="_blank" href="/s#/record">查询订单</a></li>
+                <li class="menu-item"><a href="#">首頁</a></li>
+                <li class="menu-item"><a target="_blank" href="/s#/record">查詢訂單</a></li>
                 @if(config('app.project') === 'card')
-                    <li class="menu-item"><a target="_blank" href="/s#/report">投诉订单</a></li>
+                    <li class="menu-item"><a target="_blank" href="/s#/report">投訴訂單</a></li>
                 @endif
             </ul>
         </div>
@@ -65,7 +65,7 @@ $version = '1.3';
 <div id="page-1">
     <div class="shop-ann" id="ann">
         <div>
-            商家名称:&nbsp;{{ $config['shop']['name'] }}，商家ＱＱ:&nbsp;{{ $config['shop']['qq'] }}
+            商家名稱:&nbsp;{{ $config['shop']['name'] }}，商家ＱＱ:&nbsp;{{ $config['shop']['qq'] }}
         </div>
         <p class="container ql-editor quill-html"></p>
     </div>
@@ -87,36 +87,36 @@ $version = '1.3';
             </div>
             <div class="price-item cutline">
                 <div class="priceName">
-                    <span class="current">售价 :</span>
+                    <span class="current">售價 :</span>
                 </div>
                 <ul class="price">
                     <li tabindex="0" id="price" class="current"><b></b></li>
                 </ul>
-                <button id="priceWholeBtn" class="seeMore">批发价格 &gt;</button>
+                <button id="priceWholeBtn" class="seeMore">批發價格 &gt;</button>
             </div>
 
             <div class="categorySelect cutline">
-                <div class="selectTitle" tabindex="0">请选择分类</div>
+                <div class="selectTitle" tabindex="0">請選擇分類</div>
                 <div id="categories">
                 </div>
             </div>
 
             <div class="productSelect cutline">
-                <div class="selectTitle" tabindex="0">请选择商品</div>
+                <div class="selectTitle" tabindex="0">請選擇商品</div>
                 <div id="products" class="options-half">
                 </div>
             </div>
             @if(in_array('sms_send_order', $config['functions']) || in_array('mail_send_order', $config['functions']))
                 <div class="extService cutline">
-                    <div class="selectTitle" tabindex="0">增值服务</div>
+                    <div class="selectTitle" tabindex="0">增值服務</div>
 
                     <div class="options-half">
                         @if(in_array('sms_send_order', $config['functions']))
                             <div class="option option-sms">
                                 <a href="javascript:;" tabindex="0">
                                     <div class="p-texts">
-                                        <span class="p-name">通过短信接收订单信息</span>
-                                        <span class="p-price">{{ $config['sms_send_order']['sms_price'] ? ('￥' . ($config['sms_send_order']['sms_price']/100)): '免费' }}</span>
+                                        <span class="p-name">通過短信接收訂單信息</span>
+                                        <span class="p-price">{{ $config['sms_send_order']['sms_price'] ? ('￥' . ($config['sms_send_order']['sms_price']/100)): '免費' }}</span>
                                     </div>
                                 </a>
                             </div>
@@ -125,8 +125,8 @@ $version = '1.3';
                             <div class="option option-mail">
                                 <a href="javascript:;" tabindex="0">
                                     <div class="p-texts">
-                                        <span class="p-name">通过邮箱接收订单信息</span>
-                                        <span class="p-price">免费</span>
+                                        <span class="p-name">通過郵箱接收訂單信息</span>
+                                        <span class="p-price">免費</span>
                                     </div>
                                 </a>
                             </div>
@@ -136,12 +136,12 @@ $version = '1.3';
             @endif
 
             <div class="buy">
-                <button class="add2cart buyBtn">立即购买</button>
+                <button class="add2cart buyBtn">立即購買</button>
             </div>
 
             <div class="buyMobile">
                 <div class="navs"></div>
-                <button class="btn buyBtn">立即购买</button>
+                <button class="btn buyBtn">立即購買</button>
             </div>
 
         </div>
@@ -164,9 +164,9 @@ $version = '1.3';
 
     <div class="checkoutContainer">
         <div class="showMobileOrder" onclick="$('.rightContainer').toggleClass('show');">
-            <div class="numbers"><span>订单信息 : </span></div>
-            <div class="price"><span>总价 : </span>
-                <span class="price-label">¥19,852.00</span>
+            <div class="numbers"><span>訂單信息 : </span></div>
+            <div class="price"><span>總價 : </span>
+                <span class="price-label">￥19,852.00</span>
                 <span class="vector go" name="go">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                          preserveAspectRatio="xMidYMid" width="100%" height="100%" viewBox="0 0 5.281 9">
@@ -179,24 +179,24 @@ $version = '1.3';
         </div>
         <div class="leftContainer">
             <div class="moduleList">
-                <div class="moduleTitle bottomline"><span>1.收货信息</span></div>
+                <div class="moduleTitle bottomline"><span>1.收貨信息</span></div>
                 <form>
                     <div class="li" id="count-box">
-                        <label for="count"><i>*</i><em>购买数量</em></label>
+                        <label for="count"><i>*</i><em>購買數量</em></label>
                         <div class="inputbox">
                             <input id="count" type="number">
                         </div>
                     </div>
                     <div class="li" id="contact-box">
-                        <label for="contact"><i>*</i><em>联系方式</em></label>
+                        <label for="contact"><i>*</i><em>聯系方式</em></label>
                         <div class="inputbox">
                             <input id="contact" placeholder="">
                         </div>
                     </div>
                     <div class="li" id="coupon-box">
-                        <label for="coupon"><em>优惠券</em></label>
+                        <label for="coupon"><em>優惠券</em></label>
                         <div class="inputbox">
-                            <input id="coupon" placeholder="请输入优惠券(没有可不填)">
+                            <input id="coupon" placeholder="請輸入優惠券(沒有可不填)">
                         </div>
                         <p id="coupon-tip"></p>
                     </div>
@@ -205,13 +205,13 @@ $version = '1.3';
                             <label>
                                 <input type="checkbox" id="send-sms"
                                        onclick="$('#sms_to-box')[this.checked ? 'show' : 'hide']();calcTotalPrice();">
-                                <span>&nbsp;通过短信接收订单信息（￥{{ $config['sms_send_order']['sms_price']/100 }}）</span>
+                                <span>&nbsp;通過短信接收訂單信息（￥{{ $config['sms_send_order']['sms_price']/100 }}）</span>
                             </label>
                         </p>
                         <div class="li" id="sms_to-box">
-                            <label for="sms_to"><em>接收手机号</em></label>
+                            <label for="sms_to"><em>接收手機號</em></label>
                             <div class="inputbox">
-                                <input id="sms_to" name="mobile" placeholder="请输入手机号，用于接收订单短信">
+                                <input id="sms_to" name="mobile" placeholder="請輸入手機號，用于接收訂單短信">
                             </div>
                         </div>
                     @endif
@@ -220,13 +220,13 @@ $version = '1.3';
                             <label>
                                 <input type="checkbox" id="send-mail"
                                        onclick="$('#mail_to-box')[this.checked ? 'show' : 'hide']();calcTotalPrice();">
-                                <span>&nbsp;通过邮件接收订单信息</span>
+                                <span>&nbsp;通過郵件接收訂單信息</span>
                             </label>
                         </p>
                         <div class="li" id="mail_to-box">
-                            <label for="mail_to"><em>接收邮箱</em></label>
+                            <label for="mail_to"><em>接收郵箱</em></label>
                             <div class="inputbox">
-                                <input id="mail_to" name="email" placeholder="请输入邮箱，用于接收订单邮件">
+                                <input id="mail_to" name="email" placeholder="請輸入郵箱，用于接收訂單郵件">
                             </div>
                         </div>
                     @endif
@@ -245,12 +245,12 @@ $version = '1.3';
                 </div>
 
                 <div class="checkoutBtnContainer">
-                    <button class="checkout checkoutBtn">提交订单</button>
+                    <button class="checkout checkoutBtn">提交訂單</button>
                 </div>
 
                 <div class="buyMobile">
                     <div class="navs"></div>
-                    <button class="btn checkoutBtn">提交订单</button>
+                    <button class="btn checkoutBtn">提交訂單</button>
                 </div>
             </div>
         </div>
@@ -258,7 +258,7 @@ $version = '1.3';
         <div class="rightContainer" onclick="event.target === this ? $('.rightContainer').toggleClass('show') : '';">
             <div class="rightContainerInner moduleList">
                 <div class="moduleTitle">
-                    <span>订单信息</span>
+                    <span>訂單信息</span>
                     <a class="edit" href="javascript:history.go(-1);">返回商店</a>
                 </div>
                 <div class="closeList" onclick="$('.rightContainer').toggleClass('show');">
@@ -269,15 +269,15 @@ $version = '1.3';
                                   fill-rule="evenodd"></path>
                         </svg>
                     </span>
-                    <em>收起订单信息</em>
+                    <em>收起訂單信息</em>
                 </div>
                 <div class="shopList">
                     <ul>
                         <li class="mainList">
-                            <div class="product-name"><p>商品名称</p></div>
+                            <div class="product-name"><p>商品名稱</p></div>
                             <div class="product-priceBox">
-                                <p>¥ 5,788.00</p>
-                                <p>数量：2</p>
+                                <p>￥ 5,788.00</p>
+                                <p>數量：2</p>
                             </div>
                         </li>
                     </ul>
@@ -285,7 +285,7 @@ $version = '1.3';
                 <div class="result">
                     <ul>
                         <li class="all">
-                            <em>总计</em><b class="price-label">¥19,852.00</b>
+                            <em>總計</em><b class="price-label">￥19,852.00</b>
                         </li>
                     </ul>
                 </div>

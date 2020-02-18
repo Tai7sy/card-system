@@ -1,15 +1,15 @@
 /*
-*text:内容  
-*delay:延迟时间  
+*text:內容  
+*delay:延遲時間  
 */
 ;(function ($) {
   function Tip(config) {
     this.config = {
-      text: '出错了',
+      text: '出錯了',
       delay: 3000,
       bgColor: '#fff0f0'//background:#fff0f0;
     };
-    //默认参数扩展
+    //默認參數擴展
     if (config && $.isPlainObject(config)) {
       $.extend(this.config, config);
     }

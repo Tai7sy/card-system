@@ -20,20 +20,20 @@
         <div class="amount">￥{{ sprintf('%0.2f',$amount/100) }}</div>
         <div class="qr-image" id="qrcode"></div>
         <div id="open-app-container">
-            <span style="display: block;margin-top: 24px">请截屏此界面或保存二维码，打开微信扫码，选择相册图片</span>
-            <span style="display: block;color: red;margin-top: 8px">请支付成功后直接返回，不要重复支付！</span>
-            <span style="display: block;color: red;margin-top: 8px">请支付成功后直接返回，不要重复支付！</span>
-            <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 8px" id="open-app" href="weixin://">点击打开微信</a>
+            <span style="display: block;margin-top: 24px">請截屏此界面或保存二維碼，打開微信掃碼，選擇相冊圖片</span>
+            <span style="display: block;color: red;margin-top: 8px">請支付成功后直接返回，不要重復支付！</span>
+            <span style="display: block;color: red;margin-top: 8px">請支付成功后直接返回，不要重復支付！</span>
+            <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 8px" id="open-app" href="weixin://">點擊打開微信</a>
         </div>
         <div class="detail" id="orderDetail">
             <dl class="detail-ct" style="display: none;">
                 <dt>商品</dt>
                 <dd id="storeName">{{ $name }}</dd>
-                <!--dt>说明</dt>
-                <dd id="productName">用户充值</dd-->
-                <dt>订单号</dt>
+                <!--dt>說明</dt>
+                <dd id="productName">用戶充值</dd-->
+                <dt>訂單號</dt>
                 <dd id="billId">{{ $id }}</dd>
-                <dt>时间</dt>
+                <dt>時間</dt>
                 <dd id="createTime"><?php echo date('Y-m-d H:i:s')?></dd>
             </dl>
             <a href="javascript:void(0)" class="arrow"><i class="ico-arrow"></i></a>
@@ -43,8 +43,8 @@
             <span class="dec dec-right"></span>
             <div class="ico-scan"></div>
             <div class="tip-text">
-                <p>请使用微信扫一扫</p>
-                <p>扫描二维码完成支付</p>
+                <p>請使用微信掃一掃</p>
+                <p>掃描二維碼完成支付</p>
             </div>
         </div>
         <div class="tip-text">
@@ -52,7 +52,7 @@
     </div>
     <div class="foot">
         <div class="inner">
-            <p><?php echo SYS_NAME ?>, 有疑问请联系客服</p>
+            <p><?php echo SYS_NAME ?>, 有疑問請聯系客服</p>
         </div>
     </div>
 </div>
@@ -66,10 +66,10 @@
         colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H,
-        title: '请使用微信扫一扫'
+        title: '請使用微信掃一掃'
     });
 
-    // 订单详情
+    // 訂單詳情
     var orderDetail = $('#orderDetail');
     orderDetail.find('.arrow').click(function (event) {
         if (orderDetail.hasClass('detail-open')) {
@@ -94,7 +94,7 @@
                 function (r) {
                     clearInterval(interval);
                     $('.qr-image').remove();
-                    $('.tip').html('<p style="font-size:24px">已支付，正在处理...</p>');
+                    $('.tip').html('<p style="font-size:24px">已支付，正在處理...</p>');
                     window.location = r.data;
                 }, 'json');
         }
@@ -109,7 +109,7 @@
     } else {
         // call app
         if (navigator.userAgent.match(/(iPhone|iPod|Android|ios|SymbianOS)/i) !== null) {
-            // 想跳转微信, 真的跳不过去啊, 傻吊微信
+            // 想跳轉微信, 真的跳不過去啊, 傻吊微信
         } else {
             // $('#open-app-container').hide();
             $('#open-app-tip').hide();
@@ -118,7 +118,7 @@
     }
 
     setTimeout(function () {
-        alert('请支付成功后直接返回，不要重复支付！');
+        alert('請支付成功后直接返回，不要重復支付！');
     }, 100);
 </script>
 </body>

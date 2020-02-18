@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" name="viewport">
-    <title>支付宝扫码</title>
+    <title>支付寶掃碼</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="renderer" content="webkit">
     <link type="text/css" href="/plugins/css/ali_qr.css" rel="stylesheet">
@@ -51,23 +51,23 @@
 <body>
 <div class="body">
     <h1 class="mod-title">
-        <span class="ico-wechat"></span><span class="text">支付宝扫码</span>
+        <span class="ico-wechat"></span><span class="text">支付寶掃碼</span>
     </h1>
     <div class="mod-ct">
         <div class="order"></div>
         <div class="amount">￥{{ sprintf('%0.2f',$amount/100) }}</div>
         <div class="qr-image" id="qrcode"></div>
 
-        <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 24px" id="open-app">点击打开支付宝</a>
+        <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 24px" id="open-app">點擊打開支付寶</a>
         <div class="detail" id="orderDetail">
             <dl class="detail-ct" style="display: none;">
                 <dt>商品</dt>
                 <dd id="storeName">{{ $name }}</dd>
-                <!--dt>说明</dt>
-                <dd id="productName">用户充值</dd-->
-                <dt>订单号</dt>
+                <!--dt>說明</dt>
+                <dd id="productName">用戶充值</dd-->
+                <dt>訂單號</dt>
                 <dd id="billId">{{ $id }}</dd>
-                <dt>时间</dt>
+                <dt>時間</dt>
                 <dd id="createTime"><?php echo date('Y-m-d H:i:s')?></dd>
             </dl>
             <a href="javascript:void(0)" class="arrow"><i class="ico-arrow"></i></a>
@@ -77,8 +77,8 @@
             <span class="dec dec-right"></span>
             <div class="ico-scan"></div>
             <div class="tip-text">
-                <p>请使用支付宝扫一扫</p>
-                <p style="color: red">先扫红包更省钱</p>
+                <p>請使用支付寶掃一掃</p>
+                <p style="color: red">先掃紅包更省錢</p>
             </div>
             <img src="https://s2.ax1x.com/2019/06/20/Vj4sWq.jpg" style="max-width: 70%; margin-top: 24px"/>
         </div>
@@ -87,7 +87,7 @@
     </div>
     <div class="foot">
         <div class="inner">
-            <p><?php echo SYS_NAME ?>, 有疑问请联系客服</p>
+            <p><?php echo SYS_NAME ?>, 有疑問請聯系客服</p>
         </div>
     </div>
     <!-- Modal Dialog -->
@@ -111,10 +111,10 @@
         colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H,
-        title: '请使用支付宝扫一扫'
+        title: '請使用支付寶掃一掃'
     });
 
-    // 订单详情
+    // 訂單詳情
     var orderDetail = $('#orderDetail');
     orderDetail.find('.arrow').click(function (event) {
         if (orderDetail.hasClass('detail-open')) {
@@ -139,7 +139,7 @@
                 function (r) {
                     clearInterval(interval);
                     $('.qr-image').remove();
-                    $('.tip').html('<p style="font-size:24px">已支付，正在处理...</p>');
+                    $('.tip').html('<p style="font-size:24px">已支付，正在處理...</p>');
                     window.location = r.data;
                 }, 'json');
         }
@@ -156,8 +156,8 @@
             goPage(app_url, app_package);
         });
         setTimeout(function () {
-            // 好像有点问题, 加了限制 2019年4月3日 13:42:34
-            // 重新开启吧, 限制没了 2019年06月24日20:05:05
+            // 好像有點問題, 加了限制 2019年4月3日 13:42:34
+            // 重新開啟吧, 限制沒了 2019年06月24日20:05:05
             goPage(app_url, app_package);
         }, 100);
     } else {

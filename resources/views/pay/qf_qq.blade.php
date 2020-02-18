@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" name="viewport">
-    <title>QQ钱包支付</title>
+    <title>QQ錢包支付</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="renderer" content="webkit">
     <link type="text/css" href="/plugins/css/qq_qr.css" rel="stylesheet">
@@ -14,7 +14,7 @@
 <body>
 <div class="body">
     <h1 class="mod-title">
-        <span class="ico-wechat"></span><span class="text">QQ钱包支付</span>
+        <span class="ico-wechat"></span><span class="text">QQ錢包支付</span>
     </h1>
     <div class="mod-ct" id="pay_body">
         <div class="order"></div>
@@ -25,11 +25,11 @@
             <dl class="detail-ct" style="display: none;">
                 <dt>商品</dt>
                 <dd id="storeName">{{ $name }}</dd>
-                <!--dt>说明</dt>
-                <dd id="productName">用户充值</dd-->
-                <dt>订单号</dt>
+                <!--dt>說明</dt>
+                <dd id="productName">用戶充值</dd-->
+                <dt>訂單號</dt>
                 <dd id="billId">{{ $id }}</dd>
-                <dt>时间</dt>
+                <dt>時間</dt>
                 <dd id="createTime"><?php echo date('Y-m-d H:i:s')?></dd>
             </dl>
             <a href="javascript:void(0)" class="arrow"><i class="ico-arrow"></i></a>
@@ -39,8 +39,8 @@
             <span class="dec dec-right"></span>
             <div class="ico-scan"></div>
             <div class="tip-text">
-                <p>请使用手机QQ扫一扫</p>
-                <p>扫描二维码完成支付</p>
+                <p>請使用手機QQ掃一掃</p>
+                <p>掃描二維碼完成支付</p>
             </div>
         </div>
         <div class="tip-text">
@@ -49,16 +49,16 @@
     <div class="mod-ct" id="jump_to_pay" style="display: none">
         <div class="tip">
             <div class="tip-text">
-                <p>若没有弹出支付窗口,&nbsp;您可以</p>
+                <p>若沒有彈出支付窗口,&nbsp;您可以</p>
             </div>
             <div class="detail" style="margin-top: 12px; padding-top: 12px">
-                <a href="javascript:jumpToPay()" class="arrow">点击重试</a>
+                <a href="javascript:jumpToPay()" class="arrow">點擊重試</a>
             </div>
         </div>
     </div>
     <div class="foot">
         <div class="inner">
-            <p><?php echo SYS_NAME ?>, 有疑问请联系客服</p>
+            <p><?php echo SYS_NAME ?>, 有疑問請聯系客服</p>
         </div>
     </div>
 </div>
@@ -80,12 +80,12 @@
             $('#pay_body').hide();
             $('#jump_to_pay').show();
             var pay_params = decodeURIComponent('{!! urlencode($qrcode) !!}');
-            // 一个超级无敌尴尬的事情: pay_params是有了, 但是mqq.tenpay.pay()需要从腾讯认证的域名调用
-            // 所以这个支付方式宣告破产
+            // 一個超級無敵尷尬的事情: pay_params是有了, 但是mqq.tenpay.pay()需要從騰訊認證的域名調用
+            // 所以這個支付方式宣告破產
             mqq.tenpay.pay(pay_params, function (e) {
                 e.resultCode = parseInt(e.resultCode);
                 0 === e.resultCode ? alert('支付成功') :
-                    e.resultCode === -11001 || e.resultCode === -1 || alert("唤起QQ钱包失败，请稍后再试"),alert(e)
+                    e.resultCode === -11001 || e.resultCode === -1 || alert("喚起QQ錢包失敗，請稍后再試"),alert(e)
             });
         }
     }
@@ -101,7 +101,7 @@
         correctLevel: QRCode.CorrectLevel.H
     });
 
-    // 订单详情
+    // 訂單詳情
     var orderDetail = $('#orderDetail');
     orderDetail.find('.arrow').click(function (event) {
         if (orderDetail.hasClass('detail-open')) {
@@ -128,7 +128,7 @@
                 function (r) {
                     clearInterval(interval);
                     $('.qr-image').remove();
-                    $('.tip').html('<p style="font-size:24px">已支付，正在处理...</p>');
+                    $('.tip').html('<p style="font-size:24px">已支付，正在處理...</p>');
                     window.location = r.data;
                 }, 'json');
         }

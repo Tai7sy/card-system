@@ -2,7 +2,7 @@
 if (!isset($result)) {
     $result = [
         'success' => false,
-        'msg' => '未知错误, 渲染失败'
+        'msg' => '未知錯誤, 渲染失敗'
     ];
 }
 if (!isset($result['success'])) {
@@ -17,8 +17,8 @@ if (!isset($result['success'])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <style type="text/css">
         html{background:#eee}
-        body{background:#fff;color:#333;font-family:"微软雅黑","Microsoft YaHei",sans-serif;margin:2em auto;padding:1em 2em;max-width:700px;-webkit-box-shadow:10px 10px 10px rgba(0,0,0,.13);box-shadow:10px 10px 10px rgba(0,0,0,.13);opacity:.8}
-        h1{border-bottom:1px solid #dadada;clear:both;color:#666;font:24px "微软雅黑","Microsoft YaHei",sans-serif;margin:30px 0 0 0;padding:0 0 7px}
+        body{background:#fff;color:#333;font-family:"微軟雅黑","Microsoft YaHei",sans-serif;margin:2em auto;padding:1em 2em;max-width:700px;-webkit-box-shadow:10px 10px 10px rgba(0,0,0,.13);box-shadow:10px 10px 10px rgba(0,0,0,.13);opacity:.8}
+        h1{border-bottom:1px solid #dadada;clear:both;color:#666;font:24px "微軟雅黑","Microsoft YaHei",sans-serif;margin:30px 0 0 0;padding:0 0 7px}
         #page{margin-top:50px}
         #page p{font-size:16px;line-height:1.5;margin:25px 0 20px; word-wrap: break-word;}
         #page code{font-family:Consolas,Monaco,monospace}
@@ -35,16 +35,16 @@ if (!isset($result['success'])) {
         <script type="text/javascript" src="/plugins/js/quill.min.js"></script>
         <script type="text/javascript" src="/plugins/js/clipboard.min.js"></script>
     @endif
-    <title>支付结果</title>
+    <title>支付結果</title>
 </head>
 <body id="page">
-<h3>{{ isset($result['title']) ? $result['title'] : ($result['success'] ? '订单已支付' : '支付失败！' ) }}</h3>
+<h3>{{ isset($result['title']) ? $result['title'] : ($result['success'] ? '訂單已支付' : '支付失敗！' ) }}</h3>
 <div>
     <p class="status-msg">{!! $result['msg'] !!}</p>
     @if(isset($card_txt))
         <div>
             <textarea id="card-txt" class="card-txt" title="卡密列表" rows="6" readonly>{{ $card_txt }}</textarea>
-            <a id="card-copy" href="#" data-clipboard-target="#card-txt">一键复制</a>
+            <a id="card-copy" href="#" data-clipboard-target="#card-txt">一鍵復制</a>
             <script type="text/javascript">
                 new ClipboardJS('#card-copy');
             </script>
@@ -62,7 +62,7 @@ if (!isset($result['success'])) {
             document.getElementById('instructions').innerHTML = renderDescription({!! $product['instructions'] !!});
         </script>
     @endif
-    <a style="float:right" href="javascript:window.close()">关闭</a>
+    <a style="float:right" href="javascript:window.close()">關閉</a>
     <br/>
 </div>
 </body>

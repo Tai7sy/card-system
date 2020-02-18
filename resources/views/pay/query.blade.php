@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" name="viewport">
-    <title>支付结果</title>
+    <title>支付結果</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="renderer" content="webkit">
     <link type="text/css" href="/plugins/css/wx_qr.css" rel="stylesheet">
@@ -12,7 +12,7 @@
 <body>
 <div class="body">
     <h1 class="mod-title">
-        <span class="text">支付处理中</span>
+        <span class="text">支付處理中</span>
     </h1>
     <div class="mod-ct">
         <div class="order"></div>
@@ -21,13 +21,13 @@
             <span class="dec dec-left"></span>
             <span class="dec dec-right"></span>
             <div class="tip-text">
-                <p>订单已支付, 正在处理...</p>
+                <p>訂單已支付, 正在處理...</p>
             </div>
         </div>
     </div>
     <div class="foot">
         <div class="inner">
-            <p><?php echo SYS_NAME ?>, 有疑问请联系客服</p>
+            <p><?php echo SYS_NAME ?>, 有疑問請聯系客服</p>
         </div>
     </div>
 </div>

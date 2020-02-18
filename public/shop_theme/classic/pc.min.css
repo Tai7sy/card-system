@@ -141,7 +141,7 @@ input::-webkit-input-placeholder{color:#aaa;letter-spacing:1px}
 #news{margin-top:0}
 #news li{clear:both;height:100px;border-bottom:1px dashed #eee;padding:20px 10px;width:calc(100% - 20px);position:relative;cursor:pointer;transition:ease .3s}
 #news .date{background:url(../images/date.png) no-repeat;width:100px;height:84px;text-align:center;padding-top:22px;font-size:14px;color:#999;float:left;left:0}
-#news .date b{color:#33334f;font-size:32px;font-family:'黑体',serif}
+#news .date b{color:#33334f;font-size:32px;font-family:'黑體',serif}
 #news .news_text{float:left;margin:10px;width:calc(100% - 120px)}
 #news .news_text a{display:block;text-align:left;text-decoration:none;font-size:16px;line-height:24px;color:#33334f;margin-bottom:24px}
 #news .news_text b a:hover{text-decoration:underline}
