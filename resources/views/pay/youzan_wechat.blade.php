@@ -17,7 +17,7 @@
     </h1>
     <div class="mod-ct">
         <div class="order"></div>
-        <div class="amount">￥{{ sprintf('%0.2f',$amount/100) }}</div>
+        <div class="amount">${{ sprintf('%0.2f',$amount/100) }}</div>
         <div class="qr-image" id="qrcode"></div>
         <div id="open-app-container">
             <span style="display: block;margin-top: 24px">請截屏此界面或保存二維碼，打開微信掃碼，選擇相冊圖片</span>

@@ -118,7 +118,7 @@
                 </li-->
                 <li style="height: 44px;line-height: 44px;">
                     @if(in_array('sms_send_order', $config['functions']))
-                        <label class="fz_lab" style="padding-right: 4px">短信提醒（￥{{ $config['sms_send_order']['sms_price']/100 }}）<input type="checkbox" name="send-sms" id="send-sms" onclick="$('#sms_to_container').toggle(this.checked);calcTotalPrice();">
+                        <label class="fz_lab" style="padding-right: 4px">短信提醒（${{ $config['sms_send_order']['sms_price']/100 }}）<input type="checkbox" name="send-sms" id="send-sms" onclick="$('#sms_to_container').toggle(this.checked);calcTotalPrice();">
                         </label>
                     @endif
                     @if(in_array('mail_send_order', $config['functions']))

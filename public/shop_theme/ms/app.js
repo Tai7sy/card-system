@@ -129,7 +129,7 @@ function getParameterByName(name, url) {
 }
 
 function toCurrency(a) {
-    return '￥ ' + (a / 100).toFixed(2).replace(/\d(?=(?:\d{3})+\b)/g, '$&,')
+    return '$ ' + (a / 100).toFixed(2).replace(/\d(?=(?:\d{3})+\b)/g, '$&,')
 }
 
 function renderQuill(delta, checkEmpty) {
@@ -206,7 +206,7 @@ function selectCategory(category) {
 
             var item_btn_price = document.createElement('span');
             item_btn_price.setAttribute('class', 'p-price');
-            item_btn_price.innerText = '￥' + (product.price / 100);
+            item_btn_price.innerText = '$' + (product.price / 100);
 
             item_btn_texts.appendChild(item_btn_name);
             item_btn_texts.appendChild(item_btn_price);
@@ -254,7 +254,7 @@ function selectProduct(product) {
         productsElm.children('[data-id=' + product.id + ']').addClass('active');
 
         // 單價
-        $('#price b').text('￥' + (product.price / 100));
+        $('#price b').text('$' + (product.price / 100));
 
         // 商品標題
         $('.title-item h1').text(product.name);

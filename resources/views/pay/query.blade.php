@@ -16,7 +16,7 @@
     </h1>
     <div class="mod-ct">
         <div class="order"></div>
-        <div class="amount">￥{{ sprintf('%0.2f',$amount/100) }}</div>
+        <div class="amount">${{ sprintf('%0.2f',$amount/100) }}</div>
         <div class="tip">
             <span class="dec dec-left"></span>
             <span class="dec dec-right"></span>

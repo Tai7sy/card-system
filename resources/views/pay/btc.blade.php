@@ -19,7 +19,7 @@
         <div class="order"></div>
         <div class="qr-image" id="qrcode"></div>
         <div class="amount">
-            <div>￥{{ sprintf('%0.2f',$amount/100) }}</div>
+            <div>${{ sprintf('%0.2f',$amount/100) }}</div>
             <p>地址:&nbsp;<code class="btc_address"></code></p>
             <p>數量:&nbsp;<code class="btc_amount"></code></p>
         </div>

@@ -55,7 +55,7 @@
     </h1>
     <div class="mod-ct">
         <div class="order"></div>
-        <div class="amount">￥{{ sprintf('%0.2f',$amount/100) }}</div>
+        <div class="amount">${{ sprintf('%0.2f',$amount/100) }}</div>
         <div class="qr-image" id="qrcode"></div>
 
         <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 24px" id="open-app">點擊打開支付寶</a>

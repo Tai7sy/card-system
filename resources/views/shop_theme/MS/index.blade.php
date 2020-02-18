@@ -116,7 +116,7 @@ $version = '1.3';
                                 <a href="javascript:;" tabindex="0">
                                     <div class="p-texts">
                                         <span class="p-name">通過短信接收訂單信息</span>
-                                        <span class="p-price">{{ $config['sms_send_order']['sms_price'] ? ('￥' . ($config['sms_send_order']['sms_price']/100)): '免費' }}</span>
+                                        <span class="p-price">{{ $config['sms_send_order']['sms_price'] ? ('$' . ($config['sms_send_order']['sms_price']/100)): '免費' }}</span>
                                     </div>
                                 </a>
                             </div>
@@ -166,7 +166,7 @@ $version = '1.3';
         <div class="showMobileOrder" onclick="$('.rightContainer').toggleClass('show');">
             <div class="numbers"><span>訂單信息 : </span></div>
             <div class="price"><span>總價 : </span>
-                <span class="price-label">￥19,852.00</span>
+                <span class="price-label">$19,852.00</span>
                 <span class="vector go" name="go">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                          preserveAspectRatio="xMidYMid" width="100%" height="100%" viewBox="0 0 5.281 9">
@@ -205,7 +205,7 @@ $version = '1.3';
                             <label>
                                 <input type="checkbox" id="send-sms"
                                        onclick="$('#sms_to-box')[this.checked ? 'show' : 'hide']();calcTotalPrice();">
-                                <span>&nbsp;通過短信接收訂單信息（￥{{ $config['sms_send_order']['sms_price']/100 }}）</span>
+                                <span>&nbsp;通過短信接收訂單信息（${{ $config['sms_send_order']['sms_price']/100 }}）</span>
                             </label>
                         </p>
                         <div class="li" id="sms_to-box">
@@ -276,7 +276,7 @@ $version = '1.3';
                         <li class="mainList">
                             <div class="product-name"><p>商品名稱</p></div>
                             <div class="product-priceBox">
-                                <p>￥ 5,788.00</p>
+                                <p>$ 5,788.00</p>
                                 <p>數量：2</p>
                             </div>
                         </li>
@@ -285,7 +285,7 @@ $version = '1.3';
                 <div class="result">
                     <ul>
                         <li class="all">
-                            <em>總計</em><b class="price-label">￥19,852.00</b>
+                            <em>總計</em><b class="price-label">$19,852.00</b>
                         </li>
                     </ul>
                 </div>

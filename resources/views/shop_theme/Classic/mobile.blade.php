@@ -116,7 +116,7 @@
         <li>
             <span class="form_title" style="display: inline-block; margin-right: 4px">附加服務</span>
             @if(in_array('sms_send_order', $config['functions']))
-                <label><input type="checkbox" name="send-sms" id="send-sms" onclick="$('#sms_to_container').toggle(this.checked);calcTotalPrice();">短信提醒（￥{{ $config['sms_send_order']['sms_price']/100 }}）</label>
+                <label><input type="checkbox" name="send-sms" id="send-sms" onclick="$('#sms_to_container').toggle(this.checked);calcTotalPrice();">短信提醒（${{ $config['sms_send_order']['sms_price']/100 }}）</label>
             @endif
             @if(in_array('mail_send_order', $config['functions']))
                 <label><input type="checkbox" name="send-mail" id="send-mail" onclick="$('#mail_to_container').toggle(this.checked);calcTotalPrice();">郵件提醒</label>
