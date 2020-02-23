@@ -259,7 +259,7 @@ class Pay extends Controller
         if ($pay_money === 0) {
             // 支付金额为0, 直接成功
             $this->shipOrder($request, $order_no, $pay_money, null);
-            return route('pay.result', [$order_no], false);
+            return redirect()->away(route('pay.result', [$order_no], false));
         }
 
         $order_name = $order_no;  // 商品名改成单号
