@@ -114,7 +114,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.token']], function () 
 
     // 尝试更新
     Route::get('version', 'Admin\Dashboard@version');
-    Route::get('version/check_update','Admin\Dashboard@checkUpdate');
 });
 
 // 查看 storage/logs

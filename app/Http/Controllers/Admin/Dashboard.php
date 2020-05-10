@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class Dashboard extends Controller
 {
@@ -91,9 +92,25 @@ class Dashboard extends Controller
 
     function version()
     {
+        $update = [];
+        $version_raw = CurlRequest::get('https://raw.githubusercontent.com/Tai7sy/card-system/master/.version');
+        $version = @json_decode($version_raw, true);
+
+        if (!@$version['data']['version']) {
+            Log::error('Dashboard.version checkUpdate failed', ['version_raw' => $version_raw]);
+            $update['message'] = '检查更新失败';
+        } else {
+            $update = [
+                'version' => $version['data']['version'],
+                'description' => $version['data']['description'],
+            ];
+        }
+
         return Response::success([
-            'version' => config('app.version')
+            'version' => config('app.version'),
+            'update' => $update,
         ]);
+
     }
 
     /**
@@ -117,15 +134,5 @@ class Dashboard extends Controller
         } else {
             throw new \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException('logs-token');
         }
-    }
-
-
-    function checkUpdate()
-    {
-        return Response::success(
-            @json_decode(
-                CurlRequest::get('https://raw.githubusercontent.com/Tai7sy/card-system/master/.version'
-                ), true)
-        );
     }
 }
