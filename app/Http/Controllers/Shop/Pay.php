@@ -54,8 +54,8 @@ class Pay extends Controller
             // \Log::debug('Shop/Pay.goPay, order_no:' . $order_no . ', step2');
             return self::renderResultPage($request, [
                 'success' => false,
-                'title' => '请稍后',
-                'msg' => '支付方式加载中，请稍后'
+                'title' => trans('shop.please_wait'),
+                'msg' => trans('shop.please_wait_for_pay')
             ]);
         } catch (\Exception $e) {
             return self::renderResultPage($request, ['msg' => $e->getMessage()]);
@@ -92,9 +92,9 @@ class Pay extends Controller
         $send_sms = !empty(@json_decode($contact_ext, true)['_mobile']);
         $pay_id = (int)$request->input('pay_id');
         if (!$category_id || !$product_id)
-            return self::renderResultPage($request, ['msg' => '请选择商品']);
+            return self::renderResultPage($request, ['msg' => trans('shop.product.required')]);
         if (strlen($contact) < 1)
-            return self::renderResultPage($request, ['msg' => '请输入联系方式']);
+            return self::renderResultPage($request, ['msg' => trans('shop.contact.required')]);
 
         /* @var \App\Category $category */
         $category = Category::findOrFail($category_id);
@@ -105,37 +105,42 @@ class Pay extends Controller
             ->where('enabled', 1)
             ->with(['user'])->first();
         if ($product == null || $product->user == null)
-            return self::renderResultPage($request, ['msg' => '该商品未找到，请重新选择']);
+            return self::renderResultPage($request, ['msg' => trans('shop.product.not_found')]);
+
+
+        if (!$product->enabled) {
+            return self::renderResultPage($request, ['msg' => trans('shop.product.not_on_sell')]);
+        }
 
         // 如果商品设置了密码, 那么不校验分类密码
         if ($product->password_open) {
             if ($product->password !== $request->input('product_password')) {
-                return self::renderResultPage($request, ['msg' => '商品密码输入错误']);
+                return self::renderResultPage($request, ['msg' => trans('shop.product.password_error')]);
             }
         } else {
             if ($category->password_open) {
                 if ($category->password !== $request->input('category_password')) {
                     // 检查下是否从商品链接过来的(商品链接会把分类临时密码写进去)
                     if ($category->getTmpPassword() !== $request->input('category_password')) {
-                        return self::renderResultPage($request, ['msg' => '分类密码输入错误']);
+                        return self::renderResultPage($request, ['msg' => trans('shop.category.password_error')]);
                     }
                 }
             }
         }
 
         if ($count < $product->buy_min)
-            return self::renderResultPage($request, ['msg' => '该商品最少购买' . $product->buy_min . '件，请重新选择']);
+            return self::renderResultPage($request, ['msg' => trans('shop.product.buy_min', ['num' => $product->buy_min])]);
 
         if ($count > $product->buy_max)
-            return self::renderResultPage($request, ['msg' => '该商品限购' . $product->buy_max . '件，请重新选择']);
+            return self::renderResultPage($request, ['msg' => trans('shop.product.buy_max', ['num' => $product->buy_max])]);
 
         if ($product->count < $count)
-            return self::renderResultPage($request, ['msg' => '该商品库存不足']);
+            return self::renderResultPage($request, ['msg' => trans('shop.product.out_of_stock')]);
 
         /** @var \App\Pay $pay */
         $pay = \App\Pay::find($pay_id);
         if ($pay == null || !$pay->enabled) {
-            return self::renderResultPage($request, ['msg' => '支付方式未找到，请重新选择']);
+            return self::renderResultPage($request, ['msg' => trans('shop.pay.not_found')]);
         }
 
         // 计算商品应付价格
@@ -180,7 +185,7 @@ class Pay extends Controller
                 }
             }
             if ($used_coupon === null) {
-                return self::renderResultPage($request, ['msg' => '优惠券信息错误，请重新输入']);
+                return self::renderResultPage($request, ['msg' => trans('shop.coupon.invalid')]);
             }
             $pay_money -= $discount_fee;
         }
@@ -248,13 +253,13 @@ class Pay extends Controller
             });
         } catch (\Throwable $e) {
             Log::error('Shop.Pay.buy 下单失败', ['exception' => $e]);
-            return self::renderResultPage($request, ['msg' => '发生错误，下单失败，请稍后重试']);
+            return self::renderResultPage($request, ['msg' => trans('shop.pay.internal_error')]);
         }
 
         if ($pay_money === 0) {
             // 支付金额为0, 直接成功
             $this->shipOrder($request, $order_no, $pay_money, null);
-            return route('pay.result', [$order_no], false);
+            return redirect()->away(route('pay.result', [$order_no], false));
         }
 
         $order_name = $order_no;  // 商品名改成单号
@@ -272,7 +277,7 @@ class Pay extends Controller
     {
         $order = \App\Order::whereOrderNo($order_no)->first();
         if ($order == null) {
-            return self::renderResultPage($request, ['msg' => '订单未找到，请重试']);
+            return self::renderResultPage($request, ['msg' => trans('shop.order.not_found')]);
         }
 
         if ($order->status !== \App\Order::STATUS_UNPAY) {
@@ -283,7 +288,7 @@ class Pay extends Controller
         $pay = $order->pay;
         if (!$pay) {
             \Log::error($logTag . ' cannot find Pay');
-            return $this->renderResultPage($request, ['msg' => '支付方式未找到']);
+            return $this->renderResultPage($request, ['msg' => trans('shop.pay.not_found')]);
         }
         $logTag .= ',' . $pay->driver;
 
@@ -295,7 +300,7 @@ class Pay extends Controller
             $this->payApi = GatewayPay::getDriver($pay);
         } catch (\Exception $e) {
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
-            return $this->renderResultPage($request, ['msg' => '支付驱动未找到']);
+            return $this->renderResultPage($request, ['msg' => trans('shop.pay.driver_not_found')]);
         }
         // 如果已经支付成功, 直接返回
         if ($this->payApi->verify($config, function ($order_no, $amount, $trade_no) use ($request) {
@@ -314,20 +319,20 @@ class Pay extends Controller
 
         // 超过 5 分钟就不准重新进入页面了, 但是已经在页面的是不影响支付的
         if ($order->created_at < Carbon::now()->addMinutes(-5)) {
-            return $this->renderResultPage($request, ['msg' => '当前订单长时间未支付已作废, 请重新下单']);
+            return $this->renderResultPage($request, ['msg' => trans('shop.order.expired')]);
         }
 
         $product = Product::where('id', $order->product_id)
             ->where('enabled', 1)
             ->first();
         if ($product == null) {
-            return self::renderResultPage($request, ['msg' => '该商品已下架']);
+            return self::renderResultPage($request, ['msg' => trans('shop.product.not_on_sell')]);
         }
 
         $product->setAttribute('count', count($product->cards) ? $product->cards[0]->count : 0);
 
         if ($product->count < $order->count) {
-            return self::renderResultPage($request, ['msg' => '该商品库存不足']);
+            return self::renderResultPage($request, ['msg' => trans('shop.product.out_of_stock')]);
         }
 
         $order_name = $order_no;  // 商品名改成单号
@@ -346,26 +351,26 @@ class Pay extends Controller
     {
         $order = \App\Order::whereOrderNo($order_no)->with('product')->first();
         if ($order == null) {
-            return self::renderResultPage($request, ['msg' => '订单未找到，请重试']);
+            return self::renderResultPage($request, ['msg' => trans('shop.order.not_found')]);
         }
 
         // 超过 5 分钟就不准重新进入页面了, 但是已经在页面的是不影响支付的
         if ($order->created_at < Carbon::now()->addMinutes(-5)) {
-            return $this->renderResultPage($request, ['msg' => '当前订单长时间未支付已作废, 请重新下单']);
+            return $this->renderResultPage($request, ['msg' => trans('shop.order.expired')]);
         }
 
         if ($order->product_id !== \App\Product::ID_API) {
             $product = $order->product;
             if ($product == null) {
-                return self::renderResultPage($request, ['msg' => '商品未找到，请重试']);
+                return self::renderResultPage($request, ['msg' => trans('shop.product.not_found')]);
             }
             if ($product->count < $order->count) {
-                return self::renderResultPage($request, ['msg' => '该商品库存不足']);
+                return self::renderResultPage($request, ['msg' => trans('shop.product.out_of_stock')]);
             }
         }
 
         if (strpos($pay_file, '..')) {
-            return $this->msg('你玩你妈呢');
+            return $this->msg(trans('shop.you_are_sb'));
         }
 
         return view('pay/' . $pay_file, [
@@ -387,19 +392,23 @@ class Pay extends Controller
      */
     function qrQuery(Request $request, $pay_id)
     {
-        $order_no_outer = $request->input('id', '');
-        return self::payReturn($request, $pay_id, $order_no_outer);
+        $order_no_outer = $request->input('id'); // 订单号
+        if (isset($order_no_outer{5})) {
+            return self::payReturn($request, $pay_id, $order_no_outer);
+        } else {
+            return Response::fail('order_no error');
+        }
     }
 
     /**
      * 支付回调 - 前台返回 (二维码查询也是这个接口)
      * @param Request $request
      * @param string $pay_id
-     * @param string $order_no 可选参数, <br>
+     * @param string|null $order_no 可选参数, <br>
      * 若设置(二维码查询/Aliwap/Alipay), 会检验是否已经发货(若发货, 直接返回, 不进行verify了, 效率高一些)
      * @return mixed
      */
-    function payReturn(Request $request, $pay_id, $order_no = '')
+    function payReturn(Request $request, $pay_id, $order_no = null)
     {
         $logTag = 'payReturn: ' . $pay_id;
         \Log::debug($logTag);
@@ -408,13 +417,14 @@ class Pay extends Controller
         if (!$pay) {
             return $this->renderResultPage($request, [
                 'success' => 0,
-                'msg' => '支付方式错误'
+                'msg' => trans('shop.pay.not_found')
             ]);
         }
         $logTag .= ',' . $pay->driver;
 
         // check if already processed
-        if (strlen($order_no) > 0) {
+        if ($order_no && isset($order_no{5})) {
+            // 如果订单号传递了
             $order = \App\Order::whereOrderNo($order_no)->firstOrFail();
             if ($order && ($order->status === \App\Order::STATUS_PAID || $order->status === \App\Order::STATUS_SUCCESS)) {
                 \Log::notice($logTag . ' already success' . "\n\n");
@@ -438,7 +448,7 @@ class Pay extends Controller
             \Log::error($logTag . ' cannot find Driver: ' . $e->getMessage());
             return $this->renderResultPage($request, [
                 'success' => 0,
-                'msg' => '支付驱动未找到'
+                'msg' => trans('shop.pay.driver_not_found')
             ]);
         }
 
@@ -476,7 +486,7 @@ class Pay extends Controller
             Log::debug($logTag . ' verify finished: 0' . "\n\n");
             return $this->renderResultPage($request, [
                 'success' => 0,
-                'msg' => '支付验证失败，您可以稍后查看支付状态。'
+                'msg' => trans('shop.pay.verify_failed')
             ]);
         }
     }
@@ -536,7 +546,7 @@ class Pay extends Controller
         /** @var \App\Order $order */
         $order = \App\Order::where('order_no', $order_no)->first();
         if ($order == null) {
-            return self::renderResultPage($request, ['msg' => '订单未找到，请重试']);
+            return self::renderResultPage($request, ['msg' => trans('shop.order.not_found')]);
         }
 
         if ($order->status === \App\Order::STATUS_PAID) {
@@ -544,12 +554,12 @@ class Pay extends Controller
             $qq = $order->user->qq;
             if ($order->product) {
                 if ($order->product->delivery === \App\Product::DELIVERY_MANUAL) {
-                    $msg = '您购买的为手动充值商品，请耐心等待处理';
+                    $msg = trans('shop.order.msg_product_manual_please_wait');
                 } else {
-                    $msg = '商家库存不足，因此没有自动发货，请联系商家客服发货';
+                    $msg = trans('shop.order.msg_product_out_of_stock_not_send');
                 }
             } else {
-                $msg = '卖家已删除此商品，请联系客服退款';
+                $msg = trans('shop.order.msg_product_deleted');
             }
 
             if ($qq) {
@@ -557,7 +567,7 @@ class Pay extends Controller
             }
             return self::renderResultPage($request, [
                 'success' => false,
-                'title' => '订单已支付',
+                'title' => trans('shop.order_is_paid'),
                 'msg' => $msg
             ], [
                 'order' => $order
@@ -569,7 +579,7 @@ class Pay extends Controller
 
         return self::renderResultPage($request, [
             'success' => false,
-            'msg' => $order->remark ? '失败原因:<br>' . $order->remark : '订单未支付成功<br>如果您已经支付请耐心等待或联系客服解决'
+            'msg' => $order->remark ? trans('shop.order_process_failed_because', ['reason' => $order->remark]) : trans('shop.order_process_failed_default')
         ], [
             'order' => $order
         ]);

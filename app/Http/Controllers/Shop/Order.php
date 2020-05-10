@@ -14,13 +14,8 @@ class Order extends Controller
 {
     function get(Request $request)
     {
-        if ((int)\App\System::_get('vcode_shop_search') === 1) {
-            $ret = Geetest\API::verify($request->post('geetest_challenge'),
-                $request->post('geetest_validate'),
-                $request->post('geetest_seccode'));
-            if (!$ret) {
-                return Response::fail('系统无法接受您的验证结果，请刷新页面后重试。');
-            }
+        if (\App\System::_getInt('vcode_shop_search') === 1) {
+            $this->validateCaptcha($request);
         }
 
         $query = \App\Order::where('created_at',
@@ -45,7 +40,7 @@ class Order extends Controller
                 return Response::success();
             $query->where('contact', $contact);
         } else {
-            return Response::fail('请选择查询类型');
+            return Response::fail(trans('shop.search_type.required'));
         }
 
 

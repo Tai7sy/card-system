@@ -29,11 +29,14 @@ class AuthenticateToken extends BaseMiddleware
         $issuedAtTime = $this->auth->manager()->getPayloadFactory()->buildClaimsCollection()->get('iat')->getValue();
         // $issuedAtTime = $this->auth->getClaim('iat'); // 会校验是否认证通过, (现在是有可能刷新过token, 旧的已经是blacklist了)
         // Log::error($request->url() . ' $issuedAtTime: ' . $issuedAtTime . ', remember_token: ' . $user->remember_token);
-        if ($issuedAtTime >= $user->remember_token) {
+
+        // 如果token之后改过密码
+        if ($issuedAtTime < $user->remember_token) {
             // remember_token 储存上一次 修改密码/退出 的时间, 用于校验是否token已经失效
-            return true;
+            return false;
         }
-        return false;
+
+        return true;
     }
 
 

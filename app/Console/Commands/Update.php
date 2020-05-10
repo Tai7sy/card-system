@@ -110,14 +110,25 @@ class Update extends Command
 
         // /www/server/php/72/bin/php /www/wwwroot/demo.fakaxitong.com/artisan
 
-        if (getenv('_')) {
+        if (!empty(getenv('_'))) {
             $artisan = '"' . getenv('_') . '" "' . $_SERVER['PHP_SELF'] . '" ';
+        } else if (!empty($_SERVER['_'])) {
+            $artisan = '"' . $_SERVER['_'] . '" "' . $_SERVER['PHP_SELF'] . '" ';
         } else {
             if (PHP_OS === 'WINNT') {
                 $php = dirname(php_ini_loaded_file()) . DIRECTORY_SEPARATOR . 'php.exe';
             } else {
-                $php = dirname(php_ini_loaded_file()) . DIRECTORY_SEPARATOR . 'php';
+                $php = dirname(php_ini_loaded_file());
+                if (ends_with($php, DIRECTORY_SEPARATOR . 'etc')) {
+                    $php = substr($php, 0, -4);
+                }
+                $php .= DIRECTORY_SEPARATOR . 'php';
             }
+            if (!file_exists($php)) {
+                echo "未找到php安装路径!\n";
+                goto LABEL_EXIT;
+            }
+
             $artisan = '"' . $php . '" "' . $_SERVER['PHP_SELF'] . '" ';
         }
 

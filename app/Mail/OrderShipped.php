@@ -11,6 +11,12 @@ class OrderShipped extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /** 重试 3 次. */
+    public $tries = 3;
+
+    /** 超时时间。 */
+    public $timeout = 20;
+
 
     public $order_no;
     public $order_url;

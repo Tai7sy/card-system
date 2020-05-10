@@ -87,8 +87,8 @@ return [
     'unique'               => ':attribute 已存在',
     'uploaded'             => ':attribute 上传失败',
     'url'                  => ':attribute 无效的格式',
-    'captcha'              => '验证码错误',
-    'captcha_api'          => '验证码错误',
+    'captcha'              => '验证码输入错误',
+    'captcha_api'          => '验证码输入错误',
 
     /*
     |--------------------------------------------------------------------------

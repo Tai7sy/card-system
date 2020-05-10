@@ -16,7 +16,7 @@ class Coupon extends Controller
         $category_id = (int)$request->post('category_id', -1);
         $product_id = (int)$request->post('product_id', -1);
         $coupon = $request->post('coupon');
-        if (!$coupon) return Response::fail('请输入优惠券');
+        if (!$coupon) return Response::fail(trans('shop.coupon.required'));
 
 
         if ($category_id > 0) {
@@ -28,7 +28,7 @@ class Coupon extends Controller
             $product = Product::findOrFail($product_id);
             $user_id = $product->user_id;
         } else {
-            return Response::fail('请先选择分类或商品');
+            return Response::fail(trans('shop.please_select_category_or_product'));
         }
 
 
@@ -45,6 +45,6 @@ class Coupon extends Controller
                 return Response::success($coupon);
             }
         }
-        return Response::fail('您输入的优惠券信息无效<br>如果没有优惠券请不要填写');
+        return Response::fail(trans('shop.coupon.invalid'));
     }
 }
