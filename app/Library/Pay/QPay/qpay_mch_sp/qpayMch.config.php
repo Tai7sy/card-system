@@ -1,0 +1,2 @@
+<?php
+class QpayMchConf { const CERT_FILE_PATH = '/xxx/qpay_mch/ssl/cert/apiclient_cert.pem'; const KEY_FILE_PATH = '/xxx/qpay_mch/ssl/cert/apiclient_key.pem'; const NOTIFY_URL = 'https://10.222.146.71:80/success.xml'; }

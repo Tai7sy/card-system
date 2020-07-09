@@ -1,0 +1,29 @@
+<?php
+namespace App\Library\Pay\PayPal; use App\Library\CurlRequest; use App\Library\Pay\ApiInterface; use Illuminate\Support\Facades\Log; class Api implements ApiInterface { private $url_notify = ''; private $url_return = ''; private $pay_id; public function __construct($spe00284) { $this->url_notify = SYS_URL_API . '/pay/notify/' . $spe00284; $this->url_return = SYS_URL . '/pay/return/' . $spe00284; $this->pay_id = $spe00284; } function goPay($spc27de0, $spba04f6, $sp9f49de, $sp224c81, $sp6956b3) { $sp8dca46 = self::getUsd($sp6956b3); $sp9b2bb6 = sprintf('%.2f', $sp8dca46 / 100); \App\Order::where('order_no', $spba04f6)->update(array('pay_trade_no' => $sp9b2bb6)); if (!isset($spc27de0['business'])) { throw new \Exception('请填写 business (商家邮箱)'); } die('
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>正在转到付款页</title>
+</head>
+<body onload="document.pay.submit()">
+<form name="pay" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input type="hidden" name="cmd" value="_xclick">
+    <input type="hidden" name="business" value="' . $spc27de0['business'] . '">
+    <input type="hidden" name="item_name" value="' . $sp9f49de . '">
+    <input type="hidden" name="item_number" value="' . $spba04f6 . '">
+    <input type="hidden" name="currency_code" value="USD">
+    <input type="hidden" name="amount" value="' . $sp9b2bb6 . '">
+    <input type="hidden" name="tax" value="0.00">
+    <input type="hidden" name="no_note" value="1">
+    <input type="hidden" name="no_shipping" value="1">
+    <input type="hidden" name="address_override" value="0">
+    <input type="hidden" name="charset" value="utf-8">
+    <input type="hidden" name="bn" value="PAY">
+    <input type="hidden" name="rm" value="2">
+    <input type="hidden" name="return" value="' . $this->url_return . '/' . $spba04f6 . '">
+    <input type="hidden" name="cancel_return" value="' . $this->url_return . '/' . $spba04f6 . '">
+    <input type="hidden" name="notify_url" value="' . $this->url_notify . '">
+</form>
+</body>
+        '); } function verify($spc27de0, $sp4294a3) { $spb2acff = isset($spc27de0['isNotify']) && $spc27de0['isNotify']; if (!$spb2acff && @(!isset($_POST['business']))) { return false; } $sp12b17d = file_get_contents('php://input'); $sp811050 = explode('&', $sp12b17d); $sp0c558d = array(); foreach ($sp811050 as $sp05dc5a) { $sp05dc5a = explode('=', $sp05dc5a); if (count($sp05dc5a) == 2) { $sp0c558d[$sp05dc5a[0]] = urldecode($sp05dc5a[1]); } } $spb18322 = 'cmd=_notify-validate'; if (function_exists('get_magic_quotes_gpc')) { $sp7eed35 = true; } foreach ($sp0c558d as $sp7b7024 => $spc82d84) { if ($sp7eed35 == true && get_magic_quotes_gpc() == 1) { $spc82d84 = urlencode(stripslashes($spc82d84)); } else { $spc82d84 = urlencode($spc82d84); } $spb18322 .= "&{$sp7b7024}={$spc82d84}"; } $sp4e752c = curl_init('https://ipnpb.paypal.com/cgi-bin/webscr'); curl_setopt($sp4e752c, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1); curl_setopt($sp4e752c, CURLOPT_POST, 1); curl_setopt($sp4e752c, CURLOPT_RETURNTRANSFER, 1); curl_setopt($sp4e752c, CURLOPT_POSTFIELDS, $spb18322); curl_setopt($sp4e752c, CURLOPT_SSL_VERIFYPEER, 1); curl_setopt($sp4e752c, CURLOPT_SSL_VERIFYHOST, 2); curl_setopt($sp4e752c, CURLOPT_FORBID_REUSE, 1); curl_setopt($sp4e752c, CURLOPT_HTTPHEADER, array('Connection: Close')); if (!($sp7098d5 = curl_exec($sp4e752c))) { Log::error('Pay.PayPal.verify notify fail, Got ' . curl_error($sp4e752c) . ' when processing IPN data'); curl_close($sp4e752c); die; } curl_close($sp4e752c); if (strcmp($sp7098d5, 'VERIFIED') == 0) { if ($spb2acff) { echo 'IPN OK'; } $spd56469 = $_POST['item_number']; $spb99da5 = $_POST['payment_status']; $spba0687 = $_POST['mc_gross']; $sp658add = $_POST['mc_currency']; $spaa9795 = $_POST['txn_id']; $sp6d82f2 = $spb2acff ? $_POST['receiver_email'] : $_POST['business']; if ($spb99da5 !== 'Completed') { Log::debug('Pay.PayPal.verify fail, order_no:' . $spd56469 . ', Payment status is not Completed, current(' . $spb99da5 . ')', array('$_POST' => $_POST)); return false; } if ($sp658add !== 'USD') { Log::error('Pay.PayPal.verify fail, order_no:' . $spd56469 . ', Payment currency is not USD, current(' . $sp658add . ')', array('$_POST' => $_POST)); return false; } $sp7dcca7 = \App\Order::where('order_no', $spd56469)->firstOrFail(); if ($sp7dcca7->status === \App\Order::STATUS_PAID || $sp7dcca7->status === \App\Order::STATUS_SUCCESS) { return true; } if ($sp7dcca7->pay_trade_no !== $spba0687) { Log::error('Pay.PayPal.verify fail, order_no:' . $spd56469 . ', Payment amount error (' . $sp7dcca7->pay_trade_no . '), current(' . $spba0687 . ')', array('$_POST' => $_POST)); } if ($sp6d82f2 !== $spc27de0['business']) { Log::error('Pay.PayPal.verify fail, order_no:' . $spd56469 . ', payment account is not yours(' . $spc27de0['business'] . '), current(' . $sp6d82f2 . ')', array('$_POST' => $_POST)); return false; } $sp4294a3($spd56469, $sp7dcca7->paid, $spaa9795); return true; } else { if (strcmp($sp7098d5, 'INVALID') == 0) { if ($spb2acff) { echo 'IPN OK'; } Log::debug('Pay.PayPal.verify notify fail, IPN INVALID', array('$res' => $sp7098d5, '$_POST' => $_POST)); } else { Log::debug('Pay.PayPal.verify notify fail, Unknown IPN error', array('$res' => $sp7098d5, '$_POST' => $_POST)); } } return false; } function getUsd($spa65b1f) { $spcb019a = @json_decode(CurlRequest::get('https://m.cmbchina.com/api/rate/getfxrate'), true); if (!isset($spcb019a['data'])) { throw new \Exception('获取汇率失败'); } $spd361d0 = 0.2; foreach ($spcb019a['data'] as $sp338f71) { if ($sp338f71['ZCcyNbr'] === '美元') { $spd361d0 = 100 / $sp338f71['ZRtcOfr']; break; } } return $spa65b1f * $spd361d0; } }
