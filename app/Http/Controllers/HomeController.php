@@ -8,7 +8,6 @@ use App\Pay;
 use App\Product;
 use App\System;
 use App\User;
-use App\UserDomain;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use App\Library\Geetest;
@@ -89,6 +88,7 @@ class HomeController extends Controller
                 'inventory' => System::_getInt('shop_inventory')
             ];
 
+            $keywords = false;
             if ($product) {
                 // 如果是产品连接 (那么一定有分类)
                 $category->setVisible(['id', 'name', 'password_open']);
@@ -127,14 +127,15 @@ class HomeController extends Controller
                 }
 
                 $config['categories'] = $categories;
-
-                $name = $config['name'];
-                $description = $config['shop']['ann'];
-                if (@$description[0] === '{') {
-                    $matches = [];
-                    preg_match_all('/"insert":"(.+?)"/', $description, $matches);
-                    $description = str_replace('\n', ' ', @join(' ', $matches[1]));
+                if (config('app.name') && config('app.title')) {
+                    $name = config('app.name') . ' - ' . config('app.title');
+                } else {
+                    $name = config('app.name') ? config('app.name') : config('app.title');
                 }
+
+                $description = config('app.description');
+                $keywords = config('app.keywords');
+
             }
 
             $config['pays'] = \App\PayWay::gets($user, function ($query) {
@@ -151,8 +152,8 @@ class HomeController extends Controller
                 $user->theme_config[$shop_theme->name] :
                 $shop_theme->config;
 
-            $keywords = preg_replace('/[、，；。！？]/', ', ', $name);
-        }else{
+            $keywords = $keywords ? $keywords : preg_replace('/[、，；。！？]/', ', ', $name);
+        } else {
             throw new \Exception('不可能到这');
         }
 

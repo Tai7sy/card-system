@@ -80,7 +80,11 @@ class Pay extends Controller
         }
 
         if (System::_getInt('vcode_shop_buy') === 1) {
-            $this->validateCaptcha($request);
+            try {
+                $this->validateCaptcha($request);
+            } catch (\Throwable $e) {
+                return self::renderResultPage($request, ['msg' => trans('validation.captcha')]);
+            }
         }
 
         $category_id = (int)$request->input('category_id');

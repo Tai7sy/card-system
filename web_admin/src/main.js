@@ -13,7 +13,6 @@ import errLog from '@/store/errLog'; // error log组件
 import '~/utils/helper'
 import '~/utils/filters'
 import '~/utils/trick'
-import '~/utils/gt'
 import App from './App.vue' // 一定要晚于 前面的 自定义样式要最后加载
 
 Vue.config.productionTip = false;

@@ -91,7 +91,7 @@ class Pay extends Controller
     function edit(Request $request)
     {
         $this->validate($request, [
-            'id' => 'required|integer',
+            'id' => 'sometimes|integer',
             'name' => 'required|string',
             'driver' => 'required|string',
             'way' => 'required|string',
