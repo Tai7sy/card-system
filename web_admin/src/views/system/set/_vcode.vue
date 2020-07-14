@@ -3,15 +3,25 @@
     <el-form ref="form" v-loading.body="loading" :model="form" :label-width="labelWidth" :rules="formRules">
       <h2 class="title">验证码驱动</h2>
 
-      <el-form-item prop="vcode_geetest_id" class="item-container">
-        <span>GEETEST_ID</span>
-        <el-input type="text" placeholder="GEETEST_ID" v-model="form.vcode_geetest_id"/>
+      <el-form-item class="item-container">
+        <span>驱动</span>
+        <el-radio-group v-model="form.vcode_driver">
+          <el-radio label="code">普通验证码</el-radio>
+          <el-radio label="geetest">Geetest</el-radio>
+        </el-radio-group>
       </el-form-item>
 
-      <el-form-item prop="vcode_geetest_key" class="item-container">
-        <span>GEETEST_KEY</span>
-        <el-input type="text" placeholder="GEETEST_KEY" v-model="form.vcode_geetest_key"/>
-      </el-form-item>
+      <div v-if="form.vcode_driver === 'geetest'">
+        <el-form-item prop="vcode_geetest_id" class="item-container">
+          <span>GEETEST_ID</span>
+          <el-input type="text" placeholder="GEETEST_ID" v-model="form.vcode_geetest_id"/>
+        </el-form-item>
+
+        <el-form-item prop="vcode_geetest_key" class="item-container">
+          <span>GEETEST_KEY</span>
+          <el-input type="text" placeholder="GEETEST_KEY" v-model="form.vcode_geetest_key"/>
+        </el-form-item>
+      </div>
 
       <h2 class="title" style="margin-top: 48px">后台验证码</h2>
 
@@ -68,7 +78,7 @@
         loading: false,
         labelWidth: '0px', // this.$store.state.app.isMobile ? '70px' : '90px',
         form: {
-          vcode_driver: 'geetest',
+          vcode_driver: 'code',
           vcode_geetest_id: '',
           vcode_geetest_key: '',
           vcode_login_admin: 0,

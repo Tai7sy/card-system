@@ -64,9 +64,7 @@ class HomeController extends Controller
                 ]
             ]
         ];
-        if ($config['captcha']['driver'] === 'geetest') {
-            $config['captcha']['config'] = Geetest\API::get();
-        }
+
 
         $customer = Cookie::get('customer');
         $cookie = Cookie::make('customer',
@@ -297,9 +295,7 @@ class HomeController extends Controller
                 ]
             ]
         ];
-        if ($config['captcha']['driver'] === 'geetest') {
-            $config['captcha']['config'] = Geetest\API::get();
-        }
+
 
         if (System::_getInt('product_manual')) {
             $config['functions'] = ['product_manual']; // 开启手动发货功能
