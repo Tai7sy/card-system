@@ -18,10 +18,13 @@ class ConfigServiceProvider extends ServiceProvider
     {
         // config('filesystems.default');
 
+        config()->set([
+            'app.project' => 'card_free',
+            'app.version' => '3.11',
+        ]);
+
         try {
             config()->set([
-                'app.project' => 'card_free',
-                'app.version' => '3.1',
 
                 'app.name' => System::_get('app_name'),
                 'app.title' => System::_get('app_title'),

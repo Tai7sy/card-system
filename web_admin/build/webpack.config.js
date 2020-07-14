@@ -1,3 +1,4 @@
+
 const path = require('path');
 const webpack = require('webpack');
 
@@ -24,5 +25,9 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': process.env
     }),
+    new webpack.ProvidePlugin({
+      'window.Quill': 'quill/dist/quill.js',
+      'Quill': 'quill/dist/quill.js',
+    })
   ]
 };
