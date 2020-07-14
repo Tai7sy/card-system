@@ -1,2 +1,2 @@
 <?php
-Broadcast::channel('App.User.{id}', function ($spe2c9ac, $speb3ceb) { return (int) $spe2c9ac->id === (int) $speb3ceb; });
+Broadcast::channel('App.User.{id}', function ($sp590011, $sp138835) { return (int) $sp590011->id === (int) $sp138835; });
