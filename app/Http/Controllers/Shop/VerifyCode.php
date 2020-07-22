@@ -1,2 +1,2 @@
 <?php
-namespace App\Http\Controllers\Shop; use App\Library\Response; use App\Library\Geetest; use Illuminate\Http\Request; use App\Http\Controllers\Controller; class VerifyCode extends Controller { function getVerify() { $sp15097d = array('driver' => 'geetest', 'geetest' => Geetest\API::get()); return Response::success($sp15097d); } }
+namespace App\Http\Controllers\Shop; use App\Library\Response; use App\Library\Geetest; use Illuminate\Http\Request; use App\Http\Controllers\Controller; class VerifyCode extends Controller { function getVerify() { $sp303806 = array('driver' => 'geetest', 'geetest' => Geetest\API::get()); return Response::success($sp303806); } }
