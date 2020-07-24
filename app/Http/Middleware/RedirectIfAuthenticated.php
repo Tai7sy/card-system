@@ -1,2 +1,2 @@
 <?php
-namespace App\Http\Middleware; use Closure; use Illuminate\Support\Facades\Auth; class RedirectIfAuthenticated { public function handle($sp0aae4c, Closure $sp25db9f, $spf680ae = null) { if (Auth::guard($spf680ae)->check()) { return redirect('/home'); } return $sp25db9f($sp0aae4c); } }
+namespace App\Http\Middleware; use Closure; use Illuminate\Support\Facades\Auth; class RedirectIfAuthenticated { public function handle($spbaac90, Closure $sp1d096c, $spcd069c = null) { if (Auth::guard($spcd069c)->check()) { return redirect('/home'); } return $sp1d096c($spbaac90); } }
