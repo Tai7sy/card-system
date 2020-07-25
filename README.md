@@ -1,13 +1,13 @@
 
 ### 关于
 
-> 当前版本: 2.92
+> 当前版本: 2.93
+
+> 支付网关: [card-gateway](https://github.com/Tai7sy/card-gateway)
 
 > [安装教程 V2.X](https://github.com/Tai7sy/card-system/wiki/BT%E9%9D%A2%E6%9D%BF%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B---V2.X)
 
 > [更新教程 V2.X](https://github.com/Tai7sy/card-system/wiki/V2.X-%E6%9B%B4%E6%96%B0%E6%95%99%E7%A8%8B)
-
-> 支付网关: [card-gateway](https://github.com/Tai7sy/card-gateway)
 
 > 广告: 商业版 [http://demo.fakaxitong.com/](http://demo.fakaxitong.com/)
 ### 常见问题
