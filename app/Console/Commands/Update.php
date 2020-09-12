@@ -125,8 +125,16 @@ class Update extends Command
                 $php .= DIRECTORY_SEPARATOR . 'php';
             }
             if (!file_exists($php)) {
-                echo "未找到php安装路径!\n";
-                goto LABEL_EXIT;
+                if (PHP_OS === 'WINNT') {
+                    $php = 'php.exe';
+                } else {
+                    $php = 'php';
+                }
+
+                if ((bool)@exec($php . ' --version') === FALSE) {
+                    echo "未找到php安装路径!\n";
+                    goto LABEL_EXIT;
+                }
             }
 
             $artisan = '"' . $php . '" "' . $_SERVER['PHP_SELF'] . '" ';
