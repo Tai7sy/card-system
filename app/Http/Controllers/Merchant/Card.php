@@ -264,8 +264,8 @@ class Card extends Controller
                 if (strlen($card_number) < 1)
                     continue;
 
-                if (strlen($card_number) > 255)
-                    return Response::fail('第 ' . $i . ' 张卡密 ' . $card_number . ' 长度错误<br>卡密最大长度为255');
+                if (strlen($card_number) > 1024)
+                    return Response::fail('第 ' . $i . ' 张卡密 ' . $card_number . ' 长度错误<br>卡密最大长度为1024');
 
                 if ($is_check) {
                     if (in_array($card_number, $cards_all)) {
