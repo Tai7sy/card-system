@@ -22,11 +22,9 @@ class CreateFundRecordsTable extends Migration
             $table->integer('order_id')->nullable(); //关联订单
             $table->string('withdraw_id')->nullable(); //关联订单
             $table->string('remark')->nullable();
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable();
         });
-
-        DB::unprepared('ALTER TABLE `fund_records` CHANGE COLUMN `created_at` `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP;');
-
     }
 
     /**
