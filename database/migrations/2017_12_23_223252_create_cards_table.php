@@ -22,11 +22,11 @@ class CreateCardsTable extends Migration
             $table->integer('status')->default(\App\Card::STATUS_NORMAL);
             $table->integer('count_sold')->default(0); // type 为 TYPE_REPEAT 时, 表示已卖出次数
             $table->integer('count_all')->default(1);  // type 为 TYPE_REPEAT 时, 表示可卖总次数
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable();
             $table->softDeletes();
         });
 
-        DB::unprepared('ALTER TABLE `cards` CHANGE COLUMN `created_at` `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP;');
     }
 
     /**
