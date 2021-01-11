@@ -14,7 +14,7 @@
     <script src="/shop_theme/classic/layui/layer.js"></script>
     <link href="/plugins/css/quill.snow.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="/plugins/js/quill.min.js"></script>
-    @if($config['vcode']['buy'] && $config['vcode']['driver'] === 'geetest')
+    @if(@$config['captcha']['scene']['shop']['buy'] && $config['captcha']['driver'] === 'geetest')
         <script type="text/javascript" src="/plugins/js/gt.js"></script>
     @endif
 </head>
