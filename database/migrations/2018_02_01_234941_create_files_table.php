@@ -1,2 +1,36 @@
 <?php
-use Illuminate\Support\Facades\Schema; use Illuminate\Database\Schema\Blueprint; use Illuminate\Database\Migrations\Migration; use Illuminate\Support\Facades\DB; class CreateFilesTable extends Migration { public function up() { Schema::create('files', function (Blueprint $sp2bac3d) { $sp2bac3d->increments('id'); $sp2bac3d->integer('user_id'); $sp2bac3d->string('driver'); $sp2bac3d->string('path'); $sp2bac3d->string('url'); $sp2bac3d->timestamp('created_at')->useCurrent(); }); } public function down() { Schema::dropIfExists('files'); } }
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+class CreateFilesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('files', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('user_id');
+            $table->string('driver');
+            $table->string('path');
+            $table->string('url');
+            $table->timestamp('created_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('files');
+    }
+}
