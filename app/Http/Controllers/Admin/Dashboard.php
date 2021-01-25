@@ -93,12 +93,12 @@ class Dashboard extends Controller
     function version()
     {
         $update = [];
-        $version_raw = CurlRequest::get('https://raw.githubusercontent.com/Tai7sy/card-system/master/.version');
+        $version_raw = CurlRequest::curl('https://raw.githubusercontent.com/Tai7sy/card-system/master/.version', 0, null, [], 5, $cookie, $httpCode, $error);
         $version = @json_decode($version_raw, true);
 
         if (!@$version['data']['version']) {
-            Log::error('Dashboard.version checkUpdate failed', ['version_raw' => $version_raw]);
-            $update['message'] = '检查更新失败';
+            Log::error('Dashboard.version checkUpdate failed', ['response' => $version_raw, 'httpCode' => $httpCode, 'error' => $error]);
+            $update['message'] = '检查更新失败: ' . $error;
         } else {
             $update = [
                 'version' => $version['data']['version'],
