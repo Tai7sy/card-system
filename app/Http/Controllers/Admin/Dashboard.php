@@ -102,7 +102,7 @@ class Dashboard extends Controller
         } else {
             $update = [
                 'version' => $version['data']['version'],
-                'description' => $version['data']['description'],
+                'description' => (@$version['data']['description'] ?? '无'),
             ];
         }
 
