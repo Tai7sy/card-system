@@ -231,3 +231,6 @@ input::-webkit-input-placeholder{color:#aaa;letter-spacing:1px}
 .button-select-item.checked{border:1px solid #658fe1}
 .quill-html img{max-width:100%}
 .quill-html p{margin:0!important}
+@-webkit-keyframes shellPulse { 0% {opacity: 1} 50% {opacity: .3} to {opacity: 1} }
+@keyframes shellPulse { 0% {opacity: 1} 50% {opacity: .3} to {opacity: 1} }
+.captcha-pulse.loading {-webkit-animation: shellPulse 1s infinite;animation: shellPulse 1s infinite}

@@ -1,7 +1,7 @@
 <?php
-$version = '1.3';
+$version = '1.4';
 ?>
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset=utf-8>
@@ -193,6 +193,14 @@ $version = '1.3';
                             <input id="contact" placeholder="">
                         </div>
                     </div>
+                    @if(in_array('order_query_password', $config['functions']))
+                        <div class="li" id="query_password-box">
+                            <label for="query_password"><i>*</i><em>订单查询密码</em></label>
+                            <div class="inputbox">
+                                <input id="query_password" placeholder="">
+                            </div>
+                        </div>
+                    @endif
                     <div class="li" id="coupon-box">
                         <label for="coupon"><em>优惠券</em></label>
                         <div class="inputbox">
