@@ -69,10 +69,11 @@ function showOrderTip(tip, then) {
 }
 
 
-function passwordDialog(title, then) {
+function inputDialog(title, then) {
     swal({
         type: 'info',
-        title: title,
+        title: typeof title === 'object' ? title.title : title,
+        text: typeof title === 'object' ? title.content : '',
         input: 'text',
         inputAttributes: {
             autocapitalize: 'off',
