@@ -47,6 +47,10 @@ class HomeController extends Controller
             }
         }
 
+        if(System::_getInt('order_query_password_open')){
+            $config['functions'][] = 'order_query_password'; // 开启订单查询密码
+        }
+
         if (System::_getInt('sms_send_order')) {
             $config['functions'][] = 'sms_send_order'; // 开启短信功能
             $config['sms_send_order'] = [

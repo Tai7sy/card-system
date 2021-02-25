@@ -31,6 +31,11 @@ return [
         'required' => '請輸入聯系方式',
     ],
 
+    'query_password' => [
+        'required' => '請輸入查詢密碼',
+        'weak' => '您輸入的查詢密碼過於簡單，請重新輸入',
+    ],
+
     'pay' => [
         'not_found' => '支付方式未找到，請重新選擇',
         'driver_not_found' => '支付驅動未找到，請聯系客服',

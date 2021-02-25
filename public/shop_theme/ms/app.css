@@ -1091,4 +1091,8 @@ body.noOutline select:focus {
   }
 }
 
+@-webkit-keyframes shellPulse { 0% {opacity: 1} 50% {opacity: .3} to {opacity: 1} }
+@keyframes shellPulse { 0% {opacity: 1} 50% {opacity: .3} to {opacity: 1} }
+.captcha-pulse.loading {-webkit-animation: shellPulse 1s infinite;animation: shellPulse 1s infinite}
+
 /*# sourceMappingURL=app.css.map */

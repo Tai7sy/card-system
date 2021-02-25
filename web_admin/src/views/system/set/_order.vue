@@ -11,6 +11,15 @@
 
       <el-form-item class="item-container">
         <el-switch
+            v-model="form.order_query_password_open"
+            inactive-text="开启订单查询密码"
+            :active-value="1"
+            :inactive-value="0">
+        </el-switch>
+      </el-form-item>
+
+      <el-form-item class="item-container">
+        <el-switch
           v-model="form.order_clean_unpay_open"
           inactive-text="清理未支付订单"
           :active-value="1"
@@ -27,8 +36,7 @@
 
       <div v-show="form.order_clean_unpay_open" style="font-size: 12px">
         <span>注意: 本功能需要开启定时任务</span>
-        <code style="display: block"> * * * * * php /www/wwwroot/card_dist/artisan schedule:run >> /dev/null 2>&1 & echo
-          'card_job';</code><br>
+        <code style="display: block"> * * * * * php /www/wwwroot/card_dist/artisan schedule:run;</code><br>
         你也可以点此&nbsp;<el-button size="mini" @click="clearOrder">手动清理</el-button>
       </div>
 
@@ -53,6 +61,7 @@
         labelWidth: '0px', // this.$store.state.app.isMobile ? '70px' : '90px',
         form: {
           order_query_day: 30,
+          order_query_password_open: 0,
           order_clean_unpay_open: 0,
           order_clean_unpay_day: 7
         },

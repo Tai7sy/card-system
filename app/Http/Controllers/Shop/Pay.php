@@ -58,6 +58,9 @@ class Pay extends Controller
                 'msg' => trans('shop.please_wait_for_pay')
             ]);
         } catch (\Exception $e) {
+            if(config('app.debug')){
+                return self::renderResultPage($request, ['msg' => $e->getMessage() . '<br>' . str_replace("\n", '<br>', $e->getTraceAsString())]);
+            }
             return self::renderResultPage($request, ['msg' => $e->getMessage()]);
         }
     }
@@ -99,6 +102,18 @@ class Pay extends Controller
             return self::renderResultPage($request, ['msg' => trans('shop.product.required')]);
         if (strlen($contact) < 1)
             return self::renderResultPage($request, ['msg' => trans('shop.contact.required')]);
+
+        $query_password = null;
+        if(System::_getInt('order_query_password_open')){
+            $query_password = $request->input('query_password');
+            if (strlen($query_password) < 1){
+                return self::renderResultPage($request, ['msg' => trans('shop.query_password.required')]);
+            }
+
+            if(strlen($query_password) < 6 || Helper::isWakePassword($query_password)){
+                return self::renderResultPage($request, ['msg' => trans('shop.query_password.weak')]);
+            }
+        }
 
         /* @var \App\Category $category */
         $category = Category::findOrFail($category_id);
@@ -215,7 +230,7 @@ class Pay extends Controller
 
         try {
             DB::transaction(function () use (
-                $product, $order_no, $used_coupon, $contact, $contact_ext, $customer,
+                $product, $order_no, $used_coupon, $contact, $contact_ext, $query_password, $customer,
                 $count, $cost, $price, $sms_price, $discount_fee, $pay_money, $pay, $system_fee, $merchant_income
             ) {
 
@@ -238,6 +253,7 @@ class Pay extends Controller
                     'customer' => $customer,
                     'contact' => $contact,
                     'contact_ext' => $contact_ext,
+                    'query_password' => $query_password,
                     'cost' => $cost,                    // 商户商品成本
                     'price' => $price,                  // 应付款总额(单价*数量)
                     'sms_price' => $sms_price,          // 短信费

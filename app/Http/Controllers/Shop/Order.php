@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Shop;
 
+use App\System;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -39,6 +40,14 @@ class Order extends Controller
             if (strlen($contact) < 6)
                 return Response::success();
             $query->where('contact', $contact);
+
+            if(System::_getInt('order_query_password_open')) {
+                $query_password = $request->post('query_password', '');
+                if (strlen($query_password) < 6)
+                    return Response::success();
+
+                $query->where('query_password', $query_password);
+            }
         } else {
             return Response::fail(trans('shop.search_type.required'));
         }
