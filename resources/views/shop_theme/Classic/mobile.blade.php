@@ -101,6 +101,14 @@
             </span>
             <input class="phone_num" type="text" id="contact" value="" placeholder="填写必须为真实QQ或邮箱或手机号">
         </li>
+        @if(in_array('order_query_password', $config['functions']))
+        <li id="query_password-box">
+            <span class="form_title"><label for="query_password">查询密码</label>
+                <span style="margin-left:5px;font-weight: lighter;color: #fe825a">（订单查询重要凭证）</span>
+            </span>
+            <input class="phone_num" type="text" id="query_password" value="" placeholder="请输入订单查询密码">
+        </li>
+        @endif
         <!--li id="pwdTackBox" style="display:none">
             <span class="form_title">取卡密码
                 <span style="margin-left:5px;font-weight: lighter;color: #fe825a">（查询卡密时需填写，请牢记！）</span>
