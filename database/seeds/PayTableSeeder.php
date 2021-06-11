@@ -8,6 +8,33 @@ class PayTableSeeder extends Seeder
     private function initPay()
     {
         $pay = new \App\Pay;
+        $pay->name = '支付宝';
+        $pay->driver = 'Alidirect';
+        $pay->way = 'alipay';
+        $pay->comment = 'www.zfbjk.com - 支付宝';
+        $pay->config = '{
+  "id": "商户ID",
+  "key": "商户密钥",
+  "pid": "支付宝PID"
+}';
+        $pay->enabled = true;
+        $pay->fee_system = 0;
+        $pay->save();
+
+        $pay = new \App\Pay;
+        $pay->name = '微信';
+        $pay->driver = 'Alidirect';
+        $pay->way = 'weixin';
+        $pay->comment = 'www.zfbjk.com - 微信';
+        $pay->config = '{
+  "id": "商户ID",
+  "key": "商户密钥"
+}';
+        $pay->enabled = true;
+        $pay->fee_system = 0;
+        $pay->save();
+
+        $pay = new \App\Pay;
         $pay->name = '支付宝 电脑';
         $pay->driver = 'Fakala';
         $pay->way = 'alipay';
