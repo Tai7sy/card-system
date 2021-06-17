@@ -33,7 +33,7 @@
 * 吉易支付/JIPAYS
 * 思狐云支付/UigPay
 * 幻兮支付
-* ZFBJK支付宝免签约辅助
+* [ZFBJK支付宝免签约辅助](http://www.zfbjk.com/show.asp?g=2&id=37214)
 * ...
 
 更多请参考 [card-gateway](https://github.com/Tai7sy/card-gateway)
