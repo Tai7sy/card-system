@@ -1,8 +1,8 @@
 <h1 align="center">CardSystem</h1>
 <p align="center">
-<a href="https://github.com/Tai7sy/card-system/releases"><img src="https://img.shields.io/badge/version-3.02-blue.svg?style=flat-square" alt="License"></a>
+<a href="https://github.com/Tai7sy/card-system/releases"><img src="https://img.shields.io/badge/version-unknown-blue.svg?style=flat-square" alt="License"></a>
 <img alt="PHP from Packagist badge" src="https://img.shields.io/badge/php-%3E%3D7.0.0-brightgreen.svg?style=flat-square">
-<a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square" alt="License"></a>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square" alt="License"></a>
 <a href="https://travis-ci.org/Tai7sy/card-system"><img src="https://img.shields.io/travis/Tai7sy/card-system.svg?style=flat-square" alt="Travis"></a>
 <br><br>
 <a href="https://github.com/Tai7sy/card-system/wiki/%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B---BT%E9%9D%A2%E6%9D%BF">安装文档</a>&nbsp;&nbsp;
@@ -40,20 +40,31 @@
 
 ## 常见问题
  - 修改 `.env` 文件无效 / 修改网站设置无效
- ```
- cd /www/wwwroot/example.com  #进入网站目录
- php artisan config:clear
- php artisan cache:clear
- ```
+ 
+   请清空网站缓存, 操作如下
+   ```
+   cd /www/wwwroot/example.com  #进入网站目录
+   rm -rf storage/framework/cache/data/*
+   php artisan cache:clear
+   php artisan config:clear
+   php artisan route:clear
+   ```
+
  - 忘记密码后重置
- ```
- cd /www/wwwroot/example.com  #进入网站目录
- php artisan reset:password admin@qq.com 123456
- ```
- - 500错误	
- ```	
- storage/logs 里面有错误详细内容, 可以自行参考解决, 或者附录log文件提交issue/mail	
- ```
+   ```
+   cd /www/wwwroot/example.com  #进入网站目录
+   php artisan reset:password admin@qq.com 123456
+   ```
+
+ - 提示500错误 / 未知错误
+
+   `storage/logs` 里面有错误详细内容, 可以自行参考解决, 或者附录log文件提交issue/mail	
+
+ - 开启后台登录验证码无法登录, 如何关闭	
+
+    修改数据库`systems`表的`vcode_login`字段为0, 然后参考第一个问题清空网站缓存
+
+
 
 ## 商业版
 
