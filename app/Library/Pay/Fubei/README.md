@@ -1,3 +1,5 @@
+准备工作 http://docs.51fubei.com/open-api/product/preparatoryWork.html
+
 后台添加支付方式
 
 支付方式填wechat或alipay
