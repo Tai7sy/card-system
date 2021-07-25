@@ -23,7 +23,7 @@
     <div class="container">
         <!--导航-->
         <div class="top">
-            <div class="logo"><a href="/"><img src="/images/logo.png" alt="" height="64"></a></div>
+            <div class="logo"><a href="/"><img src="{{ config('app.logo') }}" alt="" height="64"></a></div>
             <div class="nav_btn"><i></i></div>
             <div class="user_btns">
                 <a href="/s#/record" target="_blank" class="reg_btn" style="width: 180px">
