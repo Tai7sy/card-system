@@ -6,6 +6,7 @@ use App\Library\Helper;
 use App\Library\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class System extends Controller
@@ -301,6 +302,47 @@ class System extends Controller
         \App\Order::where('status', \App\Order::STATUS_UNPAY)
             ->where('created_at', '<', (new \Carbon\Carbon)->addDays(-$day))
             ->delete();
+        return Response::success();
+    }
+
+    function deleteOrders(Request $request){
+        $this->validate($request, [
+            'date' => 'required|date_format:Y-m-d',
+        ]);
+
+        $date = $request->input('date');
+
+
+        // \App\CardOrder::whereRaw('`order_id` IN (SELECT `id` FROM `orders` WHERE `created_at` < "'. $date .'")')->delete();
+        \App\Order::where('created_at', '<', $date)->delete();
+        return Response::success();
+    }
+
+    function deleteFundRecords(Request $request){
+        $this->validate($request, [
+            'date' => 'required|date_format:Y-m-d',
+        ]);
+
+        $date = $request->input('date');
+        \App\FundRecord::where('created_at', '<', $date)->delete();
+
+        // 用户的余额
+
+        \App\User::where('m_paid', '>', 0)->update([
+            'm_all' => DB::raw('m_all-m_paid'),
+            'm_paid' => 0,
+        ]);
+
+        return Response::success();
+    }
+
+    function deleteLogs(Request $request){
+        $this->validate($request, [
+            'date' => 'required|date_format:Y-m-d',
+        ]);
+
+        $date = $request->input('date');
+        \App\Log::where('created_at', '<', $date)->delete();
         return Response::success();
     }
 }

@@ -338,7 +338,7 @@ class Pay extends Controller
         }
 
         // 超过 5 分钟就不准重新进入页面了, 但是已经在页面的是不影响支付的
-        if ($order->created_at < Carbon::now()->addMinutes(-5)) {
+        if ($order->created_at < Carbon::now()->addMinutes(-System::_getInt('order_pay_timeout_minutes', 5))) {
             return $this->renderResultPage($request, ['msg' => trans('shop.order.expired')]);
         }
 
@@ -375,7 +375,7 @@ class Pay extends Controller
         }
 
         // 超过 5 分钟就不准重新进入页面了, 但是已经在页面的是不影响支付的
-        if ($order->created_at < Carbon::now()->addMinutes(-5)) {
+        if ($order->created_at < Carbon::now()->addMinutes(-System::_getInt('order_pay_timeout_minutes', 5))) {
             return $this->renderResultPage($request, ['msg' => trans('shop.order.expired')]);
         }
 

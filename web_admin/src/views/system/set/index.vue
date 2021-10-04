@@ -29,6 +29,10 @@
       <el-tab-pane label="文件储存" name="storage">
         <set-storage v-if="initialized.storage"/>
       </el-tab-pane>
+
+      <el-tab-pane label="数据清理" name="clean">
+        <set-clean v-if="initialized.clean"/>
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -42,6 +46,7 @@
   import setOrder from './_order'
   import setVcode from './_vcode'
   import setStorage from './_storage'
+  import setClean from './_clean'
 
   const const_init = {
     info: false,
@@ -52,6 +57,7 @@
     vcode: false,
     security: false,
     storage: false,
+    clean: false,
     other: false,
   };
   export default {
@@ -63,6 +69,7 @@
       setOrder,
       setVcode,
       setStorage,
+      setClean,
     },
     data () {
       const activeTab = this.$route.query.tab || 'info';

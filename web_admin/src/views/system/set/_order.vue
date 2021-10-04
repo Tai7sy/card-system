@@ -3,6 +3,12 @@
     <el-form ref="form" v-loading.body="loading" :model="form" :label-width="labelWidth" :rules="formRules">
       <h2 class="title">订单设置</h2>
 
+      <el-form-item prop="order_pay_timeout_minutes" class="item-container">
+        <span>订单支付超时(分钟)</span>
+        <el-input type="number" placeholder="请输入订单支付超时分钟" v-model="form.order_pay_timeout_minutes"/>
+        <span class="tip">支付超时后, 未支付订单将不再允许支付</span>
+      </el-form-item>
+
       <el-form-item prop="order_query_day" class="item-container">
         <span>订单查询最长天数</span>
         <el-input type="number" placeholder="请输入订单查询最长天数" v-model="form.order_query_day"/>
@@ -36,7 +42,7 @@
 
       <div v-show="form.order_clean_unpay_open" style="font-size: 12px">
         <span>注意: 本功能需要开启定时任务</span>
-        <code style="display: block"> * * * * * php /www/wwwroot/card_dist/artisan schedule:run;</code><br>
+        <code style="display: block"> * * * * * php 安装目录/artisan schedule:run;</code><br>
         你也可以点此&nbsp;<el-button size="mini" @click="clearOrder">手动清理</el-button>
       </div>
 
@@ -61,6 +67,7 @@
         labelWidth: '0px', // this.$store.state.app.isMobile ? '70px' : '90px',
         form: {
           order_query_day: 30,
+          order_pay_timeout_minutes: 5,
           order_query_password_open: 0,
           order_clean_unpay_open: 0,
           order_clean_unpay_day: 7
@@ -68,7 +75,10 @@
         formRules: {
           order_query_day: [
             { required: true, message: '请输入订单查询最长天数', trigger: 'blur' }
-          ]
+          ],
+          order_pay_timeout_minutes: [
+            { required: true, message: '请输入订单支付超时分钟', trigger: 'blur' }
+          ],
         }
       }
     },

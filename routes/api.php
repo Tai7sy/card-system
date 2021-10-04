@@ -40,6 +40,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.token']], function () 
     Route::post('system/email/test', 'Admin\System@emailTest');
     Route::post('system/order/clean', 'Admin\System@orderClean');
 
+    Route::post('system/delete/orders', 'Admin\System@deleteOrders');
+    Route::post('system/delete/fund_records', 'Admin\System@deleteFundRecords');
+    Route::post('system/delete/logs', 'Admin\System@deleteLogs');
+
     Route::get('pay', 'Admin\Pay@get');
     Route::get('pay/stat', 'Admin\Pay@stat');
     Route::post('pay/sort', 'Admin\Pay@sort');
