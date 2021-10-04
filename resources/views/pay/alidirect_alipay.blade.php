@@ -64,7 +64,7 @@
 </div>
 
 <script>
-<?php if(is_numeric($qrcode)&&strlen($qrcode)==16){?>
+        <?php if(is_numeric($qrcode)&&strlen($qrcode)==16){?>
     var code_url = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u": "{{$qrcode}}","a": "{{ sprintf('%0.2f',$amount/100) }}","m":"{{$_GET["title"]}}"}';
 
     var qrcode = new QRCode("qrcode", {
@@ -76,7 +76,7 @@
         correctLevel: QRCode.CorrectLevel.H,
         title: '请使用支付宝扫一扫'
     });
-<?}?>
+    <?}?>
     // 订单详情
     var orderDetail = $('#orderDetail');
     orderDetail.find('.arrow').click(function (event) {
