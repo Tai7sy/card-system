@@ -13,17 +13,6 @@
       0 => 'Fideloper\\Proxy\\TrustedProxyServiceProvider',
     ),
   ),
-  'intervention/image' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Intervention\\Image\\ImageServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'Image' => 'Intervention\\Image\\Facades\\Image',
-    ),
-  ),
   'jacobcyl/ali-oss-storage' => 
   array (
     'providers' => 
@@ -70,17 +59,6 @@
       0 => 'Carbon\\Laravel\\ServiceProvider',
     ),
   ),
-  'overtrue/laravel-wechat' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Overtrue\\LaravelWeChat\\ServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'EasyWeChat' => 'Overtrue\\LaravelWeChat\\Facade',
-    ),
-  ),
   'rap2hpoutre/laravel-log-viewer' => 
   array (
     'providers' => 
@@ -105,6 +83,17 @@
     'providers' => 
     array (
       0 => 'zgldh\\QiniuStorage\\QiniuFilesystemServiceProvider',
+    ),
+  ),
+  'intervention/image' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Intervention\\Image\\ImageServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Image' => 'Intervention\\Image\\Facades\\Image',
     ),
   ),
 );
