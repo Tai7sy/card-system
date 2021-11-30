@@ -1,0 +1,36 @@
+<configuration>
+  <system.webServer>
+    <!--start-php-->
+    <!--此处为宝塔配置, 其他IIS配置请自行设置-->
+	<handlers>
+	  <remove name="php_5.2" />
+	  <remove name="php_5.3" />
+	  <remove name="php_5.4" />
+	  <remove name="php_5.5" />
+	  <remove name="php_5.6" />
+	  <remove name="php_7.0" />
+	  <remove name="php_7.1" />
+	  <add name="php_7.1" path="*.php" verb="*" modules="FastCgiModule" scriptProcessor="C:\BtSoft\WebSoft\php\7.1\php-cgi.exe" resourceType="Unspecified" requireAccess="Script" />
+	</handlers>
+	<!--end-php-->
+    <rewrite>
+      <rules>
+        <rule name="Redirect Trailing Slashes If Not A Folder" enabled="false" stopProcessing="true">
+          <match url="^(.*)/$" ignoreCase="false" />
+          <conditions>
+            <add input="{REQUEST_FILENAME}" matchType="IsDirectory" ignoreCase="false" negate="true" />
+          </conditions>
+          <action type="Redirect" redirectType="Permanent" url="/{R:1}" />
+        </rule>
+        <rule name="Handle Front Controller" stopProcessing="true">
+          <match url="^" ignoreCase="false" />
+          <conditions>
+            <add input="{REQUEST_FILENAME}" matchType="IsDirectory" ignoreCase="false" negate="true" />
+            <add input="{REQUEST_FILENAME}" matchType="IsFile" ignoreCase="false" negate="true" />
+          </conditions>
+          <action type="Rewrite" url="index.php" />
+        </rule>
+      </rules>
+    </rewrite>
+  </system.webServer>
+</configuration>
