@@ -5,9 +5,6 @@
 @import "./scss/page-checkout";
 
 
-
-
-
 .header-store {
   background-color: #ffffff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
@@ -29,9 +26,16 @@
 
   .logo {
     // padding: 0 12px;
-
     img {
       padding-top: 12px;
+    }
+    // 文本格式的标题(没有logo的情况下)
+    span {
+      white-space: nowrap;
+      display: inline-block;
+      line-height: 55px;
+      font-weight: lighter;
+      font-size: 23px;
     }
   }
 
@@ -42,6 +46,7 @@
       display: inline-block;
       vertical-align: middle;
       position: relative;
+
       & > a {
         display: inline-block;
         font-size: 15px;
@@ -50,7 +55,7 @@
         padding: 18px 12px;
         text-decoration: none !important;
         @media screen and (min-width: 860px) {
-          &:hover{
+          &:hover {
             &:before {
               background: currentColor;
               content: "";
