@@ -20,7 +20,7 @@ class ConfigServiceProvider extends ServiceProvider
 
         config()->set([
             'app.project' => 'card_free',
-            'app.version' => '3.14',
+            'app.version' => '3.15',
         ]);
 
         try {
