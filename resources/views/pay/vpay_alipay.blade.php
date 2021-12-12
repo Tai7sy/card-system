@@ -104,7 +104,9 @@
 </div>
 
 <script>
-    var code_url = decodeURIComponent('{!! urlencode($qrcode) !!}');
+    // fix bug in https://github.com/dreamncn/VPay/blob/5d31cc1f55ee5beb4e0498a9e2a4a6db05ee6b19/protected/model/Order.php#L543
+    // $qrcode is already encoded
+    var code_url = decodeURIComponent(decodeURIComponent('{!! urlencode($qrcode) !!}')).replace(/\+/g,'');
 
     new QRCode("qrcode", {
         text: code_url,
@@ -112,7 +114,7 @@
         height: 230,
         colorDark: "#000000",
         colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H,
+        correctLevel: 3,
         title: '请使用支付宝扫一扫'
     });
 
