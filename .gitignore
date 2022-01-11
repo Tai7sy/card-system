@@ -11,5 +11,5 @@ npm-debug.log
 yarn-error.log
 /.env
 /database/seeds/MyPayTableSeeder.php
-.phpstorm.meta.php
-_ide_helper*
+/public/.htaccess
+/public/web.config
