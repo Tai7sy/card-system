@@ -1,2 +1,44 @@
 <?php
-use Illuminate\Support\Facades\Schema; use Illuminate\Database\Schema\Blueprint; use Illuminate\Database\Migrations\Migration; class CreateCardsTable extends Migration { public function up() { Schema::create('cards', function (Blueprint $sp2bac3d) { $sp2bac3d->increments('id'); $sp2bac3d->integer('user_id')->index(); $sp2bac3d->integer('product_id')->index(); $sp2bac3d->text('card'); $sp2bac3d->integer('type'); $sp2bac3d->integer('status')->default(\App\Card::STATUS_NORMAL); $sp2bac3d->integer('count_sold')->default(0); $sp2bac3d->integer('count_all')->default(1); $sp2bac3d->timestamps(); $sp2bac3d->softDeletes(); }); DB::unprepared('ALTER TABLE `cards` CHANGE COLUMN `created_at` `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP;'); } public function down() { Schema::dropIfExists('cards'); try { DB::unprepared('DROP PROCEDURE `add_cards`;'); } catch (\Exception $spf95c2c) { } } }
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateCardsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('cards', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('user_id')->index();
+            $table->integer('product_id')->index();
+            $table->text('card');
+            $table->integer('type');
+            $table->integer('status')->default(\App\Card::STATUS_NORMAL);
+            $table->integer('count_sold')->default(0); // type 为 TYPE_REPEAT 时, 表示已卖出次数
+            $table->integer('count_all')->default(1);  // type 为 TYPE_REPEAT 时, 表示可卖总次数
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        DB::unprepared('ALTER TABLE `cards` CHANGE COLUMN `created_at` `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP;');
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('cards');
+        try{
+            DB::unprepared('DROP PROCEDURE `add_cards`;');
+        }catch (\Exception $e){}
+    }
+}
