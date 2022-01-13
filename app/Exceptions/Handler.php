@@ -100,6 +100,11 @@ class Handler extends ExceptionHandler
         } elseif ($e instanceof \Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException) {
             // 疑似攻击
             return $this->msg($request, trans('exception.method_not_allowed'), 405);
+        }  elseif ($e instanceof \ErrorException && starts_with($e->getMessage(), 'file_put_contents') && strpos($e->getMessage(), 'failed to open stream') !== FALSE) {
+            $error = $e->getMessage() . "\r\n<br>\r\n<br>请检查目录权限是否正确配置\r\n<br>";
+            die("[FATAL ERROR] \r\n<br>" . $error);
+        } elseif (get_class($e) === 'Exception') {
+            // return $this->msg($request, $e->getMessage(), 500);
         }
 
         Log::error('Uncaught Exception', [
