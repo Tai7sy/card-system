@@ -1,4 +1,18 @@
 language: php
+
 php:
   - '7.0'
-  - nightly
+  - '7.1'
+  - '7.2'
+  - '7.3'
+
+services:
+  - mysql
+
+before_install:
+  - mysql -e 'CREATE DATABASE card_test;'
+
+before_script:
+  - curl -s http://getcomposer.org/installer | php
+  - composer create-project
+  - php -r "file_put_contents('.env', str_replace('your_db_name', 'card_test', str_replace('your_db_username', 'root', str_replace('your_db_password', '', file_get_contents('.env')))));"
