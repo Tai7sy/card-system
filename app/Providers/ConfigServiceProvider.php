@@ -78,6 +78,11 @@ class ConfigServiceProvider extends ServiceProvider
             ]);
         } catch (\Exception $e) {
             $error = $e->getMessage();
+            if (strpos($error, "Base table or view not found:") !== FALSE && strpos($error, "`systems`") !== FALSE) {
+                // 安装过程, 不校验
+                return;
+            }
+
             \Log::error('Config init failed: ' . $error, ['exception' => $e]);
 
             if (strpos($error, "'forge'@'localhost'") !== FALSE) {
