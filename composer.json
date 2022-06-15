@@ -10,6 +10,7 @@
     "php": ">=7.0.0",
     "ext-curl": "*",
     "ext-dom": "*",
+    "ext-gmp": "*",
     "ext-json": "*",
     "ext-libxml": "*",
     "ext-simplexml": "*",
@@ -116,7 +117,10 @@
   "config": {
     "preferred-install": "dist",
     "sort-packages": true,
-    "optimize-autoloader": true
+    "optimize-autoloader": true,
+    "allow-plugins": {
+      "kylekatarnls/update-helper": true
+    }
   },
   "repositories": {
     "packagist": {

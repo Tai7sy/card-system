@@ -18,6 +18,7 @@ class ConfigServiceProvider extends ServiceProvider
     {
         // config('filesystems.default');
 
+
         config()->set([
             'app.project' => 'card_free',
             'app.version' => '3.15',
@@ -95,6 +96,10 @@ class ConfigServiceProvider extends ServiceProvider
             die("[FATAL ERROR] \r\n<br>" . $error);
         }
 
+
+        if (!function_exists('gmp_add') && !function_exists('bcadd')) {
+            die("[FATAL ERROR] \r\n<br> PHP环境不符合，请安装 BC Math 或 GMP 扩展.");
+        }
     }
 
     /**
