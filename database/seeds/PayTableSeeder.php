@@ -8,6 +8,59 @@ class PayTableSeeder extends Seeder
     private function initPay()
     {
         $pay = new \App\Pay;
+        $pay->name = '支付宝 电脑';
+        $pay->driver = 'Fakala';
+        $pay->way = 'alipay';
+        $pay->comment = '安发卡支付 https://www.anfaka.com';
+        $pay->config = '{
+  "gateway": "https://www.327ka.com",
+  "api_id": "你的 API_ID",
+  "api_key": "你的 API_KEY"
+}';
+        $pay->enabled = true;
+        $pay->save();
+
+        $pay = new \App\Pay;
+        $pay->name = '支付宝 手机';
+        $pay->driver = 'Fakala';
+        $pay->way = 'alipaywap';
+        $pay->comment = '安发卡支付 https://www.anfaka.com';
+        $pay->config = '{
+  "gateway": "https://www.327ka.com",
+  "api_id": "你的 API_ID",
+  "api_key": "你的 API_KEY"
+}';
+        $pay->enabled = true;
+        $pay->save();
+
+        $pay = new \App\Pay;
+        $pay->name = '微信 电脑';
+        $pay->driver = 'Fakala';
+        $pay->way = 'wx';
+        $pay->comment = '安发卡支付 https://www.anfaka.com';
+        $pay->config = '{
+  "gateway": "https://www.327ka.com",
+  "api_id": "你的 API_ID",
+  "api_key": "你的 API_KEY"
+}';
+        $pay->enabled = true;
+        $pay->save();
+
+        $pay = new \App\Pay;
+        $pay->name = '微信 手机';
+        $pay->driver = 'Fakala';
+        $pay->way = 'wxwap';
+        $pay->comment = '安发卡支付 https://www.anfaka.com';
+        $pay->config = '{
+  "gateway": "https://www.327ka.com",
+  "api_id": "你的 API_ID",
+  "api_key": "你的 API_KEY"
+}';
+        $pay->enabled = true;
+        $pay->save();
+
+
+        $pay = new \App\Pay;
         $pay->name = '支付宝';
         $pay->driver = 'Alipay';
         $pay->way = 'pc';
@@ -208,28 +261,28 @@ class PayTableSeeder extends Seeder
         $payway->name = '前台支付方式-支付宝';
         $payway->img = '/plugins/images/ali.png';
         $payway->enabled = \App\PayWay::ENABLED_PC;
-        $payway->channels = [[\App\Pay::where('driver', 'AliAop')->where('way', 'pc')->first()->id, 1]];
+        $payway->channels = [[\App\Pay::where('driver', 'Fakala')->where('way', 'alipay')->first()->id, 1]];
         $payway->saveOrFail();
 
         $payway = new \App\PayWay;
         $payway->name = '前台支付方式-支付宝手机';
         $payway->img = '/plugins/images/ali.png';
         $payway->enabled = \App\PayWay::ENABLED_MOBILE;
-        $payway->channels = [[\App\Pay::where('driver', 'AliAop')->where('way', 'mobile')->first()->id, 1]];
+        $payway->channels = [[\App\Pay::where('driver', 'Fakala')->where('way', 'alipaywap')->first()->id, 1]];
         $payway->saveOrFail();
 
         $payway = new \App\PayWay;
         $payway->name = '前台支付方式-微信';
         $payway->img = '/plugins/images/wx.png';
         $payway->enabled = \App\PayWay::ENABLED_PC;
-        $payway->channels = [[\App\Pay::where('driver', 'WeChat')->where('way', 'NATIVE')->first()->id, 1]];
+        $payway->channels = [[\App\Pay::where('driver', 'Fakala')->where('way', 'wx')->first()->id, 1]];
         $payway->saveOrFail();
 
         $payway = new \App\PayWay;
         $payway->name = '前台支付方式-微信手机';
         $payway->img = '/plugins/images/wx.png';
         $payway->enabled = \App\PayWay::ENABLED_MOBILE;
-        $payway->channels = [[\App\Pay::where('driver', 'WeChat')->where('way', 'JSAPI')->first()->id, 1]];
+        $payway->channels = [[\App\Pay::where('driver', 'Fakala')->where('way', 'wxwap')->first()->id, 1]];
         $payway->saveOrFail();
 
         $payway = new \App\PayWay;
