@@ -490,7 +490,7 @@ function getPayway() {
     return null;
 }
 
-function _calcContactExt () {
+function _calcContactExt() {
     var ret = {};
     for (var i = 0; i < contactExtValues.length; i++) {
         ret[contactExt[i]] = contactExtValues[i];
@@ -502,6 +502,12 @@ function _calcContactExt () {
     var sendMail = $('#send-mail')[0];
     if (sendMail && sendMail.checked) {
         ret['_mail'] = $('#mail_to').val();
+    }
+    if (config.functions && config.functions.indexOf('mail_send_order_use_contact') > -1) {
+        var contact = $('#contact').val();
+        if (validateEmail(contact)) {
+            ret['_mail'] = contact;
+        }
     }
     return JSON.stringify(ret);
 }
@@ -570,7 +576,7 @@ function checkOrder() {
             type: 'error',
             content: err,
             then: function () {
-                if(focus === undefined) focus = '#contact';
+                if (focus === undefined) focus = '#contact';
                 setTimeout(function () {
                     $(focus).focus();
                 }, 300);
@@ -628,6 +634,8 @@ function checkOrder() {
 }
 
 $(function () {
+    Quill.imports['formats/link'].PROTOCOL_WHITELIST.push('mqqapi');
+
     $('#ann>.container').html(renderQuill(config.shop.ann));
     if (config.shop.ann_pop) {
         var ann_pop = renderQuill(config.shop.ann_pop, true);
