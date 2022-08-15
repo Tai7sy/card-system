@@ -86,12 +86,13 @@ class ConfigServiceProvider extends ServiceProvider
 
             \Log::error('Config init failed: ' . $error, ['exception' => $e]);
 
-            if (strpos($error, "'forge'@'localhost'") !== FALSE) {
+            if (strpos($error, "'forge'@'localhost'") !== FALSE || strpos($error, "database 'forge'") !== FALSE) {
                 $error .= "\r\n<br>
 \r\n<br>
 可能的原因：\r\n<br>
 1. <code>.env</code>文件无法正常工作，请参考安装教程进行安装\r\n<br>
-2. 目录权限没有正常配置，请参考安装教程进行安装\r\n<br>";
+2. 目录权限没有正常配置，请参考安装教程进行安装\r\n
+3. 配置文件缓存未清理，请参考README进行清理<br>";
             }
             die("[FATAL ERROR] \r\n<br>" . $error);
         }
