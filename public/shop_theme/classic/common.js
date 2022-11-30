@@ -21,7 +21,7 @@ var contactTypeText = {
         title: '联系方式',
         placeholder: '可以输入QQ、邮箱、手机号等等，用于查询订单'
     }
-}
+};
 var contactExt = [];
 var contactExtValues = [];
 if (config.product && config.product.id > 0) {
@@ -271,27 +271,24 @@ function showProductInfo(product) {
             contactType = 'any';
             contactExt = [];
         }
-        $('#contact_info label').text(contactTypeText[contactType].title);
-        $('#contact_info input').attr('placeholder', contactTypeText[contactType].placeholder);
+        $('#contact-box label').text(contactTypeText[contactType].title);
+        $('#contact-box input').attr('placeholder', contactTypeText[contactType].placeholder);
 
         $('#price').text((product.price / 100).toFixed(2));
         $('#invent').html('库存: ' + product.count2);
         $('#description').html(renderQuill(product.description)).show();
 
-        if (product.price_whole) {
-            try {
-                var price_whole = JSON.parse(product.price_whole)
-            } catch (e) {
-                price_whole = [];
-            }
-            if (price_whole.length) {
-                var msg = '';
-                price_whole.forEach(function (e) {
-                    msg += '满' + e[0] + '件，单价<b>' + (e[1] / 100).toFixed(2) + '</b>元<br>';
-                });
-                $('#discount-btn').fadeIn();
-                $('#discount-tip').html('<p>优惠<br>' + msg + '<p>')
-            }
+        if (product.price_whole && typeof product.price_whole === 'string') {
+            product.price_whole = JSON.parse(product.price_whole);
+        }
+
+        if (product.price_whole.length) {
+            var msg = '';
+            product.price_whole.forEach(function (e) {
+                msg += '满' + e[0] + '件，单价<b>' + (e[1] / 100).toFixed(2) + '</b>元<br>';
+            });
+            $('#discount-btn').fadeIn();
+            $('#discount-tip').html('<p>优惠<br>' + msg + '<p>')
         }
 
         if (product.support_coupon) {
@@ -304,6 +301,7 @@ function showProductInfo(product) {
 
 
     if (product.password_open && !product.password) {
+        var currentChoose = product;
         passwordDialog('请输入商品密码', function (password) {
             if (!password || !password.length) {
                 showToast('warn', '请输入商品密码');
@@ -314,10 +312,14 @@ function showProductInfo(product) {
                 product_id: product.id,
                 password: password
             }).success(function () {
-                product.password = password;
-                renderInfoToHtml();
+                if(currentChoose === product){
+                    product.password = password;
+                    renderInfoToHtml();
+                }
             }).error(function () {
-                selectProduct(-1);
+                if(currentChoose === product) {
+                    selectProduct(-1);
+                }
             });
         });
     } else {
@@ -350,16 +352,11 @@ function calcTotalPrice() {
 
     var buyCount = $('#quantity').val();
     var price = currentProduct.price * buyCount;
-    try {
-        var price_whole = JSON.parse(currentProduct.price_whole)
-    } catch (e) {
-        price_whole = [];
-    }
-    if (price_whole) {
-        for (var i = price_whole.length - 1; i >= 0; i--) {
-            if (buyCount >= parseInt(price_whole[i][0])) {
-                $('#price').text((price_whole[i][1] / 100).toFixed(2));
-                price = price_whole[i][1] * buyCount;
+    if (currentProduct.price_whole) {
+        for (var i = currentProduct.price_whole.length - 1; i >= 0; i--) {
+            if (buyCount >= parseInt(currentProduct.price_whole[i][0])) {
+                $('#price').text((currentProduct.price_whole[i][1] / 100).toFixed(2));
+                price = currentProduct.price_whole[i][1] * buyCount;
                 break;
             }
         }
@@ -565,7 +562,7 @@ function checkOrder() {
 
     if (!currentProduct) {
         showToast('error', '请选择商品');
-        ('#products').focus();
+        $('#products').focus();
         return false;
     }
 
@@ -583,7 +580,7 @@ function checkOrder() {
             }
         });
         return false;
-    }
+    };
 
     if (contactType === 'any') {
         if (!contact) return showError('请填写您的联系信息，如QQ、邮箱、手机号等等，用于查询订单');
