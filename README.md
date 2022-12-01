@@ -1,7 +1,7 @@
 
 ### 关于
 
-> 当前版本: unknown
+> 当前版本: 2.95d
 
 > 支付网关: [card-gateway](https://github.com/Tai7sy/card-gateway)
 
