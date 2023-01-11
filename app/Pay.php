@@ -1,2 +1,2 @@
 <?php
-namespace App; use Illuminate\Database\Eloquent\Model; class Pay extends Model { protected $guarded = array(); const ENABLED_DISABLED = 0; const ENABLED_PC = 1; const ENABLED_MOBILE = 2; const ENABLED_ALL = 3; }
+namespace App; use Illuminate\Database\Eloquent\Model; use Illuminate\Support\Facades\Cache; class Pay extends Model { protected $guarded = array(); public static function gets() { return Cache::remember('model.pays', 10, function () { return self::query()->get(); }); } public static function flushCache() { Cache::forget('model.pays'); } protected static function boot() { parent::boot(); static::updated(function () { self::flushCache(); }); static::created(function () { self::flushCache(); }); static::deleted(function () { self::flushCache(); }); } }
