@@ -38,8 +38,24 @@
     "phpunit/phpunit": "~6.0"
   },
   "autoload": {
+    "classmap": [
+      "database/seeds",
+      "database/factories"
+    ],
     "psr-4": {
-      "App\\": "app/"
+      "App\\": "app/",
+      "Gateway\\": "app/Library/Gateway/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "dont-discover": [
+      ]
     }
   },
   "config": {
