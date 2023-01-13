@@ -10,9 +10,10 @@ services:
   - mysql
 
 before_install:
-  - mysql -e 'CREATE DATABASE card_test;'
+  - mysql -e 'CREATE DATABASE `card_test` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
 
 before_script:
   - curl -s http://getcomposer.org/installer | php
   - composer create-project
   - php -r "file_put_contents('.env', str_replace('your_db_name', 'card_test', str_replace('your_db_username', 'root', str_replace('your_db_password', '', file_get_contents('.env')))));"
+  - php artisan migrate:fresh --seed
