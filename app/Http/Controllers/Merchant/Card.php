@@ -203,10 +203,11 @@ class Card extends Controller
         $cards = $request->post('card');
         $type = (int)$request->post('type', \App\Card::TYPE_ONETIME);
         $is_check = $request->post('is_check') === 'true';
-        // $delimiter = $request->post('delimiter', " ");
 
-        if (str_contains($cards, '<') || str_contains($cards, '>'))
-            return Response::fail('卡密不能包含 < 或 > 符号');
+        // deprecated
+        // $delimiter = $request->post('delimiter', " ");
+        // if (str_contains($cards, '<') || str_contains($cards, '>'))
+        //     return Response::fail('卡密不能包含 < 或 > 符号');
 
         $user_id = $this->getUserIdOrFail($request);
         /* @var \App\Product $product */
