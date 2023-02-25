@@ -62,16 +62,23 @@ function showOrderTip(tip, then) {
     })
 }
 
-function passwordDialog(title, then) {
-    layer.prompt({
+function inputDialog(title, then) {
+
+    var options = {
         formType: 0,
         value: '',
-        title: title,
+        title: typeof title === 'object' ? title.title : title,
         btn2: function () {
             console.log('cancel ?');
             then();
         }
-    }, function (value, index, elem) {
+    };
+
+    if(typeof title === 'object'){
+        options.content = title.content;
+    }
+
+    layer.prompt(options, function (value, index, elem) {
         then(value);
         layer.close(index);
     });

@@ -24,6 +24,7 @@ class CreateOrdersTable extends Migration
             $table->string('customer', 32)->nullable();     // 购买者ID, 下单时随机生成, 用于浏览器缓存查订单
             $table->string('contact')->nullable();                  // 购买者邮箱 or 联系方式
             $table->text('contact_ext')->nullable();                // 购买者附加信息
+            $table->string('query_password', 128)->nullable();    // 訂單查詢密碼
             $table->tinyInteger('send_status')->default(App\Order::SEND_STATUS_UN);  // 邮件/短信 发送状态
 
             $table->text('remark')->nullable();

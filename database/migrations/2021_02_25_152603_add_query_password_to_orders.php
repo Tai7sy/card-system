@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class ModifyCardsCreatedAt extends Migration
+class AddQueryPasswordToOrders extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,11 @@ class ModifyCardsCreatedAt extends Migration
      */
     public function up()
     {
-        DB::unprepared('ALTER TABLE `cards` CHANGE COLUMN `created_at` `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP;');
+        if (!Schema::hasColumn('orders', 'query_password')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->string('query_password', 128)->nullable()->after('contact_ext'); // 訂單查詢密碼
+            });
+        }
     }
 
     /**

@@ -31,6 +31,11 @@ return [
         'required' => '请输入联系方式',
     ],
 
+    'query_password' => [
+        'required' => '请输入查询密码',
+        'weak' => '您输入的查询密码过于简单，请重新输入',
+    ],
+
     'pay' => [
         'not_found' => '支付方式未找到，请重新选择',
         'driver_not_found' => '支付驱动未找到，请联系客服',
