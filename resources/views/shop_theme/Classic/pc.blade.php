@@ -106,6 +106,12 @@
                     <label for="contact" class="span_up">联系方式</label>
                     <input class="phone_num" id="contact" name="contact" type="text" placeholder="可以输入QQ、邮箱、手机号等等，用于查询订单">
                 </li>
+                @if(in_array('order_query_password', $config['functions']))
+                <li id="query_password-box">
+                    <label for="query_password" class="span_up">查询密码</label>
+                    <input class="phone_num" id="query_password" name="query_password" type="text" placeholder="请输入订单查询密码">
+                </li>
+                @endif
                 <li id="coupon-box" style="display:none">
                     <label for="coupon" class="span_up">优惠券</label>
                     <input id="coupon" name="coupon" type="text" placeholder="[选填]请输入优惠券代码">

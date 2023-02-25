@@ -44,5 +44,12 @@ return [
             'type' => 'checkbox',
             'value' => 1
         ],
+        'music' => [
+            'label' => '背景音乐',
+            'type' => 'text',
+            'inputType' => 'text',
+            'placeholder' => '请填写背景音乐URL, 如 https://link.hhtjim.com/qq/001DEjRI0ihriN.mp3',
+            'value' => ''
+        ],
     ]
 ];
