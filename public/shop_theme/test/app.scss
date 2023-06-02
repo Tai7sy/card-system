@@ -39,66 +39,6 @@
     }
   }
 
-  .nav-buttons {
-    margin-left: 24px;
-
-    .button-container {
-      display: inline-block;
-      vertical-align: middle;
-      position: relative;
-
-      & > a {
-        display: inline-block;
-        font-size: 15px;
-        color: #262626;
-        user-select: none;
-        padding: 18px 12px;
-        text-decoration: none !important;
-        @media screen and (min-width: 860px) {
-          &:hover {
-            &:before {
-              background: currentColor;
-              content: "";
-              display: block;
-              bottom: 12px;
-              width: calc(100% - 24px);
-              height: 2px;
-              position: absolute;
-              box-sizing: border-box;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .nav-mobile-menu-btn {
-    display: none;
-    position: absolute;
-    width: 41px;
-    height: 51px;
-    top: 0;
-    right: 0;
-    text-align: center;
-    background-color: #fff;
-    line-height: 50px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-
-    &.active {
-      border-left: 1px solid rgba(0, 0, 0, 0.2);
-      border-bottom: 1px solid #fff;
-    }
-
-    .icon-menu {
-      display: inline-block;
-      width: 18px;
-      height: 16px;
-      line-height: 0;
-      vertical-align: middle;
-      overflow: hidden;
-    }
-  }
-
   .nav-mobile-menu {
     width: 100%;
     display: none;
@@ -127,6 +67,35 @@
       }
     }
   }
+  
+  .nav-mobile-menu-btn {
+    display: none;
+    position: absolute;
+    width: 41px;
+    height: 51px;
+    top: 0;
+    right: 0;
+    text-align: center;
+    background-color: #fff;
+    line-height: 50px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+
+    &.active {
+      border-left: 1px solid rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid #fff;
+    }
+
+    .icon-menu {
+      display: inline-block;
+      width: 18px;
+      height: 16px;
+      line-height: 0;
+      vertical-align: middle;
+      overflow: hidden;
+    }
+  }
+
+
 
   @media only screen and (max-width: 767px) {
     .header {
