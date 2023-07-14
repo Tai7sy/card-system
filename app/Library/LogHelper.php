@@ -1,2 +1,2 @@
 <?php
-namespace App\Library; use Illuminate\Support\Facades\Log; class LogHelper { public static function setLogFile($spffaea6) { Log::getMonolog()->setHandlers(array()); Log::useDailyFiles(storage_path(DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . $spffaea6 . '_' . php_sapi_name() . '.log'), 0, config('app.log_level')); } }
+namespace App\Library; use Illuminate\Support\Facades\Log; class LogHelper { public static function setLogFile($spe26b52) { Log::getMonolog()->setHandlers(array()); Log::useDailyFiles(storage_path(DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . $spe26b52 . '_' . php_sapi_name() . '.log'), 0, config('app.log_level')); } }
