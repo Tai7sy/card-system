@@ -3,33 +3,26 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width" name="viewport">
-    <title>支付宝扫码</title>
+    <title>微信支付</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="renderer" content="webkit">
-    <link type="text/css" href="/plugins/css/ali_qr.css" rel="stylesheet">
+    <link type="text/css" href="/plugins/css/wx_qr.css?v=20200212" rel="stylesheet">
     <script type="text/javascript" src="//ossweb-img.qq.com/images/js/jquery/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="/plugins/js/qrcode.min.js"></script>
-    <script type="text/javascript" src="/plugins/js/steal_alipay.js?v=1.1"></script>
 </head>
 <body>
 <div class="body">
     <h1 class="mod-title">
-        <span class="ico-wechat"></span><span class="text">支付宝扫码</span>
+        <span class="ico-wechat"></span><span class="text">微信支付</span>
     </h1>
     <div class="mod-ct">
         <div class="order"></div>
-        <div class="amount">￥{{ sprintf('%0.2f',$amount/100) }}</div>
-        <?php if(is_numeric($qrcode)&&strlen($qrcode)==16){?>
+        <div><span style="color:red;font-size: 18px;font-weight:bold;display: block;margin-top: 24px">请输入准确的付款金额（精确到分）</span></div>
+        <div class="amount">￥{{ $_GET["real_price"] }}</div>
         <div class="qr-image" id="qrcode"></div>
-        <?php }else{?>
-        <div class="qr-image" id="qrcode"><img src="/zfb.jpg" width="230" height="230" style="" /></div>
-        <div><span style="color:red;font-weight:bold;display: block;margin-top: 24px">付款时请输入付款备注：{{$_GET["title"]}}</span></div>
-        <?php }?>
-
         <div id="open-app-container">
-            <span style="display: block;margin-top: 24px" id="open-app-tip">请截屏此界面或保存二维码，打开支付宝扫码，选择相册图片</span>
-            <span style="display: block;color: red;margin-top: 8px">请支付成功后直接返回，不要重复支付！</span>
-            <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 8px" id="open-app">点击打开支付宝</a>
+            <span style="display: block;margin-top: 24px">请截屏此界面或保存二维码，打开微信扫码，选择相册图片</span>
+            <a style="padding:6px 34px;border:1px solid #e5e5e5;display: inline-block;margin-top: 8px" id="open-app" href="weixin://">点击打开微信</a>
         </div>
         <div class="detail" id="orderDetail">
             <dl class="detail-ct" style="display: none;">
@@ -49,7 +42,7 @@
             <span class="dec dec-right"></span>
             <div class="ico-scan"></div>
             <div class="tip-text">
-                <p>请使用支付宝扫一扫</p>
+                <p>请使用微信扫一扫</p>
                 <p>扫描二维码完成支付</p>
             </div>
         </div>
@@ -64,19 +57,19 @@
 </div>
 
 <script>
-        <?php if(is_numeric($qrcode)&&strlen($qrcode)==16){?>
-    var code_url = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u": "{{$qrcode}}","a": "{{ sprintf('%0.2f',$amount/100) }}","m":"{{$_GET["title"]}}"}';
+    var code_url = decodeURIComponent('{!! urlencode($qrcode) !!}');
 
-    var qrcode = new QRCode("qrcode", {
+    // 普通扫码
+    new QRCode('qrcode', {
         text: code_url,
         width: 230,
         height: 230,
         colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H,
-        title: '请使用支付宝扫一扫'
+        title: '请使用微信扫一扫'
     });
-    <?}?>
+
     // 订单详情
     var orderDetail = $('#orderDetail');
     orderDetail.find('.arrow').click(function (event) {
@@ -93,6 +86,7 @@
 
     $(document).ready(function () {
         var time = 4000, interval;
+
         function getData() {
             $.post('/api/qrcode/query/{!! $pay_id !!}', {
                     id: '{!! $id !!}',
@@ -105,6 +99,7 @@
                     window.location = r.data;
                 }, 'json');
         }
+
         (function run() {
             interval = setInterval(getData, time);
         })();
@@ -112,23 +107,10 @@
 
     // call app
     if (navigator.userAgent.match(/(iPhone|iPod|Android|ios|SymbianOS)/i) !== null) {
-        var app_package = 'com.eg.android.AlipayGphone';
-        var app_url = 'alipays://platformapi/startapp?saId=10000007&clientVersion=3.7.0.0718&qrcode=' + encodeURIComponent(code_url);
-        $('#open-app').on('click', function () {
-            goPage(app_url, app_package);
-        });
-        setTimeout(function () {
-            goPage(app_url, app_package);
-        }, 100);
+        // 想跳转微信, 真的跳不过去啊, 傻吊微信
     } else {
-        $('#open-app-tip').hide();
-        $('#open-app').hide();
+        $('#open-app-container').hide();
     }
-
-    setTimeout(function () {
-        alert('请支付成功后直接返回，不要重复支付！');
-    },100);
-
 </script>
 </body>
 </html>
