@@ -1,6 +1,6 @@
 <h1 align="center">CardSystem</h1>
 <p align="center">
-<a href="https://github.com/Tai7sy/card-system/releases"><img src="https://img.shields.io/badge/version-3.12-blue.svg?style=flat-square" alt="License"></a>
+<a href="https://github.com/Tai7sy/card-system/releases"><img src="https://img.shields.io/badge/version-3.13-blue.svg?style=flat-square" alt="License"></a>
 <img alt="PHP from Packagist badge" src="https://img.shields.io/badge/php-%3E%3D7.0.0-brightgreen.svg?style=flat-square">
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square" alt="License"></a>
 <a href="https://travis-ci.org/Tai7sy/card-system"><img src="https://img.shields.io/travis/Tai7sy/card-system.svg?style=flat-square" alt="Travis"></a>

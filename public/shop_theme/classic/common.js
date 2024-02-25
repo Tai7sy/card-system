@@ -27,6 +27,7 @@ var contactExtValues = [];
 if (config.product && config.product.id > 0) {
     shopType = 'product'
 }
+var ORDER_QUERY_PASSWORD = window.config.functions && window.config.functions.indexOf('order_query_password') !== -1;
 
 $(function () {
     $.ajaxSetup({
@@ -227,7 +228,7 @@ function getProducts(category_id) {
     };
 
     if (currentCategory.password_open) {
-        passwordDialog('请输入分类密码', function (password) {
+        inputDialog('请输入分类密码', function (password) {
             if (!password || !password.length) {
                 showToast('warn', '请输入分类密码');
                 selectCategory(-1);
@@ -302,7 +303,7 @@ function showProductInfo(product) {
 
     if (product.password_open && !product.password) {
         var currentChoose = product;
-        passwordDialog('请输入商品密码', function (password) {
+        inputDialog('请输入商品密码', function (password) {
             if (!password || !password.length) {
                 showToast('warn', '请输入商品密码');
                 selectProduct(-1);
@@ -514,6 +515,8 @@ function order(type) {
     // assert(currentProduct !== null);
     var contact = $('#contact').val();
 
+    var query_password = $('#query_password').val();
+
     if (!calcTotalPrice()) {
         return;
     }
@@ -532,8 +535,11 @@ function order(type) {
     orderUrl += '&count=' + $('#quantity').val() +
         '&coupon=' + encodeURIComponent($('#coupon').val()) +
         '&contact=' + encodeURIComponent(contact) +
-        '&contact_ext=' + encodeURIComponent(_calcContactExt()) +
-        '&pay_id=' + $('input[name=payway]:checked').val() +
+        '&contact_ext=' + encodeURIComponent(_calcContactExt());
+    if(ORDER_QUERY_PASSWORD){
+        orderUrl += '&query_password=' + encodeURIComponent(query_password);
+    }
+    orderUrl += '&pay_id=' + $('input[name=payway]:checked').val() +
         '&customer=' + customer;
     if (window.config.captcha.scene.shop.buy) {
         for (var key in codeValidate) {
@@ -593,7 +599,7 @@ function checkOrder() {
         if (!validateMobile(contact)) return showError('输入的手机号格式不正确');
     } else if (contactType === 'qq') {
         if (!contact) return showError('请填写您的QQ号码，用于查询订单');
-        if (contact.length < 5 || contact.length > 11 || !validatNumbers(this.contact))
+        if (contact.length < 5 || contact.length > 11 || !validatNumbers(contact))
             return showError('输入的QQ号码格式不正确');
     }
 
@@ -602,6 +608,20 @@ function checkOrder() {
             if (!contactExtValues[i]) {
                 return showError('请填写 ' + contactExt[i])
             }
+        }
+    }
+
+    if(ORDER_QUERY_PASSWORD){
+        var query_password = $('#query_password').val();
+        if (!query_password) {
+            return showError('请填写订单查询密码', '#query_password');
+        }
+        if (query_password.length < 6) {
+            return showError('查询密码长度至少为6位', '#query_password');
+        }
+        var top_100 = ['123456', 'password', '12345678', 'qwerty', '123456789', '12345', '1234', '111111', '1234567', 'dragon', '123123', 'baseball', 'abc123', 'football', 'monkey', 'letmein', '696969', 'shadow', 'master', '666666', 'qwertyuiop', '123321', 'mustang', '1234567890', 'michael', '654321', 'pussy', 'superman', '1qaz2wsx', '7777777', 'fuckyou', '121212', '000000', 'qazwsx', '123qwe', 'killer', 'trustno1', 'jordan', 'jennifer', 'zxcvbnm', 'asdfgh', 'hunter', 'buster', 'soccer', 'harley', 'batman', 'andrew', 'tigger', 'sunshine', 'iloveyou', 'fuckme', '2000', 'charlie', 'robert', 'thomas', 'hockey', 'ranger', 'daniel', 'starwars', 'klaster', '112233', 'george', 'asshole', 'computer', 'michelle', 'jessica', 'pepper', '1111', 'zxcvbn', '555555', '11111111', '131313', 'freedom', '777777', 'pass', 'fuck', 'maggie', '159753', 'aaaaaa', 'ginger', 'princess', 'joshua', 'cheese', 'amanda', 'summer', 'love', 'ashley', '6969', 'nicole', 'chelsea', 'biteme', 'matthew', 'access', 'yankees', '987654321', 'dallas', 'austin', 'thunder', 'taylor', 'matrix', 'minecraft'];
+        if (top_100.indexOf(query_password) !== -1) {
+            return showError('当前查询密码存在安全风险，请更换', '#query_password');
         }
     }
 
@@ -768,10 +788,10 @@ $(function () {
                         return alert('请完成验证');
                     }
                     codeValidate = {
-                        'captcha.a': gt_config.key,
-                        'captcha.b': result.geetest_challenge,
-                        'captcha.c': result.geetest_validate,
-                        'captcha.d': result.geetest_seccode
+                        'captcha[a]': gt_config.key,
+                        'captcha[b]': result.geetest_challenge,
+                        'captcha[c]': result.geetest_validate,
+                        'captcha[d]': result.geetest_seccode
                     };
                     msg({
                         title: '验证完成',
@@ -798,6 +818,48 @@ $(function () {
                 if (captchaObj.bindOn) {
                     captchaObj.bindOn('#gt-btn-verify');
                     // 3.0 没有 bindOn 接口
+                }
+            });
+
+        } else if (window.config.captcha.driver === 'code') {
+            $('#order-btn').click(function () {
+
+                if (checkOrder()) {
+                    // 显示验证码框框
+                    inputDialog({
+                        'title': '请输入验证码',
+                        'content': '<div style="text-align: center">' +
+                            '<img id="captcha-img" class="captcha-pulse" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAEXRFWHRTb2Z0d2FyZQBTbmlwYXN0ZV0Xzt0AAAAMSURBVAiZYzh9+jQABMYCYqKpOacAAAAASUVORK5CYII=" width="200" height="64" style="cursor: pointer">' +
+                            '<input id="captcha-input" type="text" class="layui-layer-input" value="">' +
+                            '</div>'
+                    }, function (value){
+                        if(!value || !value.length){
+                            return;
+                        }
+                        if(codeValidate.hasOwnProperty('captcha[code]')){
+                            codeValidate['captcha[code]'] = value;
+                        }
+                        order();
+                    });
+
+                    function refresh_captcha(){
+                        // 加载验证码
+
+                        $('#captcha-img').addClass('loading');
+                        $.get(window.config.url + '/captcha/api?t=' + Math.random()).then(function (response) {
+                            codeValidate = {
+                                'captcha[key]': response.key,
+                                'captcha[code]': ''
+                            };
+
+                            $('#captcha-img').removeClass('loading');
+                            $('#captcha-img').attr('src', response.img);
+                            $('#captcha-input').focus();
+                        })
+                    }
+                    $('#captcha-img').click(refresh_captcha);
+                    refresh_captcha();
+
                 }
             });
         }

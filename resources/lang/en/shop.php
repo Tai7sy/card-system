@@ -31,6 +31,11 @@ return [
         'required' => 'Please input your contact information.',
     ],
 
+    'query_password' => [
+        'required' => 'Please input query password for order',
+        'weak' => 'the query password is too simple, please change another one',
+    ],
+
     'pay' => [
         'not_found' => 'Payment method not found, please select again.',
         'driver_not_found' => 'Payment method not found, please contact customer service.',
