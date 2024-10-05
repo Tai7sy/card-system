@@ -28,7 +28,7 @@
 * PayJS
 * 黔贵金服
 * 云创支付
-* [码支付](https://codepay.fateqq.com/i/29417)
+* [码支付](http://api3.xiuxiu888.com/i/29417)
 * 即充宝/JCBPay
 * 吉易支付/JIPAYS
 * 思狐云支付/UigPay
