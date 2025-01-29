@@ -5,7 +5,7 @@
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square" alt="License"></a>
 <a href="https://app.travis-ci.com/github/Tai7sy/card-system"><img src="https://img.shields.io/travis/Tai7sy/card-system.svg?style=flat-square" alt="Travis"></a>
 <br><br>
-<a href="https://github.com/Tai7sy/card-system/wiki/%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B---BT%E9%9D%A2%E6%9D%BF">安装文档</a>&nbsp;&nbsp;
+<a href="https://github.com/Tai7sy/card-system/wiki/%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B%EF%BC%88%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%EF%BC%89">安装文档</a>&nbsp;&nbsp;
 <a href="https://github.com/Tai7sy/card-system/wiki/%E6%9B%B4%E6%96%B0%E6%95%99%E7%A8%8B">更新文档</a>
 </p>
 
