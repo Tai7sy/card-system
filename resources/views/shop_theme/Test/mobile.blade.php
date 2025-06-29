@@ -6,17 +6,6 @@
     <title>{{ $name }}</title>
     <meta name=description content="{{ $description }}">
     <meta name=keywords content="{{ $keywords }}">
-    <script src="/shop_theme/Test/jquery-1.8.3.min.js"></script>
-    <link href="/shop_theme/Test/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
-    <script src="/shop_theme/Test/sweetalert2/sweetalert2.min.js"></script>
-    <link href="/shop_theme/Test/iconfont.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/plugins/css/quill.snow.css">
-    <script type="text/javascript" src="/plugins/js/quill.min.js"></script>
-    @if(@$config['captcha']['scene']['shop']['buy'] && $config['captcha']['driver'] === 'geetest')
-        <script type="text/javascript" src="/plugins/js/gt.js"></script>
-    @endif
-    <link href="/shop_theme/Test/mobile.min.css?v={!! $version !!}" rel="stylesheet" type="text/css">
-    <script src="/shop_theme/Test/tips.js"></script>
 </head>
 <body>
 <!--顶部-->
@@ -183,6 +172,18 @@
 </div>
 <!--/ 商家公告 -->
 
+<script src="/shop_theme/Test/jquery-1.8.3.min.js"></script>
+<link href="/shop_theme/Test/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
+<script src="/shop_theme/Test/sweetalert2/sweetalert2.min.js"></script>
+<link href="/shop_theme/Test/iconfont.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="/plugins/css/quill.snow.css">
+<script type="text/javascript" src="/plugins/js/quill.min.js"></script>
+@if(@$config['captcha']['scene']['shop']['buy'] && $config['captcha']['driver'] === 'geetest')
+    <script type="text/javascript" src="/plugins/js/gt.js"></script>
+@endif
+<link href="/shop_theme/Test/mobile.min.css?v={!! $version !!}" rel="stylesheet" type="text/css">
+<script src="/shop_theme/Test/tips.js"></script>
+	
 <script type=text/javascript>var config = @json($config);</script>
 <script type=text/javascript src="/shop_theme/Test/common.min.js?v={!! $version !!}"></script>
 <script type=text/javascript src="/shop_theme/Test/mobile.min.js?v={!! $version !!}"></script>
