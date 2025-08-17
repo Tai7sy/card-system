@@ -6,17 +6,17 @@
     <title>{{ $name }}</title>
     <meta name=description content="{{ $description }}">
     <meta name=keywords content="{{ $keywords }}">
-    <script src="/shop_theme/classic/jquery-1.8.3.min.js"></script>
-    <link href="/shop_theme/classic/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
-    <script src="/shop_theme/classic/sweetalert2/sweetalert2.min.js"></script>
-    <link href="/shop_theme/classic/iconfont.css" rel="stylesheet" type="text/css">
+    <script src="/shop_theme/acg/jquery-1.8.3.min.js"></script>
+    <link href="/shop_theme/acg/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
+    <script src="/shop_theme/acg/sweetalert2/sweetalert2.min.js"></script>
+    <link href="/shop_theme/acg/iconfont.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="/plugins/css/quill.snow.css">
     <script type="text/javascript" src="/plugins/js/quill.min.js"></script>
     @if(@$config['captcha']['scene']['shop']['buy'] && $config['captcha']['driver'] === 'geetest')
         <script type="text/javascript" src="/plugins/js/gt.js"></script>
     @endif
-    <link href="/shop_theme/classic/mobile.min.css?v={!! $version !!}" rel="stylesheet" type="text/css">
-    <script src="/shop_theme/classic/tips.js"></script>
+    <link href="/shop_theme/acg/mobile.min.css?v={!! $version !!}" rel="stylesheet" type="text/css">
+    <script src="/shop_theme/acg/tips.js"></script>
 </head>
 <body>
 <!--顶部-->
@@ -145,7 +145,7 @@
     <span class="form_title" style="margin-bottom: 4px">请选择支付方式</span>
     <ul>
         @foreach ($config['pays'] as $pay)
-            <?php $img = '/shop_theme/classic/images/' . str_after($pay['img'], 'images/'); ?>
+            <?php $img = '/shop_theme/acg/images/' . str_after($pay['img'], 'images/'); ?>
             <li class="{!! \App\Library\Helper::str_between_longest($pay['img'],'images/','.') !!}">
                 <img src="{!! $img !!}" alt="{!! $pay['name'] !!}">{!! $pay['name'] !!}<span></span>
                 <input type="radio" name="payway" value="{!! $pay['id'] !!}" title="{!! $pay['name'] !!}">
@@ -160,7 +160,7 @@
 </div>
 <!-- 提示其他浏览器打开遮罩 -->
 <div id="browser_shadow" style="display:none;">
-    <img src="/shop_theme/classic/images/open_other.png" alt="请使用其他浏览器打开">
+    <img src="/shop_theme/acg/images/open_other.png" alt="请使用其他浏览器打开">
 </div>
 <!-- 批发优惠信息 -->
 <div id="discount-tip" style="display:none;">
@@ -184,8 +184,8 @@
 <!--/ 商家公告 -->
 
 <script type=text/javascript>var config = @json($config);</script>
-<script type=text/javascript src="/shop_theme/classic/common.min.js?v={!! $version !!}"></script>
-<script type=text/javascript src="/shop_theme/classic/mobile.min.js?v={!! $version !!}"></script>
+<script type=text/javascript src="/shop_theme/acg/common.min.js?v={!! $version !!}"></script>
+<script type=text/javascript src="/shop_theme/acg/mobile.min.js?v={!! $version !!}"></script>
 {!! $js_tj !!} {!! $js_kf !!}
 </body>
 </html>
