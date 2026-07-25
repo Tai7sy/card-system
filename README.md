@@ -3,11 +3,14 @@
 <a href="https://github.com/Tai7sy/card-system/releases"><img src="https://img.shields.io/badge/version-3.15-blue.svg?style=flat-square" alt="License"></a>
 <img alt="PHP from Packagist badge" src="https://img.shields.io/badge/php-%3E%3D7.0.0-brightgreen.svg?style=flat-square">
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square" alt="License"></a>
-<a href="https://app.travis-ci.com/github/Tai7sy/card-system"><img src="https://img.shields.io/travis/Tai7sy/card-system.svg?style=flat-square" alt="Travis"></a>
-<br><br>
+<br>
 <a href="https://github.com/Tai7sy/card-system/wiki/1.-%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B%EF%BC%88%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%EF%BC%89">安装文档</a>&nbsp;&nbsp;
 <a href="https://github.com/Tai7sy/card-system/wiki/2.-%E6%9B%B4%E6%96%B0%E6%95%99%E7%A8%8B">更新文档</a>
 </p>
+
+
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
+
 
 ## 介绍
 
