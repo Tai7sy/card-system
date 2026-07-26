@@ -20,7 +20,7 @@ class CreatePaysTable extends Migration
             $table->string('way');
             $table->text('config');
             $table->text('comment')->nullable();
-            $table->float('fee_system',8,4)->default(0.01); // 通道手续费 默认 1%
+            $table->decimal('fee_system',8,4)->default(0.01); // 通道手续费 默认 1%
             $table->boolean('enabled');
             $table->timestamps();
         });

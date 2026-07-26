@@ -1,0 +1,2 @@
+<?php
+ namespace App\Bootstrap; class HandleExceptions extends \Illuminate\Foundation\Bootstrap\HandleExceptions { public function handleError($level, $message, $file = '', $line = 0) { $vendor = str_replace('\\', '/', dirname(__DIR__, 2) . '/vendor/'); if (str_starts_with(str_replace('\\', '/', $file), $vendor) && in_array($level, [E_WARNING, E_USER_WARNING, E_DEPRECATED, E_USER_DEPRECATED], true)) { return; } parent::handleError($level, $message, $file, $line); } } 

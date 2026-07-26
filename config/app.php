@@ -173,8 +173,8 @@ return [
          * Package Service Providers...
          */
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
-        Naux\Mail\SendCloudServiceProvider::class,
-        Jacobcyl\AliOSS\AliOssServiceProvider::class,
+        App\Providers\SendCloudServiceProvider::class,
+        App\Providers\OssServiceProvider::class,
         zgldh\QiniuStorage\QiniuFilesystemServiceProvider::class,
         Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
         Mews\Captcha\CaptchaServiceProvider::class,
