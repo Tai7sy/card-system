@@ -1,19 +1,23 @@
 language: php
 
 php:
-  - '7.0'
-  - '7.1'
-  - '7.2'
-  - '7.3'
+  - '8.2'
 
 services:
   - mysql
 
-before_install:
-  - mysql -e 'CREATE DATABASE `card_test` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
+env:
+  global:
+    - DB_HOST=127.0.0.1
+    - DB_PORT=3306
+    - DB_DATABASE=card_free_upgrade_test
+    - DB_USERNAME=root
+    - DB_PASSWORD=
 
 before_script:
-  - curl -s http://getcomposer.org/installer | php
-  - composer create-project
-  - php -r "file_put_contents('.env', str_replace('your_db_name', 'card_test', str_replace('your_db_username', 'root', str_replace('your_db_password', '', file_get_contents('.env')))));"
-  - php artisan migrate:fresh --seed
+  - mysql -e 'CREATE DATABASE `card_free_upgrade_test` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
+  - php composer.phar install --prefer-dist --no-interaction
+
+script:
+  - php composer.phar test
+  - php composer.phar test:aws

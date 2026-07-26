@@ -1,5 +1,11 @@
 <?php
 
+namespace Database\Seeders;
+
+use Exception;
+use Illuminate\Support\Facades\DB;
+
+
 use Illuminate\Database\Seeder;
 
 class PayTableSeeder extends Seeder

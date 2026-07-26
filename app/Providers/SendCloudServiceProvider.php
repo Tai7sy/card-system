@@ -1,0 +1,2 @@
+<?php
+ namespace App\Providers; use App\Mail\Transport\SendCloudTransport; use Illuminate\Support\ServiceProvider; class SendCloudServiceProvider extends ServiceProvider { public function boot() { $this->app->make('mail.manager')->extend('sendcloud', function () { return new SendCloudTransport((string) config('services.sendcloud.api_user'), (string) config('services.sendcloud.api_key')); }); } } 

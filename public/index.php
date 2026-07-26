@@ -1,5 +1,12 @@
 <?php
 
+// Check before Composer loads dependencies that require newer PHP syntax.
+if (PHP_VERSION_ID < 80200) {
+    header('Content-Type: text/plain; charset=UTF-8');
+    exit('PHP版本过低：当前版本为 ' . PHP_VERSION . '，请将网站 PHP 升级到 8.2 或更高版本后重试。');
+}
+
+
 // hack for aliyun cdn
 if (isset($_SERVER['HTTP_ALI_SWIFT_LOG_HOST'])) {
     $_SERVER['SERVER_NAME'] = $_SERVER['HTTP_ALI_SWIFT_LOG_HOST'];
@@ -28,6 +35,8 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
+// Suppress deprecations from retained legacy dependencies during autoload.
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 require __DIR__ . '/../vendor/autoload.php';
 
 /*

@@ -1,5 +1,5 @@
 {
-  "name": "tai7sy/card-system",
+  "name": "tai7sy/card_free",
   "description": "card system free",
   "keywords": [
     "card system free"
@@ -7,35 +7,45 @@
   "license": "MIT",
   "type": "project",
   "require": {
-    "php": ">=7.0.0",
+    "barryvdh/laravel-ide-helper": "^3.6",
+    "ext-bcmath": "*",
+    "ext-ctype": "*",
     "ext-curl": "*",
     "ext-dom": "*",
+    "ext-fileinfo": "*",
+    "ext-gd": "*",
     "ext-json": "*",
     "ext-libxml": "*",
+    "ext-mbstring": "*",
+    "ext-openssl": "*",
+    "ext-pdo": "*",
     "ext-simplexml": "*",
-    "barryvdh/laravel-ide-helper": "^2.4",
-    "doctrine/dbal": "~2.3",
-    "fideloper/proxy": "~3.3",
-    "hashids/hashids": "2.0.4",
-    "jacobcyl/ali-oss-storage": "dev-master",
-    "ken/blade-minify": "^1.0",
-    "laravel/framework": "5.5.*",
-    "laravel/tinker": "~1.0",
-    "lcobucci/jwt": "3.3.3",
-    "mews/captcha": "^2.3",
-    "naux/sendcloud": "^1.1",
-    "predis/predis": "^1.0",
-    "rap2hpoutre/laravel-log-viewer": "^0.13.0",
-    "tymon/jwt-auth": "1.0.0-rc.5",
+    "ext-tokenizer": "*",
+    "ext-xml": "*",
+    "guzzlehttp/psr7": "^2.8",
+    "hashids/hashids": "^4.1",
+    "iidestiny/laravel-filesystem-oss": "^3.7",
+    "laravel/framework": "^12.0",
+    "laravel/helpers": "^1.8",
+    "laravel/tinker": "^2.10",
+    "league/flysystem-aws-s3-v3": "^3.0",
+    "mews/captcha": "^3.4",
+    "php": "^8.2",
+    "predis/predis": "^2.0",
+    "rap2hpoutre/laravel-log-viewer": "^2.4",
+    "tymon/jwt-auth": "^2.3",
     "voku/anti-xss": "4.0.1",
     "wi1dcard/alipay-sdk": "^1.3",
-    "zgldh/qiniu-laravel-storage": "^0.9.2"
+    "zgldh/qiniu-laravel-storage": "^9.0",
+    "laravel/ui": "^4.6",
+    "ext-gmp": "*"
   },
   "require-dev": {
-    "fzaninotto/faker": "~1.4",
     "filp/whoops": "~2.0",
-    "mockery/mockery": "~1.0",
-    "phpunit/phpunit": "~6.0"
+    "mockery/mockery": "^1.6",
+    "phpunit/phpunit": "^11.5",
+    "fakerphp/faker": "^1.23",
+    "laravel/legacy-factories": "^1.4"
   },
   "autoload": {
     "classmap": [
@@ -45,7 +55,10 @@
     "psr-4": {
       "App\\": "app/",
       "Gateway\\": "app/Library/Gateway/"
-    }
+    },
+    "exclude-from-classmap": [
+      "/app/Library/Gateway/"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
@@ -53,12 +66,20 @@
     }
   },
   "extra": {
+    "aws/aws-sdk-php": [
+      "S3",
+      "Sqs"
+    ],
     "laravel": {
       "dont-discover": [
+        "iidestiny/laravel-filesystem-oss"
       ]
     }
   },
   "scripts": {
+    "pre-autoload-dump": [
+      "Aws\\Script\\Composer\\Composer::removeUnusedServices"
+    ],
     "post-root-package-install": [
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ],
@@ -69,14 +90,20 @@
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
       "@php artisan package:discover"
     ],
-    "post-update-cmd": [
-      "Illuminate\\Foundation\\ComposerScripts::postUpdate",
-      "php artisan optimize"
-    ]
+    "test": "@php -d error_reporting=8191 vendor/bin/phpunit",
+    "test:aws": "@php tests/aws-storage.php"
   },
   "config": {
     "preferred-install": "dist",
     "sort-packages": true,
-    "optimize-autoloader": true
-  }
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.2.0"
+    },
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
 }

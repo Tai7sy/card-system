@@ -1,6 +1,10 @@
 #!/usr/bin/env php
 <?php
 
+if (PHP_VERSION_ID < 80200) {
+    exit('PHP版本过低：当前版本为 ' . PHP_VERSION . '，请使用 PHP 8.2 或更高版本运行命令。' . PHP_EOL);
+}
+
 define('LARAVEL_START', microtime(true));
 
 /*
@@ -15,6 +19,8 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
+// Suppress deprecations from retained legacy dependencies during autoload.
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 require __DIR__.'/vendor/autoload.php';
 
 $app = require_once __DIR__.'/bootstrap/app.php';
