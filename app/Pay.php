@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Model_ as Model;
 use Illuminate\Support\Facades\Cache;
 
 class Pay extends Model
@@ -16,7 +16,7 @@ class Pay extends Model
     public static function gets()
     {
         // Log::debug('Model.Pay.gets');
-        return Cache::remember('model.pays', 10, function () {
+        return Cache::remember('model.pays', 10 * 60, function () {
             // Log::debug('Model.Pay.gets fetch from database');
             return self::query()->get();
         });

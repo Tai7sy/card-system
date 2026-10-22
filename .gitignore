@@ -3,6 +3,7 @@
 /public/storage
 /storage/*.key
 /vendor
+/build/releases
 /.idea
 /.vagrant
 Homestead.json
@@ -13,3 +14,7 @@ yarn-error.log
 /database/seeds/MyPayTableSeeder.php
 /public/.htaccess
 /public/web.config
+
+/bootstrap/cache/*.php
+
+/storage/framework/testing/

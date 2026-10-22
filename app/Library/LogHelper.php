@@ -7,10 +7,20 @@ use Illuminate\Support\Facades\Log;
 
 class LogHelper
 {
+    private static $log_file;
 
     public static function setLogFile($file)
     {
-        Log::getMonolog()->setHandlers([]);
-        Log::useDailyFiles(storage_path(DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . $file . '_' . php_sapi_name() . '.log'), 0, config('app.log_level'));
+        $old_file = self::$log_file;
+        self::$log_file = $file;
+        config(['logging.channels.card' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/' . $file . '_' . PHP_SAPI . '.log'),
+            'days' => 0,
+            'level' => config('app.log_level', 'error'),
+        ]]);
+        Log::forgetChannel('card');
+        Log::setDefaultDriver('card');
+        return $old_file;
     }
 }

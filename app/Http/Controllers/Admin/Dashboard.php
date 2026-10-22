@@ -119,7 +119,7 @@ class Dashboard extends Controller
     function logsToken()
     {
         $token = md5(random_bytes(128));
-        Cache::put($token, Auth::getUser(), 15);
+        Cache::put($token, Auth::user(), 15 * 60);
         return response(['token' => $token]);
     }
 
@@ -128,8 +128,12 @@ class Dashboard extends Controller
      */
     function logsView(Request $request, $token)
     {
-        if (($user = Cache::get($token))) {
-            Cache::put($token, $user, 15);
+        if (preg_match('/\A[a-f0-9]{32}\z/', $token)
+            && ($user = Cache::get($token)) instanceof \App\User
+            && ($user = \App\User::find($user->id))
+            && ($user->status ?? \App\User::STATUS_OK) === \App\User::STATUS_OK
+            && $user->role === 'admin') {
+            Cache::put($token, $user, 15 * 60);
             return (new \Rap2hpoutre\LaravelLogViewer\LogViewerController)->index();
         } else {
             throw new \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException('logs-token');

@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Model_ as Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -16,13 +16,14 @@ class System extends Model
     public static function _init()
     {
         // Log::debug('SystemSetting._init');
-        static::$systems = Cache::remember('settings.all', 10, function () {
+        static::$systems = Cache::remember('settings.all', 10 * 60, function () {
             // Log::debug('SystemSetting._init.fetch from database');
             $systems = self::query()->get()->toArray();
+            $values = [];
             foreach ($systems as $system) {
-                static::$systems[$system['name']] = $system['value'];
+                $values[$system['name']] = $system['value'];
             }
-            return static::$systems;
+            return $values;
         });
         static::$systems['_initialized'] = true;
     }

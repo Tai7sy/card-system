@@ -52,4 +52,13 @@ $app->singleton(
 |
 */
 
+// Keep the existing translation directory after upgrading from Laravel 5.
+$app->useLangPath($app->resourcePath('lang'));
+
+// Keep legacy vendor warnings from becoming HTTP 500 responses.
+$app->singleton(
+    \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
+    \App\Bootstrap\HandleExceptions::class
+);
+
 return $app;

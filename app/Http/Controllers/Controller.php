@@ -111,7 +111,7 @@ class Controller extends BaseController
      */
     protected function getUser(Request $request)
     {
-        return \Auth::getUser();
+        return \Auth::user();
     }
 
 

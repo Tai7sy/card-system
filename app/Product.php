@@ -4,7 +4,7 @@
 namespace App;
 
 use App\Library\Helper;
-use Illuminate\Database\Eloquent\Model;
+use App\Model_ as Model;
 use Illuminate\Support\Facades\Log as LogWriter;
 
 

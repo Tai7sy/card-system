@@ -96,7 +96,7 @@ class HomeController extends Controller
                 $category->setVisible(['id', 'name', 'password_open']);
                 if ($category->password_open) {
                     $category->setAttribute('password', $category->getTmpPassword());
-                    $category->addVisible(['password']);
+                    $category->makeVisible(['password']);
                 }
                 $product->setForShop($user);
 

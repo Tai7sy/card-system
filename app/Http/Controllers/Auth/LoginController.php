@@ -53,7 +53,7 @@ class LoginController extends Controller
 
         if (($token = Auth::attempt($request->only('email', 'password')))) {
             /** @var \App\User $user */
-            $user = Auth::getUser();
+            $user = Auth::user();
 
             $ip = Helper::getIP() ?? $request->ip();
             $user->logs()->create([
@@ -79,8 +79,8 @@ class LoginController extends Controller
     public function getUserInfo()
     {
         /** @var \App\User $user */
-        $user = Auth::getUser();
-        $user->addHidden(['created_at', 'updated_at']);
+        $user = Auth::user();
+        $user->makeHidden(['created_at', 'updated_at']);
         $user->append(['last_login_at']);
         $user->setAttribute('shop_name', config('app.name'));
 

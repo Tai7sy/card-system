@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Merchant;
 
 use App\Library\Response;
 use App\System;
-use function GuzzleHttp\Psr7\mimetype_from_filename;
+use GuzzleHttp\Psr7\MimeType;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -126,8 +126,11 @@ class File extends Controller
                 return response()->view('message', ['title' => '404', 'message' => '404 NotFound'], 404);
             }
         }
-        ob_end_clean();
-        header('Content-Type: ' . mimetype_from_filename($relative_path));
-        die($fileBin);
+        if ($fileBin === null || $fileBin === false) {
+            return response()->view('message', ['title' => '404', 'message' => '404 NotFound'], 404);
+        }
+        return response($fileBin, 200, [
+            'Content-Type' => MimeType::fromFilename($relative_path) ?? 'application/octet-stream',
+        ]);
     }
 }

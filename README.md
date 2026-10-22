@@ -1,5 +1,5 @@
-#
+# Card Free
 
-[DEV](docs/DEV.md) <br>
-[PUBLISH](docs/PUBLISH.md) <br>
-[INSTALL](docs/INSTALL.md) <br>
+[Laravel 12 升级、部署与验证](docs/UPGRADE_LARAVEL12.md)
+
+[构建发布包](build/BUILD.txt)

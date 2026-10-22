@@ -46,9 +46,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth.token']], function () 
 
     Route::get('pay', 'Admin\Pay@get');
     Route::get('pay/stat', 'Admin\Pay@stat');
-    Route::post('pay/sort', 'Admin\Pay@sort');
     Route::post('pay/fee_system', 'Admin\Pay@fee_system');
-    Route::post('pay/fee', 'Admin\Pay@fee');
     Route::post('pay/edit', 'Admin\Pay@edit');
     Route::post('pay/comment', 'Admin\Pay@comment');
     Route::post('pay/enable', 'Admin\Pay@enable');

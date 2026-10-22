@@ -21,8 +21,17 @@ class ConfigServiceProvider extends ServiceProvider
 
         config()->set([
             'app.project' => 'card_free',
-            'app.version' => '3.15',
+            'app.version' => '3.20',
         ]);
+
+        // Build and metadata commands do not require a configured business database.
+        if ($this->app->runningInConsole() && in_array($_SERVER['argv'][1] ?? '', [
+            'build:dist', 'package:discover', 'optimize', 'clear-compiled',
+            'cache:clear', 'config:clear', 'config:cache', 'view:clear', 'view:cache', 'route:cache', 'route:clear', 'route:list',
+            'about', 'list', 'help', '--version', '-V', 'migrate', 'migrate:status', 'migrate:rollback', 'migrate:fresh', 'db:seed', 'optimize:clear', 'event:cache', 'event:clear', 'schedule:list', 'key:generate', 'jwt:secret',
+        ], true)) {
+            return;
+        }
 
         try {
             config()->set([
@@ -50,6 +59,8 @@ class ConfigServiceProvider extends ServiceProvider
                 'mail.from.address' => System::_get('mail_smtp_from_address'),
                 'mail.from.name' => System::_get('mail_smtp_from_name'),
                 'mail.encryption' => System::_get('mail_smtp_encryption') === 'null' ? null : System::_get('mail_smtp_encryption'),
+                'mail.scheme' => System::_get('mail_smtp_encryption') === 'ssl' ? 'smtps' : 'smtp',
+                'mail.require_tls' => System::_get('mail_smtp_encryption') === 'tls',
                 'services.sendcloud.api_user' => System::_get('sendcloud_user'),
                 'services.sendcloud.api_key' => System::_get('sendcloud_key'),
 

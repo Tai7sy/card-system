@@ -244,7 +244,7 @@ class Order extends Controller
             }])
             ->findOrFail($id);
 
-        $order->addHidden(['system_fee']);
+        $order->makeHidden(['system_fee']);
         return Response::success($order);
     }
 
@@ -397,7 +397,7 @@ class Order extends Controller
             $order['card_orders'] = array_map(function ($item) {
                 return ['card' => ['card' => $item]];
             }, $card_arr);
-            $order->addHidden(['system_fee']);
+            $order->makeHidden(['system_fee']);
             return Response::success($order);
         } else {
             // orderSuccess 里面写过详细log了

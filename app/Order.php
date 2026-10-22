@@ -5,7 +5,7 @@ namespace App;
 use App\Jobs\OrderSms;
 use App\Library\LogHelper;
 use App\Mail\OrderShipped;
-use Illuminate\Database\Eloquent\Model;
+use App\Model_ as Model;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log as LogWriter;
 

@@ -3,7 +3,7 @@
 namespace App;
 
 use App\Library\Helper;
-use Illuminate\Database\Eloquent\Model;
+use App\Model_ as Model;
 
 class Category extends Model
 {
@@ -43,7 +43,7 @@ class Category extends Model
         foreach ($products as $product) {
             $product->setForShop($this->user);
         };
-        $this->addVisible(['products']);
+        $this->makeVisible(['products']);
         $this->setAttribute('products', $products);
         return $products;
     }

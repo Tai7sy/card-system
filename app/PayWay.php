@@ -3,7 +3,7 @@
 namespace App;
 
 use App\Library\Helper;
-use Illuminate\Database\Eloquent\Model;
+use App\Model_ as Model;
 
 class PayWay extends Model
 {

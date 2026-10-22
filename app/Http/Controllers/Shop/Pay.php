@@ -25,9 +25,9 @@ class Pay extends Controller
 
     public function __construct()
     {
-        define('SYS_NAME', config('app.name'));
-        define('SYS_URL', config('app.url'));
-        define('SYS_URL_API', config('app.url_api'));
+        if (!defined('SYS_NAME')) define('SYS_NAME', config('app.name'));
+        if (!defined('SYS_URL')) define('SYS_URL', config('app.url'));
+        if (!defined('SYS_URL_API')) define('SYS_URL_API', config('app.url_api'));
     }
 
     /**
@@ -413,7 +413,7 @@ class Pay extends Controller
     function qrQuery(Request $request, $pay_id)
     {
         $order_no_outer = $request->input('id'); // 订单号
-        if (isset($order_no_outer{5})) {
+        if (isset($order_no_outer[5])) {
             return self::payReturn($request, $pay_id, $order_no_outer);
         } else {
             return Response::fail('order_no error');
@@ -443,7 +443,7 @@ class Pay extends Controller
         $logTag .= ',' . $pay->driver;
 
         // check if already processed
-        if ($order_no && isset($order_no{5})) {
+        if ($order_no && isset($order_no[5])) {
             // 如果订单号传递了
             $order = \App\Order::whereOrderNo($order_no)->firstOrFail();
             if ($order && ($order->status === \App\Order::STATUS_PAID || $order->status === \App\Order::STATUS_SUCCESS)) {
