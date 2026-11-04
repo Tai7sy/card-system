@@ -1,2 +1,56 @@
 <?php
- namespace App\Library\Geetest; use App\Library\Helper; use Hashids\Hashids; use Illuminate\Support\Facades\Session; class API { private $geetest_conf = null; public function __construct($config) { $this->geetest_conf = $config; } public static function get() { $id = config('services.geetest.id'); $key = config('services.geetest.key'); if (!strlen($id) || !strlen($key)) { return ['message' => 'geetest error: no config']; } $GtSdk = new Lib($id, $key); $user_id = time() . rand(1, 10000); $gt_server_status = $GtSdk->pre_process($user_id); $ret = json_decode($GtSdk->get_response_str(), true); $ret['key'] = Helper::id_encode($user_id, 0xDEE, $gt_server_status); return $ret; } public static function verify($params, $geetest_challenge, $geetest_validate, $geetest_seccode) { $GtSdk = new Lib(config('services.geetest.id'), config('services.geetest.key')); Helper::id_decode($params, 0xDEE, $decodeParams); $user_id = $decodeParams[1]; $gt_server_status = $decodeParams[4]; if ($gt_server_status === 1) { $result = $GtSdk->success_validate($geetest_challenge, $geetest_validate, $geetest_seccode, $user_id); if ($result) { return true; } else { return false; } } else { if ($GtSdk->fail_validate($geetest_challenge, $geetest_validate, $geetest_seccode)) { return true; } else { return false; } } } }
+
+namespace App\Library\Geetest;
+
+use App\Library\Helper;
+use Hashids\Hashids;
+use Illuminate\Support\Facades\Session;
+
+
+class API
+{
+    private $geetest_conf = null;
+
+    public function __construct($config)
+    {
+        $this->geetest_conf = $config;
+    }
+
+    public static function get()
+    {
+        $id = config('services.geetest.id');
+        $key = config('services.geetest.key');
+        if (!strlen($id) || !strlen($key)) {
+            return ['message' => 'geetest error: no config'];
+        }
+        $GtSdk = new Lib($id, $key);
+        $user_id = time() . rand(1, 10000);
+        $gt_server_status = $GtSdk->pre_process($user_id);
+        $ret = json_decode($GtSdk->get_response_str(), true);
+
+        $ret['key'] = Helper::id_encode($user_id, 0xDEE, $gt_server_status);
+        return $ret;
+    }
+
+    public static function verify($params, $geetest_challenge, $geetest_validate, $geetest_seccode)
+    {
+        $GtSdk = new Lib(config('services.geetest.id'), config('services.geetest.key'));
+        Helper::id_decode($params, 0xDEE, $decodeParams);
+        $user_id = $decodeParams[1];
+        $gt_server_status = $decodeParams[4];
+        if ($gt_server_status === 1) {
+            $result = $GtSdk->success_validate($geetest_challenge, $geetest_validate, $geetest_seccode, $user_id);
+            if ($result) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if ($GtSdk->fail_validate($geetest_challenge, $geetest_validate, $geetest_seccode)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+}

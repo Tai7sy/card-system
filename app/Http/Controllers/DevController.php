@@ -1,2 +1,89 @@
 <?php
- namespace App\Http\Controllers; use App\System; use Illuminate\Http\Request; use Illuminate\Support\Facades\Log; use Illuminate\Support\Facades\Mail; class DevController extends Controller { private function check_readable_r($dir) { if (is_dir($dir)) { if (is_readable($dir)) { $objects = scandir($dir); foreach ($objects as $object) { if ($object != "." && $object != "..") { if (!self::check_readable_r($dir . "/" . $object)) return false; else continue; } } echo $dir . '   ...... <span style="color: green">R</span><br>'; return true; } else { echo $dir . '   ...... <span style="color: red">R</span><br>'; return false; } } else if (file_exists($dir)) { return (is_readable($dir)); } echo $dir . '   ...... 文件不存在<br>'; return false; } private function check_writable_r($dir) { if (is_dir($dir)) { if (is_writable($dir)) { $objects = scandir($dir); foreach ($objects as $object) { if ($object != "." && $object != "..") { if (!self::check_writable_r($dir . "/" . $object)) return false; else continue; } } echo $dir . '   ...... <span style="color: green">W</span><br>'; return true; } else { echo $dir . '   ...... <span style="color: red">W</span><br>'; return false; } } else if (file_exists($dir)) { return (is_writable($dir)); } echo $dir . '   ...... 文件不存在<br>'; return false; } private function checkPathPermission($path) { self::check_readable_r($path); self::check_writable_r($path); } public function install() { $var = []; @ob_start(); self::checkPathPermission(base_path('storage')); self::checkPathPermission(base_path('bootstrap/cache')); $var['permission'] = @ob_get_clean(); return view('install', [ 'var' => $var ]); } public function test(Request $request) { } } 
+
+namespace App\Http\Controllers;
+
+use App\System;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
+class DevController extends Controller
+{
+
+    private function check_readable_r($dir)
+    {
+        if (is_dir($dir)) {
+            if (is_readable($dir)) {
+                $objects = scandir($dir);
+                foreach ($objects as $object) {
+                    if ($object != "." && $object != "..") {
+                        if (!self::check_readable_r($dir . "/" . $object)) return false;
+                        else continue;
+                    }
+                }
+                echo $dir . '   ...... <span style="color: green">R</span><br>';
+                return true;
+            } else {
+                echo $dir . '   ...... <span style="color: red">R</span><br>';
+                return false;
+            }
+
+        } else if (file_exists($dir)) {
+            return (is_readable($dir));
+        }
+        echo $dir . '   ...... 文件不存在<br>';
+        return false;
+    }
+
+    private function check_writable_r($dir)
+    {
+        if (is_dir($dir)) {
+            if (is_writable($dir)) {
+                $objects = scandir($dir);
+                foreach ($objects as $object) {
+                    if ($object != "." && $object != "..") {
+                        if (!self::check_writable_r($dir . "/" . $object)) return false;
+                        else continue;
+                    }
+                }
+                echo $dir . '   ...... <span style="color: green">W</span><br>';
+                return true;
+            } else {
+                echo $dir . '   ...... <span style="color: red">W</span><br>';
+                return false;
+            }
+
+        } else if (file_exists($dir)) {
+            return (is_writable($dir));
+        }
+        echo $dir . '   ...... 文件不存在<br>';
+        return false;
+    }
+
+    private function checkPathPermission($path)
+    {
+        self::check_readable_r($path);
+        self::check_writable_r($path);
+    }
+
+
+    public function install()
+    {
+        $var = [];
+
+        @ob_start();
+        self::checkPathPermission(base_path('storage'));
+        self::checkPathPermission(base_path('bootstrap/cache'));
+        $var['permission'] = @ob_get_clean();
+
+
+        return view('install', [
+            'var' => $var
+        ]);
+    }
+
+
+    public function test(Request $request)
+    {
+    }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "card-system",
+  "private": true,
+  "workspaces": [
+    "web_admin",
+    "web_shop"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "npm run build:shop && npm run build:admin",
+    "build:admin": "npm run build --workspace web_admin",
+    "build:shop": "npm run build --workspace web_shop",
+    "dev:admin": "npm run serve --workspace web_admin",
+    "dev:shop": "npm run serve --workspace web_shop",
+    "lint": "npm run lint --workspaces"
+  }
+}

@@ -1,2 +1,142 @@
 <?php
- namespace App\Http\Controllers\Admin; use App\Library\CurlRequest; use App\Library\Response; use App\Order; use Illuminate\Http\Request; use App\Http\Controllers\Controller; use Illuminate\Support\Facades\Auth; use Illuminate\Support\Facades\Cache; use Illuminate\Support\Facades\Log; class Dashboard extends Controller { function index(Request $request) { $dashboard = [ 'today' => [ 'count' => 0, 'paid' => 0, 'profit' => 0 ], 'yesterday' => [ 'count' => 0, 'paid' => 0, 'profit' => 0 ] ]; $ordersToday = Order::whereUserId(\Auth::Id()) ->whereDate('paid_at', \Carbon\Carbon::now()->toDateString()) ->where(function ($query) { $query->where('status', Order::STATUS_PAID) ->orWhere('status', Order::STATUS_SUCCESS); }) ->selectRaw('COUNT(*) as `count`,SUM(`paid`) as `paid`,SUM(`paid`-`sms_price`-`cost`-`fee`) as `profit`') ->get()->toArray(); $ordersYesterday = Order::whereUserId(\Auth::Id()) ->whereDate('paid_at', \Carbon\Carbon::yesterday()->toDateString()) ->where(function ($query) { $query->where('status', Order::STATUS_PAID) ->orWhere('status', Order::STATUS_SUCCESS); }) ->selectRaw('COUNT(*) as `count`,SUM(`paid`) as `paid`,SUM(`paid`-`sms_price`-`cost`-`fee`) as `profit`') ->get()->toArray(); if (isset($ordersToday[0]) && isset($ordersToday[0]['count'])) { $dashboard['today'] = [ 'count' => (int)$ordersToday[0]['count'], 'paid' => (int)$ordersToday[0]['paid'], 'profit' => (int)$ordersToday[0]['profit'] ]; } if (isset($ordersYesterday[0]) && isset($ordersYesterday[0]['count'])) { $dashboard['yesterday'] = [ 'count' => (int)$ordersYesterday[0]['count'], 'paid' => (int)$ordersYesterday[0]['paid'], 'profit' => (int)$ordersYesterday[0]['profit'] ]; } $dashboard['need_ship_count'] = Order::whereUserId(\Auth::Id()) ->where('status', Order::STATUS_PAID)->count(); $dashboard['login'] = \App\Log::where('action', \App\Log::ACTION_LOGIN)->latest()->first(); return Response::success($dashboard); } function clearCache() { if (function_exists('opcache_reset')) { opcache_reset(); } try { \Artisan::call('cache:clear'); \Artisan::call('route:cache'); \Artisan::call('config:cache'); } catch (\Throwable $e) { return Response::fail($e->getMessage()); } return Response::success(); } function version() { $update = []; $version_raw = CurlRequest::curl('https://raw.githubusercontent.com/Tai7sy/card-system/master/.version', 0, null, [], 5, $cookie, $httpCode, $error); $version = @json_decode($version_raw, true); if (!@$version['data']['version']) { Log::error('Dashboard.version checkUpdate failed', ['response' => $version_raw, 'httpCode' => $httpCode, 'error' => $error]); $update['message'] = '检查更新失败: ' . $error; } else { $update = [ 'version' => $version['data']['version'], 'description' => (@$version['data']['description'] ?? '无'), ]; } return Response::success([ 'version' => config('app.version'), 'update' => $update, ]); } function logsToken() { $token = md5(random_bytes(128)); Cache::put($token, Auth::user(), 15 * 60); return response(['token' => $token]); } function logsView(Request $request, $token) { if (preg_match('/\A[a-f0-9]{32}\z/', $token) && ($user = Cache::get($token)) instanceof \App\User && ($user = \App\User::find($user->id)) && ($user->status ?? \App\User::STATUS_OK) === \App\User::STATUS_OK && $user->role === 'admin') { Cache::put($token, $user, 15 * 60); return (new \Rap2hpoutre\LaravelLogViewer\LogViewerController)->index(); } else { throw new \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException('logs-token'); } } } 
+
+namespace App\Http\Controllers\Admin;
+
+use App\Library\CurlRequest;
+use App\Library\Response;
+use App\Order;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+
+class Dashboard extends Controller
+{
+    // 显示平台当日实时收入（已完成订单金额扣除商户平台费率在减去支付通道费率）
+    function index(Request $request)
+    {
+        $dashboard = [
+            'today' => [
+                'count' => 0,
+                'paid' => 0,
+                'profit' => 0
+            ],
+            'yesterday' => [
+                'count' => 0,
+                'paid' => 0,
+                'profit' => 0
+            ]
+        ];
+
+        $ordersToday = Order::whereUserId(\Auth::Id())
+            ->whereDate('paid_at', \Carbon\Carbon::now()->toDateString())
+            ->where(function ($query) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
+                $query->where('status', Order::STATUS_PAID)
+                    ->orWhere('status', Order::STATUS_SUCCESS);
+            })
+            ->selectRaw('COUNT(*) as `count`,SUM(`paid`) as `paid`,SUM(`paid`-`sms_price`-`cost`-`fee`) as `profit`')
+            ->get()->toArray();
+
+        $ordersYesterday = Order::whereUserId(\Auth::Id())
+            ->whereDate('paid_at', \Carbon\Carbon::yesterday()->toDateString())
+            ->where(function ($query) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
+                $query->where('status', Order::STATUS_PAID)
+                    ->orWhere('status', Order::STATUS_SUCCESS);
+            })
+            ->selectRaw('COUNT(*) as `count`,SUM(`paid`) as `paid`,SUM(`paid`-`sms_price`-`cost`-`fee`) as `profit`')
+            ->get()->toArray();
+
+
+        if (isset($ordersToday[0]) && isset($ordersToday[0]['count'])) {
+            $dashboard['today'] = [
+                'count' => (int)$ordersToday[0]['count'],
+                'paid' => (int)$ordersToday[0]['paid'],
+                'profit' => (int)$ordersToday[0]['profit']
+            ];
+        }
+        if (isset($ordersYesterday[0]) && isset($ordersYesterday[0]['count'])) {
+            $dashboard['yesterday'] = [
+                'count' => (int)$ordersYesterday[0]['count'],
+                'paid' => (int)$ordersYesterday[0]['paid'],
+                'profit' => (int)$ordersYesterday[0]['profit']
+            ];
+        }
+
+        $dashboard['need_ship_count'] = Order::whereUserId(\Auth::Id())
+            ->where('status', Order::STATUS_PAID)->count();
+        // 订单状态为 已支付 = 已支付未发货
+
+        $dashboard['login'] = \App\Log::where('action', \App\Log::ACTION_LOGIN)->latest()->first();
+
+        return Response::success($dashboard);
+    }
+
+
+    function clearCache()
+    {
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+        try {
+            \Artisan::call('cache:clear');
+            \Artisan::call('route:cache');
+            \Artisan::call('config:cache');
+        } catch (\Throwable $e) {
+            return Response::fail($e->getMessage());
+        }
+        return Response::success();
+    }
+
+    function version()
+    {
+        $update = [];
+        $version_raw = CurlRequest::curl('https://raw.githubusercontent.com/Tai7sy/card-system/master/.version', 0, null, [], 5, $cookie, $httpCode, $error);
+        $version = @json_decode($version_raw, true);
+
+        if (!@$version['data']['version']) {
+            Log::error('Dashboard.version checkUpdate failed', ['response' => $version_raw, 'httpCode' => $httpCode, 'error' => $error]);
+            $update['message'] = '检查更新失败: ' . $error;
+        } else {
+            $update = [
+                'version' => $version['data']['version'],
+                'description' => (@$version['data']['description'] ?? '无'),
+            ];
+        }
+
+        return Response::success([
+            'version' => config('app.version'),
+            'update' => $update,
+        ]);
+
+    }
+
+    /**
+     * 获取查看日志的Token
+     */
+    function logsToken()
+    {
+        $token = md5(random_bytes(128));
+        Cache::put($token, Auth::user(), 15 * 60);
+        return response(['token' => $token]);
+    }
+
+    /**
+     * 查看日志
+     */
+    function logsView(Request $request, $token)
+    {
+        if (preg_match('/\A[a-f0-9]{32}\z/', $token)
+            && ($user = Cache::get($token)) instanceof \App\User
+            && ($user = \App\User::find($user->id))
+            && ($user->status ?? \App\User::STATUS_OK) === \App\User::STATUS_OK
+            && $user->role === 'admin') {
+            Cache::put($token, $user, 15 * 60);
+            return (new \Rap2hpoutre\LaravelLogViewer\LogViewerController)->index();
+        } else {
+            throw new \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException('logs-token');
+        }
+    }
+}

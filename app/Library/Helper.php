@@ -1,2 +1,325 @@
 <?php
- namespace App\Library; use Hashids\Hashids; class Helper { public static function getMysqlDate($addDays = 0) { return date('Y-m-d', time() + $addDays * 24 * 3600); } public static function getIP() { if (isset($_SERVER)) { if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) { $IPAddress = $_SERVER["HTTP_X_FORWARDED_FOR"]; } else if (isset($_SERVER["HTTP_CLIENT_IP"])) { $IPAddress = $_SERVER["HTTP_CLIENT_IP"]; } else { $IPAddress = @$_SERVER["REMOTE_ADDR"]; } } else { if (getenv("HTTP_X_FORWARDED_FOR")) { $IPAddress = getenv("HTTP_X_FORWARDED_FOR"); } else if (getenv("HTTP_CLIENT_IP")) { $IPAddress = getenv("HTTP_CLIENT_IP"); } else { $IPAddress = getenv("REMOTE_ADDR"); } } if (strpos($IPAddress, ',') !== FALSE) { $IPAddArr = explode(',', $IPAddress); return $IPAddArr[0]; } return $IPAddress; } public static function getClientIP() { if (isset($_SERVER)) { $IPAddress = $_SERVER["REMOTE_ADDR"]; } else { $IPAddress = getenv("REMOTE_ADDR"); } if (strpos($IPAddress, ',') !== FALSE) { $IPAddArr = explode(',', $IPAddress); return $IPAddArr[0]; } return $IPAddress; } public static function filterWords($str, $words) { if (!$str) return false; if (!is_array($words)) { $words = explode('|', $words); } foreach ($words as $word) { if ($word && strpos($str, $word) !== FALSE) { return $word; } } return false; } public static function is_idcard($id_card) { if (strlen($id_card) == 18) { return self::idcard_checksum18($id_card); } elseif ((strlen($id_card) == 15)) { $id_card = self::idcard_15to18($id_card); return self::idcard_checksum18($id_card); } else { return false; } } private static function idcard_verify_number($idcard_base) { if (strlen($idcard_base) != 17) { return false; } $factor = array(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2); $verify_number_list = array('1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'); $checksum = 0; for ($i = 0; $i < strlen($idcard_base); $i++) { $checksum += substr($idcard_base, $i, 1) * $factor[$i]; } $mod = $checksum % 11; $verify_number = $verify_number_list[$mod]; return $verify_number; } private static function idcard_15to18($idcard) { if (strlen($idcard) != 15) { return false; } else { if (array_search(substr($idcard, 12, 3), array('996', '997', '998', '999')) !== false) { $idcard = substr($idcard, 0, 6) . '18' . substr($idcard, 6, 9); } else { $idcard = substr($idcard, 0, 6) . '19' . substr($idcard, 6, 9); } } $idcard = $idcard . self::idcard_verify_number($idcard); return $idcard; } private static function idcard_checksum18($idcard) { if (strlen($idcard) != 18) { return false; } $idcard_base = substr($idcard, 0, 17); if (self::idcard_verify_number($idcard_base) != strtoupper(substr($idcard, 17, 1))) { return false; } else { return true; } } public static function str_between($str, $mark1, $mark2) { $st = strpos($str, $mark1); if ($st === false) return ''; $ed = strpos($str, $mark2, $st + strlen($mark1)); if ($ed === false || $st >= $ed) return ''; $len = strlen($mark1); $ret = substr($str, $st + $len, ($ed - $st - $len)); return $ret; } public static function str_between_longest($str, $mark1, $mark2) { $st = strpos($str, $mark1); if ($st === false) return ''; $ed = strrpos($str, $mark2, $st + strlen($mark1)); if ($ed === false || $st >= $ed) return ''; $len = strlen($mark1); $ret = substr($str, $st + $len, ($ed - $st - $len)); return $ret; } public static function format_url($url) { if (!strlen($url)) return $url; if (!starts_with($url, 'http://') && !starts_with($url, 'https://')) { $url = 'http://' . $url; } while (ends_with($url, '/')) { $url = substr($url, 0, -1); } return $url; } public static function lite_hash($str) { $hash = crc32((string)$str); if ($hash < 0) { $hash &= 1 << 7; } return $hash; } const ID_TYPE_USER = 0; const ID_TYPE_CATEGORY = 1; const ID_TYPE_PRODUCT = 2; const ID_TYPE_AFFILIATE = 3; public static function id_encode($id, $type, ...$args) { $hashids = new Hashids(config('app.key'), 8, 'abcdefghijklmnopqrstuvwxyz1234567890'); return @$hashids->encode(self::lite_hash($id), $id, self::lite_hash($type), $type, ...$args); } public static function id_decode($en_id, $type, &$decode = false) { if (strlen($en_id) < 8) { $hashids = new Hashids(config('app.key')); if ($type === self::ID_TYPE_USER) { return intval(@$hashids->decodeHex($en_id)); } else { return intval(@$hashids->decode($en_id)[0]); } } $hashids = new Hashids(config('app.key'), 8, 'abcdefghijklmnopqrstuvwxyz1234567890'); $decode = @$hashids->decode($en_id) ?? []; return intval($decode[1]); } public static function is_mobile() { if (isset ($_SERVER['HTTP_USER_AGENT'])) { if (preg_match('/(iPhone|iPod|Android|ios|SymbianOS|Windows Phone)/i', $_SERVER['HTTP_USER_AGENT'])) { return true; } } return false; } public static function b1_rand_background() { if (self::is_mobile()) { $arr = [ '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpgyq8n5j20u01hcne2.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpfyjbd0j20u01hcte2.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpw3b5mkj20u01hcnfh.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxoybkicbj20u01hc7de.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpes8rmmj20u01hctn7.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxp8ond6gj20u01hctji.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxp4ljhhvj20u01hck0r.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpstrwnsj20u01hc7he.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxq2a1vthj20u01hc4gs.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpiebjztj20u01hcaom.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxow4b14kj20u01hc43x.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxohtyvgfj20u01hc7gk.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxp6vexa3j20u01hcdj3.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxqa0zhc6j20u01hc14e.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxomnbr0gj20u01hc79r.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpx57f0sj20u01hcqmd.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxoozjilyj20u01hcgt9.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxprigfw1j20u01hcam9.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxod70fcpj20u01hcajj.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpzb5p1tj20u01hcnca.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxozvry57j20u01hcgwo.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpv092lfj20u01hcx1o.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpdz6s0bj20u01hcaqj.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxoso79ayj20u01hcq9c.jpg', '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpqjrtjhj20u01hcapi.jpg' ]; }else{ $arr = [ '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz78cfrj2j21hc0u0kio.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7qj6l3xj21hc0u0b29.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9tqa2fvpj21hc0u017a.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz71m76skj21hc0u0nnq.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz709py6fj21hc0u0wx2.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9sgqv33lj21hc0u04qp.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9s9soh4sj21hc0u01kx.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9s9r2vkzj21hc0u0x4e.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7etbcs8j21hc0u07p3.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9sgn1bluj21hc0u0kiy.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7r6tmv1j21hc0u0anj.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7c4h0xzj21hc0u01kx.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9tq7uypvj21hc0u01be.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1fwr4pjgbncj21hc0u0kjl.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7i6u1gxj21hc0u0tyk.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1fwr4s0fb2tj21hc0u01ky.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz72wkr9dj21hc0u0h1r.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7tj5ohrj21hc0u0qnp.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9sgp23zbj21hc0u0txl.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7l9dcokj21hc0u0k9k.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1fwr4lvumu1j21hc0u0x6p.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7alxyhnj21hc0u0nkh.jpg', '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz799gvb3j21hc0u0qdt.jpg', ]; } return $arr[rand(0, count($arr) - 1)]; } public static function isWakePassword($password){ $top_100 = ['123456', 'password', '12345678', 'qwerty', '123456789', '12345', '1234', '111111', '1234567', 'dragon', '123123', 'baseball', 'abc123', 'football', 'monkey', 'letmein', '696969', 'shadow', 'master', '666666', 'qwertyuiop', '123321', 'mustang', '1234567890', 'michael', '654321', 'pussy', 'superman', '1qaz2wsx', '7777777', 'fuckyou', '121212', '000000', 'qazwsx', '123qwe', 'killer', 'trustno1', 'jordan', 'jennifer', 'zxcvbnm', 'asdfgh', 'hunter', 'buster', 'soccer', 'harley', 'batman', 'andrew', 'tigger', 'sunshine', 'iloveyou', 'fuckme', '2000', 'charlie', 'robert', 'thomas', 'hockey', 'ranger', 'daniel', 'starwars', 'klaster', '112233', 'george', 'asshole', 'computer', 'michelle', 'jessica', 'pepper', '1111', 'zxcvbn', '555555', '11111111', '131313', 'freedom', '777777', 'pass', 'fuck', 'maggie', '159753', 'aaaaaa', 'ginger', 'princess', 'joshua', 'cheese', 'amanda', 'summer', 'love', 'ashley', '6969', 'nicole', 'chelsea', 'biteme', 'matthew', 'access', 'yankees', '987654321', 'dallas', 'austin', 'thunder', 'taylor', 'matrix', 'minecraft']; return in_array($password, $top_100); } }
+
+
+namespace App\Library;
+
+use Hashids\Hashids;
+
+class Helper
+{
+    public static function getMysqlDate($addDays = 0)
+    {
+        return date('Y-m-d', time() + $addDays * 24 * 3600);
+    }
+
+    /**
+     * 获取真实IP地址
+     * @return array|false|string
+     */
+    public static function getIP()
+    {
+        if (isset($_SERVER)) {
+            if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
+                $IPAddress = $_SERVER["HTTP_X_FORWARDED_FOR"];
+            } else if (isset($_SERVER["HTTP_CLIENT_IP"])) {
+                $IPAddress = $_SERVER["HTTP_CLIENT_IP"];
+            } else {
+                $IPAddress = @$_SERVER["REMOTE_ADDR"];
+            }
+        } else {
+            if (getenv("HTTP_X_FORWARDED_FOR")) {
+                $IPAddress = getenv("HTTP_X_FORWARDED_FOR");
+            } else if (getenv("HTTP_CLIENT_IP")) {
+                $IPAddress = getenv("HTTP_CLIENT_IP");
+            } else {
+                $IPAddress = getenv("REMOTE_ADDR");
+            }
+        }
+
+        if (strpos($IPAddress, ',') !== FALSE) {
+            $IPAddArr = explode(',', $IPAddress);
+            return $IPAddArr[0];
+        }
+        return $IPAddress;
+    }
+
+
+    /**
+     * 获取访问这个页面的ip, 如果是cdn的话返回cdn ip
+     * @return array|false|string
+     */
+    public static function getClientIP()
+    {
+        if (isset($_SERVER)) {
+            $IPAddress = $_SERVER["REMOTE_ADDR"];
+        } else {
+            $IPAddress = getenv("REMOTE_ADDR");
+        }
+        if (strpos($IPAddress, ',') !== FALSE) {
+            $IPAddArr = explode(',', $IPAddress);
+            return $IPAddArr[0];
+        }
+        return $IPAddress;
+    }
+
+    /**
+     * @param string $str
+     * @param string|array $words abc|def
+     * @return bool|string
+     */
+    public static function filterWords($str, $words)
+    {
+        if (!$str) return false;
+
+        if (!is_array($words)) {
+            $words = explode('|', $words);
+        }
+        foreach ($words as $word) {
+            if ($word && strpos($str, $word) !== FALSE) {
+                return $word;
+            }
+        }
+
+        return false;
+    }
+
+    public static function is_idcard($id_card)
+    {
+        if (strlen($id_card) == 18) {
+            return self::idcard_checksum18($id_card);
+        } elseif ((strlen($id_card) == 15)) {
+            $id_card = self::idcard_15to18($id_card);
+            return self::idcard_checksum18($id_card);
+        } else {
+            return false;
+        }
+    }
+
+    // 计算身份证校验码，根据国家标准GB 11643-1999
+    private static function idcard_verify_number($idcard_base)
+    {
+        if (strlen($idcard_base) != 17) {
+            return false;
+        }
+        //加权因子
+        $factor = array(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2);
+        //校验码对应值
+        $verify_number_list = array('1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2');
+        $checksum = 0;
+        for ($i = 0; $i < strlen($idcard_base); $i++) {
+            $checksum += substr($idcard_base, $i, 1) * $factor[$i];
+        }
+        $mod = $checksum % 11;
+        $verify_number = $verify_number_list[$mod];
+        return $verify_number;
+    }
+
+    // 将15位身份证升级到18位
+    private static function idcard_15to18($idcard)
+    {
+        if (strlen($idcard) != 15) {
+            return false;
+        } else {
+            // 如果身份证顺序码是996 997 998 999，这些是为百岁以上老人的特殊编码
+            if (array_search(substr($idcard, 12, 3), array('996', '997', '998', '999')) !== false) {
+                $idcard = substr($idcard, 0, 6) . '18' . substr($idcard, 6, 9);
+            } else {
+                $idcard = substr($idcard, 0, 6) . '19' . substr($idcard, 6, 9);
+            }
+        }
+
+        $idcard = $idcard . self::idcard_verify_number($idcard);
+        return $idcard;
+    }
+
+    // 18位身份证校验码有效性检查
+    private static function idcard_checksum18($idcard)
+    {
+        if (strlen($idcard) != 18) {
+            return false;
+        }
+        $idcard_base = substr($idcard, 0, 17);
+        if (self::idcard_verify_number($idcard_base) != strtoupper(substr($idcard, 17, 1))) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static function str_between($str, $mark1, $mark2)
+    {
+        $st = strpos($str, $mark1);
+        if ($st === false) return '';
+        $ed = strpos($str, $mark2, $st + strlen($mark1));
+        if ($ed === false || $st >= $ed) return '';
+        $len = strlen($mark1);
+        $ret = substr($str, $st + $len, ($ed - $st - $len));
+        return $ret;
+    }
+
+    /**
+     * 自动匹配最长段
+     * @param $str
+     * @param $mark1
+     * @param $mark2
+     * @return bool|string
+     */
+    public static function str_between_longest($str, $mark1, $mark2)
+    {
+        $st = strpos($str, $mark1);
+        if ($st === false) return '';
+        $ed = strrpos($str, $mark2, $st + strlen($mark1));
+        if ($ed === false || $st >= $ed) return '';
+        $len = strlen($mark1);
+        $ret = substr($str, $st + $len, ($ed - $st - $len));
+        return $ret;
+    }
+
+    public static function format_url($url)
+    {
+        if (!strlen($url)) return $url;
+        // 格式: http:// 开头 且末尾没有斜杠
+        if (!starts_with($url, 'http://') && !starts_with($url, 'https://')) {
+            $url = 'http://' . $url;
+        }
+        while (ends_with($url, '/')) {
+            $url = substr($url, 0, -1);
+        }
+        return $url;
+    }
+
+    /**
+     * @param $str
+     * @return int 正整数
+     */
+    public static function lite_hash($str)
+    {
+        $hash = crc32((string)$str);
+        if ($hash < 0) {
+            $hash &= 1 << 7;
+        }
+        return $hash;
+    }
+
+    const ID_TYPE_USER = 0;
+    const ID_TYPE_CATEGORY = 1;
+    const ID_TYPE_PRODUCT = 2;
+    const ID_TYPE_AFFILIATE = 3;
+
+    /**
+     * 加密ID
+     * @param int $id
+     * @param int $type
+     * @param array $args 其他数据, 可选
+     * @return string
+     */
+    public static function id_encode($id, $type, ...$args)
+    {
+        $hashids = new Hashids(config('app.key'), 8, 'abcdefghijklmnopqrstuvwxyz1234567890');
+        // lite_hash 保证了 encode_id 分布的随机性
+        return @$hashids->encode(self::lite_hash($id), $id, self::lite_hash($type), $type, ...$args);
+    }
+
+    /**
+     * 解密ID
+     * @param $en_id
+     * @param $type
+     * @param array|bool $decode
+     * @return int
+     */
+    public static function id_decode($en_id, $type, &$decode = false)
+    {
+        if (strlen($en_id) < 8) { // 兼容旧版本
+            $hashids = new Hashids(config('app.key'));
+            if ($type === self::ID_TYPE_USER) {
+                return intval(@$hashids->decodeHex($en_id));
+            } else {
+                return intval(@$hashids->decode($en_id)[0]);
+            }
+        }
+        $hashids = new Hashids(config('app.key'), 8, 'abcdefghijklmnopqrstuvwxyz1234567890');
+        $decode = @$hashids->decode($en_id) ?? [];
+        return intval($decode[1]);
+    }
+
+    /**
+     * is_mobile
+     * @return boolean
+     */
+    public static function is_mobile()
+    {
+        //判断手机发送的客户端标志
+        if (isset ($_SERVER['HTTP_USER_AGENT'])) {
+            // 从HTTP_USER_AGENT中查找手机浏览器的关键字
+            if (preg_match('/(iPhone|iPod|Android|ios|SymbianOS|Windows Phone)/i', $_SERVER['HTTP_USER_AGENT'])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static function b1_rand_background()
+    {
+        if (self::is_mobile()) {
+            $arr = [
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpgyq8n5j20u01hcne2.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpfyjbd0j20u01hcte2.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpw3b5mkj20u01hcnfh.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxoybkicbj20u01hc7de.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpes8rmmj20u01hctn7.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxp8ond6gj20u01hctji.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxp4ljhhvj20u01hck0r.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpstrwnsj20u01hc7he.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxq2a1vthj20u01hc4gs.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpiebjztj20u01hcaom.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxow4b14kj20u01hc43x.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxohtyvgfj20u01hc7gk.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxp6vexa3j20u01hcdj3.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxqa0zhc6j20u01hc14e.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxomnbr0gj20u01hc79r.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpx57f0sj20u01hcqmd.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxoozjilyj20u01hcgt9.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxprigfw1j20u01hcam9.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxod70fcpj20u01hcajj.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpzb5p1tj20u01hcnca.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxozvry57j20u01hcgwo.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpv092lfj20u01hcx1o.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpdz6s0bj20u01hcaqj.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxoso79ayj20u01hcq9c.jpg',
+                '//ww2.sinaimg.cn/large/ac1a0c4agy1ftxpqjrtjhj20u01hcapi.jpg'
+            ];
+        }else{
+            $arr = [
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz78cfrj2j21hc0u0kio.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7qj6l3xj21hc0u0b29.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9tqa2fvpj21hc0u017a.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz71m76skj21hc0u0nnq.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz709py6fj21hc0u0wx2.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9sgqv33lj21hc0u04qp.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9s9soh4sj21hc0u01kx.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9s9r2vkzj21hc0u0x4e.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7etbcs8j21hc0u07p3.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9sgn1bluj21hc0u0kiy.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7r6tmv1j21hc0u0anj.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7c4h0xzj21hc0u01kx.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9tq7uypvj21hc0u01be.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1fwr4pjgbncj21hc0u0kjl.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7i6u1gxj21hc0u0tyk.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1fwr4s0fb2tj21hc0u01ky.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz72wkr9dj21hc0u0h1r.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7tj5ohrj21hc0u0qnp.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ft9sgp23zbj21hc0u0txl.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7l9dcokj21hc0u0k9k.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1fwr4lvumu1j21hc0u0x6p.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz7alxyhnj21hc0u0nkh.jpg',
+                '//ww1.sinaimg.cn/large/ac1a0c4agy1ftz799gvb3j21hc0u0qdt.jpg',
+            ];
+        }
+        return $arr[rand(0, count($arr) - 1)];
+    }
+
+    public static function isWakePassword($password){
+        $top_100 = ['123456', 'password', '12345678', 'qwerty', '123456789', '12345', '1234', '111111', '1234567', 'dragon', '123123', 'baseball', 'abc123', 'football', 'monkey', 'letmein', '696969', 'shadow', 'master', '666666', 'qwertyuiop', '123321', 'mustang', '1234567890', 'michael', '654321', 'pussy', 'superman', '1qaz2wsx', '7777777', 'fuckyou', '121212', '000000', 'qazwsx', '123qwe', 'killer', 'trustno1', 'jordan', 'jennifer', 'zxcvbnm', 'asdfgh', 'hunter', 'buster', 'soccer', 'harley', 'batman', 'andrew', 'tigger', 'sunshine', 'iloveyou', 'fuckme', '2000', 'charlie', 'robert', 'thomas', 'hockey', 'ranger', 'daniel', 'starwars', 'klaster', '112233', 'george', 'asshole', 'computer', 'michelle', 'jessica', 'pepper', '1111', 'zxcvbn', '555555', '11111111', '131313', 'freedom', '777777', 'pass', 'fuck', 'maggie', '159753', 'aaaaaa', 'ginger', 'princess', 'joshua', 'cheese', 'amanda', 'summer', 'love', 'ashley', '6969', 'nicole', 'chelsea', 'biteme', 'matthew', 'access', 'yankees', '987654321', 'dallas', 'austin', 'thunder', 'taylor', 'matrix', 'minecraft'];
+        return in_array($password, $top_100);
+    }
+}

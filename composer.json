@@ -1,13 +1,13 @@
 {
-  "name": "tai7sy/card_free",
-  "description": "card system free",
+  "name": "tai7sy/card-system",
+  "description": "CardSystem open source edition",
   "keywords": [
     "card system free"
   ],
   "license": "MIT",
   "type": "project",
   "require": {
-    "barryvdh/laravel-ide-helper": "^3.6",
+    "php": "^8.2",
     "ext-bcmath": "*",
     "ext-ctype": "*",
     "ext-curl": "*",
@@ -28,17 +28,16 @@
     "laravel/framework": "^12.0",
     "laravel/helpers": "^1.8",
     "laravel/tinker": "^2.10",
+    "laravel/ui": "^4.6",
     "league/flysystem-aws-s3-v3": "^3.0",
     "mews/captcha": "^3.4",
-    "php": "^8.2",
     "predis/predis": "^2.0",
     "rap2hpoutre/laravel-log-viewer": "^2.4",
     "tymon/jwt-auth": "^2.3",
     "voku/anti-xss": "4.0.1",
     "wi1dcard/alipay-sdk": "^1.3",
     "zgldh/qiniu-laravel-storage": "^9.0",
-    "laravel/ui": "^4.6",
-    "ext-gmp": "*"
+    "barryvdh/laravel-ide-helper": "^3.6"
   },
   "require-dev": {
     "filp/whoops": "~2.0",
@@ -89,6 +88,42 @@
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
       "@php artisan package:discover"
+    ],
+    "deploy_for_test": [
+      "echo 'Deploy for test'",
+      "@composer install --no-dev",
+      "@php artisan route:cache",
+      "@php artisan config:cache"
+    ],
+    "dev": [
+      "echo 'Local dev test'",
+      "@composer install",
+      "@composer dump-autoload --optimize",
+      "@php artisan route:clear",
+      "@php artisan config:clear",
+      "@php artisan cache:clear"
+    ],
+    "ide": [
+      "echo 'Generate IdeHelper...'",
+      "@php artisan ide-helper:generate",
+      "@php artisan ide-helper:meta",
+      "echo | @php artisan ide-helper:models"
+    ],
+    "db": [
+      "echo ' * Update the database...'",
+      "@php artisan migrate"
+    ],
+    "db_rebuild": [
+      "echo ' * Rebuild the database...'",
+      "@php artisan migrate:fresh --seed",
+      "@php artisan cache:clear"
+    ],
+    "update_vendor": [
+      "@composer update --optimize-autoloader"
+    ],
+    "build": [
+      "Composer\\Config::disableProcessTimeout",
+      "@php scripts/build-release.php"
     ],
     "test": "@php -d error_reporting=8191 vendor/bin/phpunit",
     "test:aws": "@php tests/aws-storage.php"

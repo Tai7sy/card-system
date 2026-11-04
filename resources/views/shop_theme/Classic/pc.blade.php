@@ -32,9 +32,6 @@
             <div class="nav">
                 <ul>
                     <li><a class="btn" target="_blank" href="/">首页</a></li>
-                    @if(config('app.project') === 'card')
-                        <li><a class="btn" target="_blank" href="/s#/report">投诉订单</a></li>
-                    @endif
                 </ul>
             </div>
         </div>

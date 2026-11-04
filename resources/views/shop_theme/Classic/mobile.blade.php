@@ -29,12 +29,6 @@
     </div>
     <div class="top_menu">
         <ul>
-            @if(config('app.project') === 'card')
-                <li onclick="window.open('/s#/report', '_blank')">
-                    <i class="iconfont icon-zixun"></i>
-                    <br><span>订单投诉</span>
-                </li>
-            @endif
             <li onclick="showAnn()">
                 <i class="iconfont icon-dingdan"></i>
                 <br><span>商家公告</span>

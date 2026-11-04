@@ -1,0 +1,95 @@
+$blue: #20A0FF;
+$el-blue-light: #58B7FF;
+$el-blue-dark: #1D8CE0;
+
+$el-success: #13CE66;
+$el-warning: #F7BA2A;
+$el-danger: #FF4949;
+
+$el-black: #1F2D3D;
+$el-black-light: #324057;
+$el-black-light-extra: #475669;
+
+$el-silver: #8492A6;
+$el-silver-light: #99A9BF;
+$el-silver-light-extra: #C0CCDA;
+
+$el-gray-deep: #909399;
+
+$el-gray: #D3DCE6;
+$el-gray-light: #E5E9F2;
+$el-gray-light-extra: #EFF2F7;
+
+$el-white: #FFFFFF;
+$el-white-dark: #F9FAFC;
+
+
+
+.el-blue {
+  color: $blue
+}
+.el-blue-light {
+  color: $el-blue-light
+}
+.el-blue-dark {
+  color: $el-blue-dark
+}
+.el-success {
+  color: $el-success
+}
+.el-warning {
+  color: $el-warning
+}
+.el-danger {
+  color: $el-danger
+}
+.el-black {
+  color: $el-black
+}
+.el-black-light {
+  color: $el-black-light
+}
+.el-black-light-extra {
+  color: $el-black-light-extra
+}
+.el-silver {
+  color: $el-silver
+}
+.el-silver-light {
+  color: $el-silver-light
+}
+.el-silver-light-extra {
+  color: $el-silver-light-extra
+}
+.el-gray {
+  color: $el-gray
+}
+.el-gray-light {
+  color: $el-gray-light
+}
+.el-gray-light-extra {
+  color: $el-gray-light-extra
+}
+.el-white {
+  color: $el-white
+}
+
+.el-white-dark {
+  color: $el-white-dark
+}
+
+.el-alert--success2 {
+  background-color: #13ce66
+}
+
+.el-alert--info2 {
+  background-color: #50bfff
+}
+
+.el-alert--warning2 {
+  background-color: rgb(255, 208, 94) !important; //更明亮的配色
+}
+
+.el-alert--error2 {
+  background-color: #ff4949
+}

@@ -1,2 +1,79 @@
 <?php
- namespace App; use App\Model_ as Model; class ShopTheme extends Model { protected $guarded = []; public $timestamps = false; protected $casts = [ 'options' => 'array', 'config' => 'array' ]; private static $default_theme; public static function defaultTheme() { if (!static::$default_theme) { static::$default_theme = ShopTheme::query()->where('name', \App\System::_get('shop_theme_default', 'Material'))->first(); if (!static::$default_theme) { static::$default_theme = ShopTheme::query()->firstOrFail(); } } return static::$default_theme; } public static function freshList() { $path = realpath(app_path( '..' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'shop_theme')); \App\ShopTheme::query()->get()->each(function ($theme) use ($path) { if (!file_exists($path . DIRECTORY_SEPARATOR . $theme->name . DIRECTORY_SEPARATOR . 'config.php')) { $theme->delete(); } }); foreach (scandir($path) as $theme_name) { if ($theme_name === '.' || $theme_name === '..') continue; try { @$theme = include($path . DIRECTORY_SEPARATOR . $theme_name . DIRECTORY_SEPARATOR . 'config.php'); } catch (\Exception $e) { continue; } $theme['config'] = array_map(function ($item) { return $item['value']; }, @$theme['options'] ?? []); $old = \App\ShopTheme::query()->where('name', $theme_name)->first(); if ($old) { $old->description = $theme['description']; $old->options = @$theme['options'] ?? []; $old->config = ($old->config ?? []) + $theme['config']; $old->saveOrFail(); }else{ if ($theme && isset($theme['description'])) { \App\ShopTheme::query()->create([ 'name' => $theme_name, 'description' => $theme['description'], 'options' => @$theme['options'] ?? [], 'config' => $theme['config'] ]); } } } } } 
+
+namespace App;
+
+use App\Model_ as Model;
+
+class ShopTheme extends Model
+{
+    protected $guarded = [];
+
+    public $timestamps = false;
+
+    protected $casts = [
+        'options' => 'array',
+        'config' => 'array'
+    ];
+
+    private static $default_theme;
+
+    /**
+     * @return \App\ShopTheme
+     */
+    public static function defaultTheme()
+    {
+        if (!static::$default_theme) {
+            static::$default_theme = ShopTheme::query()->where('name', \App\System::_get('shop_theme_default', 'Material'))->first();
+            if (!static::$default_theme) {
+                static::$default_theme = ShopTheme::query()->firstOrFail();
+            }
+        }
+        return static::$default_theme;
+    }
+
+
+    public static function freshList()
+    {
+        $path = realpath(app_path(
+            '..' . DIRECTORY_SEPARATOR .
+            'resources' . DIRECTORY_SEPARATOR .
+            'views' . DIRECTORY_SEPARATOR .
+            'shop_theme'));
+        \App\ShopTheme::query()->get()->each(function ($theme) use ($path) {
+            /**
+             * @var \App\ShopTheme $theme
+             */
+            if (!file_exists($path . DIRECTORY_SEPARATOR . $theme->name . DIRECTORY_SEPARATOR . 'config.php')) {
+                $theme->delete();
+            }
+        });
+        foreach (scandir($path) as $theme_name) {
+            if ($theme_name === '.' || $theme_name === '..') continue;
+            try {
+                @$theme = include($path . DIRECTORY_SEPARATOR . $theme_name . DIRECTORY_SEPARATOR . 'config.php');
+            } catch (\Exception $e) {
+                continue;
+            }
+            $theme['config'] = array_map(function ($item) {
+                return $item['value'];
+            }, @$theme['options'] ?? []);
+
+            $old = \App\ShopTheme::query()->where('name', $theme_name)->first();
+            if ($old) {
+                $old->description = $theme['description'];
+                $old->options = @$theme['options'] ?? [];
+                $old->config = ($old->config ?? []) + $theme['config'];
+                $old->saveOrFail();
+            }else{
+                if ($theme && isset($theme['description'])) {
+                    \App\ShopTheme::query()->create([
+                        'name' => $theme_name,
+                        'description' => $theme['description'],
+                        'options' => @$theme['options'] ?? [],
+                        'config' => $theme['config']
+                    ]);
+                }
+            }
+        }
+    }
+}

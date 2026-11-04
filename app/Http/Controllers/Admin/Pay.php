@@ -1,2 +1,183 @@
 <?php
- namespace App\Http\Controllers\Admin; use App\Library\Helper; use Carbon\Carbon; use function foo\func; use Illuminate\Http\Request; use App\Http\Controllers\Controller; use App\Library\Response; class Pay extends Controller { function get(Request $request) { $query = \App\Pay::query(); $enabled = $request->input('enabled'); if (strlen($enabled)) $query->whereIn('enabled', explode(',', $enabled)); $searchType = $request->input('search', false); $searchVal = $request->input('val', false); if ($searchType && $searchVal) { if ($searchType == 'simple') { return Response::success($query->get(['id', 'name', 'enabled' ,'comment'])); } elseif ($searchType == 'id') { $query->where('id', $searchVal); } else { $query->where($searchType, 'like', '%' . $searchVal . '%'); } } $list = $query->get(); return Response::success([ 'list' => $list, 'urls' => [ 'url' => config('app.url'), 'url_api' => config('app.url_api'), ] ]); } function stat(Request $request) { $this->validate($request, [ 'day' => 'required|integer|between:1,30' ]); $day = (int)$request->input('day'); if ($day === 30) { $start_at = Carbon::now()->addMonths(-1)->toDateString() . ' 00:00:00'; } else { $start_at = Carbon::now()->addDays(-$day)->toDateString() . ' 00:00:00'; } $list = $this->authQuery($request, \App\Order::class) ->where(function ($query) { $query->where('status', \App\Order::STATUS_PAID) ->orWhere('status', \App\Order::STATUS_SUCCESS); }) ->where('paid_at', '>=', $start_at) ->with(['pay' => function ($query) { $query->select(['id', 'name']); }]) ->groupBy('pay_id') ->selectRaw('`pay_id`,COUNT(*) as "count",SUM(`paid`) as "sum"') ->get()->toArray(); $ret = []; foreach ($list as $item) { if (isset($item['pay']) && isset($item['pay']['name'])) $index = $item['pay']['name']; else $index = '未知方式#' . $item['pay_id']; $ret[$index] = [(int)$item['count'], (int)$item['sum']]; } return Response::success($ret); } function edit(Request $request) { $this->validate($request, [ 'id' => 'sometimes|integer', 'name' => 'required|string', 'driver' => 'required|string', 'way' => 'required|string', 'config' => 'required|string', 'fee_system' => 'required|numeric', ]); $pay = \App\Pay::find((int)$request->post('id')); if (!$pay) { $pay = new \App\Pay; } $pay->name = $request->post('name'); $pay->comment = $request->post('comment'); $pay->driver = $request->post('driver'); $pay->way = $request->post('way'); $pay->config = $request->post('config'); $pay->enabled = (int)$request->post('enabled'); $pay->fee_system = $request->post('fee_system'); $pay->saveOrFail(); return Response::success(); } function comment(Request $request) { $this->validate($request, [ 'id' => 'required|integer', ]); $id = (int)$request->post('id'); $pay = \App\Pay::findOrFail($id); $pay->comment = $request->post('comment'); $pay->save(); return Response::success(); } function fee_system(Request $request) { $this->validate($request, [ 'id' => 'required|integer', ]); $id = (int)$request->post('id'); $pay = \App\Pay::findOrFail($id); $pay->fee_system = $request->post('fee_system'); $pay->saveOrFail(); return Response::success(); } function enable(Request $request) { $this->validate($request, [ 'ids' => 'required|string', 'enabled' => 'required|integer|between:0,3' ]); $ids = $request->post('ids'); $enabled = (int)$request->post('enabled'); \App\Pay::whereIn('id', explode(',', $ids))->update([ 'enabled' => $enabled ]); \App\Pay::flushCache(); return Response::success(); } function delete(Request $request) { $this->validate($request, [ 'ids' => 'required|string', ]); $ids = $request->post('ids'); \App\Pay::whereIn('id', explode(',', $ids))->delete(); \App\Pay::flushCache(); return Response::success(); } }
+
+namespace App\Http\Controllers\Admin;
+
+use App\Library\Helper;
+use Carbon\Carbon;
+use function foo\func;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Library\Response;
+
+class Pay extends Controller
+{
+    function get(Request $request)
+    {
+        $query = \App\Pay::query();
+
+        $enabled = $request->input('enabled');
+        if (strlen($enabled))
+            $query->whereIn('enabled', explode(',', $enabled));
+
+        $searchType = $request->input('search', false);
+        $searchVal = $request->input('val', false);
+        if ($searchType && $searchVal) {
+            if ($searchType == 'simple') {
+                return Response::success($query->get(['id', 'name', 'enabled' ,'comment']));
+            } elseif ($searchType == 'id') {
+                $query->where('id', $searchVal);
+            } else {
+                $query->where($searchType, 'like', '%' . $searchVal . '%');
+            }
+        }
+
+        $list = $query->get();
+
+        return Response::success([
+            'list' => $list,
+            'urls' => [
+                'url' => config('app.url'),
+                'url_api' => config('app.url_api'),
+            ]
+        ]);
+    }
+
+
+    function stat(Request $request)
+    {
+        $this->validate($request, [
+            'day' => 'required|integer|between:1,30'
+        ]);
+
+        $day = (int)$request->input('day');
+        if ($day === 30) {
+            $start_at = Carbon::now()->addMonths(-1)->toDateString() . ' 00:00:00';
+        } else {
+            $start_at = Carbon::now()->addDays(-$day)->toDateString() . ' 00:00:00';
+        }
+
+        $list = $this->authQuery($request, \App\Order::class)
+            ->where(function ($query) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
+                $query->where('status', \App\Order::STATUS_PAID)
+                    ->orWhere('status', \App\Order::STATUS_SUCCESS);
+            })
+            ->where('paid_at', '>=', $start_at)
+            ->with(['pay' => function ($query) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
+                $query->select(['id', 'name']);
+            }])
+            ->groupBy('pay_id')
+            ->selectRaw('`pay_id`,COUNT(*) as "count",SUM(`paid`) as "sum"')
+            ->get()->toArray();
+
+        $ret = [];
+        foreach ($list as $item) {
+            if (isset($item['pay']) && isset($item['pay']['name']))
+                $index = $item['pay']['name'];
+            else $index = '未知方式#' . $item['pay_id'];
+
+            $ret[$index] = [(int)$item['count'], (int)$item['sum']];
+        }
+
+        return Response::success($ret);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
+     */
+    function edit(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'sometimes|integer',
+            'name' => 'required|string',
+            'driver' => 'required|string',
+            'way' => 'required|string',
+            'config' => 'required|string',
+            'fee_system' => 'required|numeric',
+        ]);
+
+        $pay = \App\Pay::find((int)$request->post('id'));
+        if (!$pay) {
+            $pay = new \App\Pay;
+        }
+        $pay->name = $request->post('name');
+        $pay->comment = $request->post('comment');
+        $pay->driver = $request->post('driver');
+        $pay->way = $request->post('way');
+        $pay->config = $request->post('config');
+        $pay->enabled = (int)$request->post('enabled');
+
+        $pay->fee_system = $request->post('fee_system');
+        $pay->saveOrFail();
+        return Response::success();
+    }
+
+    function comment(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required|integer',
+        ]);
+        $id = (int)$request->post('id');
+        /* @var \App\Pay $pay */
+        $pay = \App\Pay::findOrFail($id);
+        $pay->comment = $request->post('comment');
+        $pay->save();
+        return Response::success();
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
+     */
+    function fee_system(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required|integer',
+        ]);
+        $id = (int)$request->post('id');
+        /* @var \App\Pay $pay */
+        $pay = \App\Pay::findOrFail($id);
+        $pay->fee_system = $request->post('fee_system');
+        $pay->saveOrFail();
+        return Response::success();
+    }
+
+
+    function enable(Request $request)
+    {
+        $this->validate($request, [
+            'ids' => 'required|string',
+            'enabled' => 'required|integer|between:0,3'
+        ]);
+        $ids = $request->post('ids');
+        $enabled = (int)$request->post('enabled');
+        \App\Pay::whereIn('id', explode(',', $ids))->update([
+            'enabled' => $enabled
+        ]);
+
+        \App\Pay::flushCache();
+        return Response::success();
+
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    function delete(Request $request)
+    {
+        $this->validate($request, [
+            'ids' => 'required|string',
+        ]);
+        $ids = $request->post('ids');
+        \App\Pay::whereIn('id', explode(',', $ids))->delete();
+
+        \App\Pay::flushCache();
+        return Response::success();
+    }
+}

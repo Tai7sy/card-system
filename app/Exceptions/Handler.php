@@ -1,2 +1,126 @@
 <?php
- namespace App\Exceptions; use App\Library\Helper; use App\Library\Response; use Exception; use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler; use Illuminate\Support\Facades\Log; class Handler extends ExceptionHandler { protected $dontReport = [ ]; protected $dontFlash = [ 'password', 'password_confirmation', ]; public function report(\Throwable $exception) { parent::report($exception); } private function msg($request, $message, $status) { return $request->isXmlHttpRequest() ? response()->json(['message' => $message], $status) : response()->view('errors._', ['code' => $status, 'message' => $message], $status); } public function render($request, \Throwable $e) { if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) { return $this->msg($request, trans('exception.resource_not_found'), 404); } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException || $e instanceof \Illuminate\Auth\AuthenticationException) { Log::error('Caught a UnauthorizedHttpException', ['exception' => $e]); return $this->msg($request, trans('exception.please_login'), 401); } elseif ($e instanceof \Illuminate\Auth\Access\AuthorizationException) { return $this->msg($request, trans('exception.un_authenticated'), 403); } elseif ($e instanceof \Illuminate\Validation\ValidationException) { $request->headers->set('X-Requested-With', 'XMLHttpRequest'); $request->headers->set('Accept', 'application/json'); return parent::render($request, $e); } elseif ($e instanceof \Illuminate\Session\TokenMismatchException) { return $this->msg($request, trans('exception.csrf_token_invalid'), 403); } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) { return $this->msg($request, trans('exception.not_found'), 404); } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException) { return $this->msg($request, trans('exception.method_not_allowed'), 405); } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException) { return $this->msg($request, trans('exception.service_unavailable'), 503); } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) { $statusCode = $e->getStatusCode() ?? 500; switch ($statusCode) { case 429: return $this->msg($request, trans('exception.too_many_requests'), $statusCode); break; default: Log::error('Caught a UnknownHttpException', ['exception' => $e]); return $this->msg($request, trans('exception.service_unavailable'), $statusCode); } } elseif ($e instanceof \Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException) { return $this->msg($request, trans('exception.method_not_allowed'), 405); } elseif ($e instanceof \ErrorException && starts_with($e->getMessage(), 'file_put_contents') && strpos($e->getMessage(), 'failed to open stream') !== FALSE) { $error = $e->getMessage() . "\r\n<br>\r\n<br>请检查目录权限是否正确配置\r\n<br>"; die("[FATAL ERROR] \r\n<br>" . $error); } elseif (get_class($e) === 'Exception') { } Log::error('Uncaught Exception', [ 'exception' => $e, 'method' => $request->method(), 'url' => $request->fullUrl(), 'data' => file_get_contents('php://input'), 'ip' => Helper::getIP() ?? $request->ip(), 'client_ip' => $request->getClientIp(), 'headers' => $request->header() ]); if (config('app.debug')) { return parent::render($request, $e); } else { return $this->msg($request, trans('exception.unknown_error'), 500); } } } 
+
+namespace App\Exceptions;
+
+use App\Library\Helper;
+use App\Library\Response;
+use Exception;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Log;
+
+class Handler extends ExceptionHandler
+{
+    /**
+     * A list of the exception types that are not reported.
+     *
+     * @var array
+     */
+    protected $dontReport = [
+        //
+    ];
+
+    /**
+     * A list of the inputs that are never flashed for validation exceptions.
+     *
+     * @var array
+     */
+    protected $dontFlash = [
+        'password',
+        'password_confirmation',
+    ];
+
+    /**
+     * Report or log an exception.
+     *
+     * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
+     *
+     * @param \Exception $exception
+     * @return void
+     * @throws Exception
+     */
+    public function report(\Throwable $exception)
+    {
+        parent::report($exception);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param string $message
+     * @param int $status
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     */
+    private function msg($request, $message, $status)
+    {
+        return $request->isXmlHttpRequest() ?
+            response()->json(['message' => $message], $status) :
+            response()->view('errors._', ['code' => $status, 'message' => $message], $status);
+    }
+
+    /**
+     * Render an exception into an HTTP response.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param \Exception $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function render($request, \Throwable $e)
+    {
+
+        if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+            return $this->msg($request, trans('exception.resource_not_found'), 404);
+        } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException || $e instanceof \Illuminate\Auth\AuthenticationException) {
+            Log::error('Caught a UnauthorizedHttpException', ['exception' => $e]);
+            return $this->msg($request, trans('exception.please_login'), 401);
+        } elseif ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
+            return $this->msg($request, trans('exception.un_authenticated'), 403);
+        } elseif ($e instanceof \Illuminate\Validation\ValidationException) {
+            // 会显示详细的错误内容
+            $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+            $request->headers->set('Accept', 'application/json');
+            return parent::render($request, $e);
+        } elseif ($e instanceof \Illuminate\Session\TokenMismatchException) { // CSRF
+            return $this->msg($request, trans('exception.csrf_token_invalid'), 403);
+        } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
+            return $this->msg($request, trans('exception.not_found'), 404);
+        } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException) {
+            return $this->msg($request, trans('exception.method_not_allowed'), 405);
+        } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException) {
+            // Log::error('Caught a ServiceUnavailableHttpException', ['exception' => $e]);
+            return $this->msg($request, trans('exception.service_unavailable'), 503);
+        } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+            $statusCode = $e->getStatusCode() ?? 500;
+            switch ($statusCode) {
+                case 429:
+                    return $this->msg($request, trans('exception.too_many_requests'), $statusCode);
+                    break;
+                default:
+                    Log::error('Caught a UnknownHttpException', ['exception' => $e]);
+                    return $this->msg($request, trans('exception.service_unavailable'), $statusCode);
+            }
+        } elseif ($e instanceof \Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException) {
+            // 疑似攻击
+            return $this->msg($request, trans('exception.method_not_allowed'), 405);
+        }  elseif ($e instanceof \ErrorException && starts_with($e->getMessage(), 'file_put_contents') && strpos($e->getMessage(), 'failed to open stream') !== FALSE) {
+            $error = $e->getMessage() . "\r\n<br>\r\n<br>请检查目录权限是否正确配置\r\n<br>";
+            die("[FATAL ERROR] \r\n<br>" . $error);
+        } elseif (get_class($e) === 'Exception') {
+            // return $this->msg($request, $e->getMessage(), 500);
+        }
+
+        Log::error('Uncaught Exception', [
+            'exception' => $e,
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'data' => file_get_contents('php://input'),
+            'ip' => Helper::getIP() ?? $request->ip(),
+            'client_ip' => $request->getClientIp(),
+            'headers' => $request->header()
+        ]);
+
+        if (config('app.debug')) {
+            return parent::render($request, $e);
+        } else {
+            return $this->msg($request, trans('exception.unknown_error'), 500);
+        }
+    }
+}

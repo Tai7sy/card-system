@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>{{ $name }}</title>
+  <meta name="description" content="{{ $description }}"/>
+  <meta name="keywords" content="{{ $keywords }}"/>
+</head>
+<body>
+<noscript>
+  <strong>We're sorry but web_shop doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+</noscript>
+<div id="progress">
+  <div id="progress-timeout" style="display: none; position:fixed;margin-top: 10vh;width:100%">
+    <p>如果您长时间停留在此页面，请确认使用的是最新版浏览器</p>
+    <p>推荐浏览器：<a href="https://www.google.cn/intl/zh-CN_ALL/chrome/" target="_blank">Chrome</a>&nbsp;&nbsp;
+      <a href="https://www.mozilla.org/zh-CN/firefox/" target="_blank">FireFox</a>&nbsp;&nbsp;
+      <a href="http://browser.qq.com/" target="_blank">
+        <del>QQ浏览器</del>
+      </a>
+    </p>
+  </div>
+  <script type="text/javascript">setTimeout(function(){var element=document.getElementById("progress-timeout");if(element){element.style.display="block"}},10000);</script>
+</div>
+<div id="app"></div>
+<div id="bkg"></div>
+<script type="text/javascript">
+  var config = @json($config);
+</script>
+<!-- built files will be auto injected -->
+{!! $js_tj !!}
+{!! $js_kf !!}
+<script type="text/javascript">
+    if(config.theme.music){
+        var music = document.createElement('audio');
+        music.setAttribute('autoplay', 'autoplay');
+        music.setAttribute('controls', 'none');
+        music.setAttribute('loop', 'loop');
+        music.setAttribute('preload', 'auto');
+        music.setAttribute('src', config.theme.music);
+        music.style.display = "none";
+        document.body.appendChild(music);
+    }
+</script>
+</body>
+</html>

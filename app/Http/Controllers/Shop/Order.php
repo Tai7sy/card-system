@@ -1,2 +1,73 @@
 <?php
- namespace App\Http\Controllers\Shop; use App\System; use Carbon\Carbon; use Illuminate\Database\Eloquent\Relations\Relation; use Illuminate\Http\Request; use App\Http\Controllers\Controller; use App\Library\Response; use App\Library\Geetest; use Illuminate\Support\Facades\Cookie; class Order extends Controller { function get(Request $request) { if (\App\System::_getInt('vcode_shop_search') === 1) { $this->validateCaptcha($request); } $query = \App\Order::where('created_at', '>=', (new Carbon)->addDay(-\App\System::_getInt('order_query_day', 30))); $type = $request->post('type', ''); if ($type === 'cookie') { $customer = Cookie::get('customer'); if (strlen($customer) !== 32) return Response::success(); $query->where('customer', $customer); } elseif ($type === 'order_no') { $order_no = $request->post('order_no', ''); if (strlen($order_no) !== 19) return Response::success(); $query->where('order_no', $order_no); } elseif ($type === 'contact') { $contact = $request->post('contact', ''); if (strlen($contact) < 6) return Response::success(); $query->where('contact', $contact); if(System::_getInt('order_query_password_open')) { $query_password = $request->post('query_password', ''); if (strlen($query_password) < 6) return Response::success(); $query->where('query_password', $query_password); } } else { return Response::fail(trans('shop.search_type.required')); } $columns = ['id', 'created_at', 'order_no', 'contact', 'status', 'send_status', 'count', 'paid']; if (1) { $columns[] = 'product_name'; $columns[] = 'contact'; $columns[] = 'contact_ext'; } $list = $query->orderBy('id', 'DESC') ->get($columns); $showMsg = ''; return Response::success([ 'list' => $list, 'msg' => count($list) ? $showMsg : '' ]); } } 
+
+namespace App\Http\Controllers\Shop;
+
+use App\System;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Library\Response;
+use App\Library\Geetest;
+use Illuminate\Support\Facades\Cookie;
+
+class Order extends Controller
+{
+    function get(Request $request)
+    {
+        if (\App\System::_getInt('vcode_shop_search') === 1) {
+            $this->validateCaptcha($request);
+        }
+
+        $query = \App\Order::where('created_at',
+            '>=',
+            (new Carbon)->addDay(-\App\System::_getInt('order_query_day', 30)));
+
+
+        $type = $request->post('type', '');
+        if ($type === 'cookie') {
+            $customer = Cookie::get('customer');
+            if (strlen($customer) !== 32)
+                return Response::success();
+            $query->where('customer', $customer);
+        } elseif ($type === 'order_no') {
+            $order_no = $request->post('order_no', '');
+            if (strlen($order_no) !== 19)
+                return Response::success();
+            $query->where('order_no', $order_no);
+        } elseif ($type === 'contact') {
+            $contact = $request->post('contact', '');
+            if (strlen($contact) < 6)
+                return Response::success();
+            $query->where('contact', $contact);
+
+            if(System::_getInt('order_query_password_open')) {
+                $query_password = $request->post('query_password', '');
+                if (strlen($query_password) < 6)
+                    return Response::success();
+
+                $query->where('query_password', $query_password);
+            }
+        } else {
+            return Response::fail(trans('shop.search_type.required'));
+        }
+
+
+        $columns = ['id', 'created_at', 'order_no', 'contact', 'status', 'send_status', 'count', 'paid'];
+        // 这里不要显示商品名称
+        if (1) {
+            $columns[] = 'product_name';
+            $columns[] = 'contact';
+            $columns[] = 'contact_ext';
+        }
+
+        $list = $query->orderBy('id', 'DESC')
+            ->get($columns);
+
+        $showMsg = '';
+        return Response::success([
+            'list' => $list,
+            'msg' => count($list) ? $showMsg : ''
+        ]);
+    }
+}

@@ -34,9 +34,6 @@ $version = '1.4';
         <div class="nav-buttons">
             <div class="button-container"><a href="#">首页</a></div>
             <div class="button-container"><a target="_blank" href="/s#/record">查询订单</a></div>
-            @if(config('app.project') === 'card')
-                <div class="button-container"><a target="_blank" href="/s#/report">投诉订单</a></div>
-            @endif
         </div>
 
         <!--手机菜单按钮-->
@@ -54,9 +51,6 @@ $version = '1.4';
             <ul class="menu">
                 <li class="menu-item"><a href="#">首页</a></li>
                 <li class="menu-item"><a target="_blank" href="/s#/record">查询订单</a></li>
-                @if(config('app.project') === 'card')
-                    <li class="menu-item"><a target="_blank" href="/s#/report">投诉订单</a></li>
-                @endif
             </ul>
         </div>
     </div>

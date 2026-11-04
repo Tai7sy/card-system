@@ -1,6 +1,266 @@
 <?php
- namespace App\Http\Controllers; use App\Category; use App\Library\Helper; use App\Pay; use App\Product; use App\System; use App\User; use Illuminate\Database\Eloquent\Relations\Relation; use Illuminate\Http\Request; use App\Library\Geetest; use Illuminate\Support\Facades\Auth; use Illuminate\Support\Facades\Cookie; class HomeController extends Controller { private function _shop_render($user, $category = null, $product = null) { $config = [ 'url' => config('app.url'), 'company' => config('app.company'), 'name' => config('app.name'), 'logo' => config('app.logo'), 'functions' => [] ]; if (System::_getInt('product_manual')) { $config['functions'][] = 'product_manual'; } if (System::_getInt('mail_send_order')) { $config['functions'][] = 'mail_send_order'; if (System::_getInt('mail_send_order_use_contact')) { $config['functions'][] = 'mail_send_order_use_contact'; } } if(System::_getInt('order_query_password_open')){ $config['functions'][] = 'order_query_password'; } if (System::_getInt('sms_send_order')) { $config['functions'][] = 'sms_send_order'; $config['sms_send_order'] = [ 'sms_price' => System::_getInt('sms_price') ]; } $config['captcha'] = [ 'driver' => System::_get('vcode_driver'), 'config' => [], 'scene' => [ 'shop' => [ 'buy' => System::_getInt('vcode_shop_buy'), 'search' => System::_getInt('vcode_shop_search'), ] ] ]; $customer = Cookie::get('customer'); $cookie = Cookie::make('customer', strlen($customer) !== 32 ? md5(str_random(16)) : $customer, 43200, null, null, false, false); $shop_theme = null; if (isset($_GET['theme'])) { $shop_theme = \App\ShopTheme::whereName($_GET['theme'])->first(); } if ($user) { $config['shop'] = [ 'name' => config('app.name'), 'qq' => System::_get('shop_qq'), 'ann' => System::_get('shop_ann'), 'ann_pop' => System::_get('shop_ann_pop'), 'inventory' => System::_getInt('shop_inventory') ]; $keywords = false; if ($product) { $category->setVisible(['id', 'name', 'password_open']); if ($category->password_open) { $category->setAttribute('password', $category->getTmpPassword()); $category->makeVisible(['password']); } $product->setForShop($user); $config['categories'] = [$category]; $config['product'] = $product; $name = $product->name . ' - ' . $config['name']; $description = $product->description; if (@$description[0] === '{') { $matches = []; preg_match_all('/"insert":"(.+?)"/', $description, $matches); $description = str_replace('\n', ' ', @join(' ', $matches[1])); } } elseif ($category) { $category->setVisible(['id', 'name', 'password_open']); $config['categories'] = [$category]; $config['product'] = null; $name = $category->name . ' - ' . $config['name']; $description = $category->name; } else { $categories = Category::where('user_id', $user->id) ->orderBy('sort') ->where('enabled', 1) ->get(); foreach ($categories as $category) { $category->setVisible(['id', 'name', 'password_open']); } $config['categories'] = $categories; if (config('app.name') && config('app.title')) { $name = config('app.name') . ' - ' . config('app.title'); } else { $name = config('app.name') ? config('app.name') : config('app.title'); } $description = config('app.description'); $keywords = config('app.keywords'); } $config['pays'] = \App\PayWay::gets($user, function ($query) { $query->where('type', \App\PayWay::TYPE_SHOP) ->whereRaw('enabled&' . (Helper::is_mobile() ? \App\PayWay::ENABLED_MOBILE : \App\PayWay::ENABLED_PC) . '!=0'); }); if (!$shop_theme) { $shop_theme = \App\ShopTheme::defaultTheme(); } $config['theme'] = $user->theme_config && isset($user->theme_config[$shop_theme->name]) ? $user->theme_config[$shop_theme->name] : $shop_theme->config; $keywords = $keywords ? $keywords : preg_replace('/[、，；。！？]/', ', ', $name); } else { throw new \Exception('不可能到这'); } if (isset($config['theme']['background']) && $config['theme']['background'] === '内置1') { $config['theme']['background'] = Helper::b1_rand_background(); } if ($user && $product === null) { if (@$config['theme']['list_type'] === 'list') { foreach ($config['categories'] as $tmp) { if (!$tmp->password_open) { $tmp->getProductsForShop(); } } } else { if (count($config['categories']) === 1) { $tmp = $config['categories'][0]; if (!$tmp->password_open) { $tmp->getProductsForShop(); } } } } return response()->view('shop_theme.' . $shop_theme->name . '.index', [ 'name' => $name, 'title' => config('app.title'), 'keywords' => $keywords, 'description' => $description, 'js_tj' => System::_get('js_tj'), 'js_kf' => System::_get('js_kf'), 'config' => $config ])->cookie($cookie); } public function shop_default(Request $request) { $this->checkIsInMaintain(); $tab = $request->get('tab', ''); return response()->redirectTo('/?theme=Material#/record?tab=' . $tab); } private function _shop_404() { $this->checkIsInMaintain(); return view('message', [ 'title' => '404 NotFound', 'message' => '该链接不存在<br>
-<a style="font-size: 18px" href="/?theme=Material#/record">查询订单</a>' ]); } public function shop_category($en_category_id) { $this->checkIsInMaintain(); $category = Category::whereId(Helper::id_decode($en_category_id, Helper::ID_TYPE_CATEGORY))->with('user')->first(); if (!$category && is_numeric($category)) { $category = Category::whereId($en_category_id) ->where('created_at', '<', \Carbon\Carbon::createFromDate(2019, 1, 1)) ->with('user')->first(); } if (!$category) { return $this->_shop_404(); } return $this->_shop_render($category->user, $category); } public function shop_product(Request $request, $en_product_id) { $this->checkIsInMaintain(); $product = Product::whereId(Helper::id_decode($en_product_id, Helper::ID_TYPE_PRODUCT)) ->with(['user', 'category'])->first(); if (!$product && is_numeric($en_product_id)) { $product = Product::whereId($en_product_id) ->where('created_at', '<', \Carbon\Carbon::createFromDate(2019, 1, 1)) ->with(['user', 'category'])->first(); } if (!$product || !$product->category) { return $this->_shop_404(); } if ($product->password_open && $product->password !== $request->input('p')) { return view('message', [ 'title' => '当前商品需要密码', 'message' => ($request->has('p') ? '密码错误，请重新输入' : '请输入商品密码') . '<br>
+
+namespace App\Http\Controllers;
+
+use App\Category;
+use App\Library\Helper;
+use App\Pay;
+use App\Product;
+use App\System;
+use App\User;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
+use App\Library\Geetest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+
+class HomeController extends Controller
+{
+    /**
+     * 店铺
+     * 通过用户匹配店铺
+     * @param \App\User $user
+     * @param \App\Category|null $category
+     * @param \App\Product|null $product
+     * @return \Illuminate\Http\Response
+     */
+    private function _shop_render($user, $category = null, $product = null)
+    {
+        $config = [
+            'url' => config('app.url'),//支付域名
+            'company' => config('app.company'),
+            'name' => config('app.name'),
+            'logo' => config('app.logo'),
+            'functions' => []
+        ];
+
+        if (System::_getInt('product_manual')) {
+            $config['functions'][] = 'product_manual'; // 开启手动发货功能
+        }
+
+        if (System::_getInt('mail_send_order')) {
+            $config['functions'][] = 'mail_send_order'; // 开启邮件功能
+
+            // 是否直接使用联系方式作为收货邮箱
+            if (System::_getInt('mail_send_order_use_contact')) {
+                $config['functions'][] = 'mail_send_order_use_contact';
+            }
+        }
+
+        if(System::_getInt('order_query_password_open')){
+            $config['functions'][] = 'order_query_password'; // 开启订单查询密码
+        }
+
+        if (System::_getInt('sms_send_order')) {
+            $config['functions'][] = 'sms_send_order'; // 开启短信功能
+            $config['sms_send_order'] = [
+                'sms_price' => System::_getInt('sms_price')
+            ];
+        }
+
+        $config['captcha'] = [
+            'driver' => System::_get('vcode_driver'),
+            'config' => [],
+            'scene' => [
+                'shop' => [
+                    'buy' => System::_getInt('vcode_shop_buy'),
+                    'search' => System::_getInt('vcode_shop_search'),
+                ]
+            ]
+        ];
+        
+        // if ($config['captcha']['driver'] === 'geetest') {
+        //     $config['captcha']['config'] = Geetest\API::get();
+        // }
+
+        $customer = Cookie::get('customer');
+        $cookie = Cookie::make('customer',
+            strlen($customer) !== 32 ? md5(str_random(16)) : $customer,
+            43200, null, null, false, false); // 30 days
+
+        /* @var $shop_theme \App\ShopTheme */
+        $shop_theme = null;
+        if (isset($_GET['theme'])) {
+            $shop_theme = \App\ShopTheme::whereName($_GET['theme'])->first();
+        }
+
+        if ($user) {
+            $config['shop'] = [
+                'name' => config('app.name'),
+                'qq' => System::_get('shop_qq'),
+                'ann' => System::_get('shop_ann'),
+                'ann_pop' => System::_get('shop_ann_pop'),
+                'inventory' => System::_getInt('shop_inventory')
+            ];
+
+            $keywords = false;
+            if ($product) {
+                // 如果是产品连接 (那么一定有分类)
+                $category->setVisible(['id', 'name', 'password_open']);
+                if ($category->password_open) {
+                    $category->setAttribute('password', $category->getTmpPassword());
+                    $category->makeVisible(['password']);
+                }
+                $product->setForShop($user);
+
+                $config['categories'] = [$category];
+                $config['product'] = $product;
+                $name = $product->name . ' - ' . $config['name'];
+                $description = $product->description;
+                if (@$description[0] === '{') {
+                    $matches = [];
+                    preg_match_all('/"insert":"(.+?)"/', $description, $matches);
+                    $description = str_replace('\n', ' ', @join(' ', $matches[1]));
+                }
+            } elseif ($category) {
+                // 如果是分类连接
+                $category->setVisible(['id', 'name', 'password_open']);
+
+                $config['categories'] = [$category];
+                $config['product'] = null;
+                $name = $category->name . ' - ' . $config['name'];
+                $description = $category->name;
+            } else {
+                // 啥也不是. 默认的店铺连接
+                $categories = Category::where('user_id', $user->id)
+                    ->orderBy('sort')
+                    ->where('enabled', 1)
+                    ->get();
+
+                foreach ($categories as $category) {
+                    $category->setVisible(['id', 'name', 'password_open']);
+                }
+
+                $config['categories'] = $categories;
+                if (config('app.name') && config('app.title')) {
+                    $name = config('app.name') . ' - ' . config('app.title');
+                } else {
+                    $name = config('app.name') ? config('app.name') : config('app.title');
+                }
+
+                $description = config('app.description');
+                $keywords = config('app.keywords');
+
+            }
+
+            $config['pays'] = \App\PayWay::gets($user, function ($query) {
+                /** @var \App\PayWay $query */
+                $query->where('type', \App\PayWay::TYPE_SHOP)
+                    ->whereRaw('enabled&' . (Helper::is_mobile() ? \App\PayWay::ENABLED_MOBILE : \App\PayWay::ENABLED_PC) . '!=0');
+            });
+
+            if (!$shop_theme) {
+                $shop_theme = \App\ShopTheme::defaultTheme();
+            }
+
+            $config['theme'] = $user->theme_config && isset($user->theme_config[$shop_theme->name]) ?
+                $user->theme_config[$shop_theme->name] :
+                $shop_theme->config;
+
+            $keywords = $keywords ? $keywords : preg_replace('/[、，；。！？]/', ', ', $name);
+        } else {
+            throw new \Exception('不可能到这');
+        }
+
+        if (isset($config['theme']['background']) && $config['theme']['background'] === '内置1') {
+            $config['theme']['background'] = Helper::b1_rand_background();
+        }
+
+        if ($user && $product === null) {
+            // 不是商品链接
+            if (@$config['theme']['list_type'] === 'list') {
+                foreach ($config['categories'] as $tmp) {
+                    /** @var \App\Category $tmp */
+                    if (!$tmp->password_open) {
+                        // 将当前分类的商品放在 products 属性中
+                        $tmp->getProductsForShop();
+                    }
+                }
+            } else {
+                if (count($config['categories']) === 1) {
+                    // 如果只有一个分类 直接返回商品列表
+                    /** @var \App\Category $tmp */
+                    $tmp = $config['categories'][0];
+                    if (!$tmp->password_open) {
+                        // 将当前分类的商品放在 products 属性中
+                        $tmp->getProductsForShop();
+                    }
+                }
+            }
+        }
+
+        return response()->view('shop_theme.' . $shop_theme->name . '.index', [
+            'name' => $name,
+            'title' => config('app.title'),
+            'keywords' => $keywords,
+            'description' => $description,
+            'js_tj' => System::_get('js_tj'),
+            'js_kf' => System::_get('js_kf'),
+            'config' => $config
+        ])->cookie($cookie);
+    }
+
+
+    public function shop_default(Request $request)
+    {
+        $this->checkIsInMaintain();
+
+        $tab = $request->get('tab', '');
+        return response()->redirectTo('/?theme=Material#/record?tab=' . $tab);
+    }
+
+    private function _shop_404()
+    {
+        $this->checkIsInMaintain();
+
+        return view('message', [
+            'title' => '404 NotFound',
+            'message' => '该链接不存在<br>
+<a style="font-size: 18px" href="/?theme=Material#/record">查询订单</a>'
+        ]);
+    }
+
+    public function shop_category($en_category_id)
+    {
+        $this->checkIsInMaintain();
+
+        $category = Category::whereId(Helper::id_decode($en_category_id, Helper::ID_TYPE_CATEGORY))->with('user')->first();
+        if (!$category && is_numeric($category)) {
+            // Warning
+            // 2019-01-01 之后的用户将无法使用 id 的形式, 转变为 en_id
+            $category = Category::whereId($en_category_id)
+                ->where('created_at', '<', \Carbon\Carbon::createFromDate(2019, 1, 1))
+                ->with('user')->first();
+        }
+        if (!$category) {
+            return $this->_shop_404();
+        }
+
+        return $this->_shop_render($category->user, $category);
+    }
+
+    public function shop_product(Request $request, $en_product_id)
+    {
+        $this->checkIsInMaintain();
+
+        $product = Product::whereId(Helper::id_decode($en_product_id, Helper::ID_TYPE_PRODUCT))
+            ->with(['user', 'category'])->first();
+
+        if (!$product && is_numeric($en_product_id)) {
+            // Warning
+            // 2019-01-01 之后的用户将无法使用 id 的形式, 转变为 en_id
+            $product = Product::whereId($en_product_id)
+                ->where('created_at', '<', \Carbon\Carbon::createFromDate(2019, 1, 1))
+                ->with(['user', 'category'])->first();
+        }
+        if (!$product || !$product->category) {
+            return $this->_shop_404();
+        }
+
+        if ($product->password_open && $product->password !== $request->input('p')) {
+            return view('message', [
+                'title' => '当前商品需要密码',
+                'message' => ($request->has('p') ? '密码错误，请重新输入' : '请输入商品密码') . '<br>
 <style type="text/css">
 .content{ width: 100%;}
 .password{display: block;margin: 8px auto;font-size: 14px;width: 90%;max-width: 340px;height: 30px;border: 1px solid #666; outline: none;padding: 0 10px;vertical-align: top;border-radius: 0;}
@@ -12,4 +272,47 @@
 </div><br>
 <a style="font-size: 18px" href="/s#/record">查询订单</a>&nbsp;&nbsp;
 <a style="font-size: 18px" href="/s#/report">投诉订单</a>\'
-' ]); } return $this->_shop_render($product->user, $product->category, $product); } public function shop() { $this->checkIsInMaintain(); $user = User::firstOrFail(); return $this->_shop_render($user); } public function admin() { $config = []; $config['url'] = config('app.url'); $config['captcha'] = [ 'driver' => System::_get('vcode_driver'), 'config' => [], 'scene' => [ 'auth' => [ 'login' => System::_getInt('vcode_login_admin'), ] ] ]; if (System::_getInt('product_manual')) { $config['functions'] = ['product_manual']; } return view('admin', [ 'config' => $config ]); } } 
+'
+            ]);
+        }
+        return $this->_shop_render($product->user, $product->category, $product);
+    }
+
+
+    public function shop()
+    {
+        $this->checkIsInMaintain();
+
+        $user = User::firstOrFail();
+        return $this->_shop_render($user);
+    }
+
+    public function admin()
+    {
+
+        $config = [];
+        $config['url'] = config('app.url');
+
+        $config['captcha'] = [
+            'driver' => System::_get('vcode_driver'),
+            'config' => [],
+            'scene' => [
+                'auth' => [
+                    'login' => System::_getInt('vcode_login_admin'),
+                ]
+            ]
+        ];
+        
+        // if ($config['captcha']['driver'] === 'geetest') {
+        //     $config['captcha']['config'] = Geetest\API::get();
+        // }
+
+        if (System::_getInt('product_manual')) {
+            $config['functions'] = ['product_manual']; // 开启手动发货功能
+        }
+
+        return view('admin', [
+            'config' => $config
+        ]);
+    }
+}

@@ -1,2 +1,23 @@
 <?php
- namespace App\Http\Middleware; use Closure; use Symfony\Component\HttpFoundation\Response; use Symfony\Component\HttpFoundation\StreamedResponse; use Symfony\Component\HttpFoundation\BinaryFileResponse; class MinifyHtml { public function handle($request, Closure $next) { $response = $next($request); if ($response instanceof Response && !($response instanceof StreamedResponse) && !($response instanceof BinaryFileResponse) && str_contains($response->headers->get('Content-Type', ''), 'text/html')) { $response->setContent(preg_replace('/<!--(?!\[if|<!|>).*?-->/s', '', $response->getContent())); } return $response; } } 
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+
+class MinifyHtml
+{
+    public function handle($request, Closure $next)
+    {
+        $response = $next($request);
+        if ($response instanceof Response && !($response instanceof StreamedResponse)
+            && !($response instanceof BinaryFileResponse)
+            && str_contains($response->headers->get('Content-Type', ''), 'text/html')) {
+            // Preserve whitespace in scripts, styles, textareas, preformatted and inline text.
+            $response->setContent(preg_replace('/<!--(?!\[if|<!|>).*?-->/s', '', $response->getContent()));
+        }
+        return $response;
+    }
+}

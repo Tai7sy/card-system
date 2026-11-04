@@ -1,0 +1,55 @@
+// 不是手机才加载动画, 手机实在是卡
+@media only screen and (min-width: 767px) {
+
+  .slide-fade-enter-active, .slide-fade-leave-active {
+    transition: all .2s ease;
+  }
+
+  .slide-fade-enter, .slide-fade-leave-active {
+    opacity: 0;
+  }
+
+  .slide-fade-enter {
+    transform: translateX(100px);
+  }
+
+  .slide-fade-leave-active {
+    top: 0;
+    position: absolute;
+    transform: translateX(-100px);
+  }
+
+  .list-complete-item {
+    transition: all 1s;
+    display: inline-block;
+    margin-right: 10px;
+  }
+  .list-complete-enter, .list-complete-leave-to
+    /* .list-complete-leave-active for below version 2.1.8 */
+  {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  .list-complete-leave-active {
+    top: 0;
+    position: absolute;
+  }
+
+  .top-slide-enter-active, .top-slide-leave-active {
+    transition: all .2s ease;
+  }
+
+  .top-slide-enter, .top-slide-leave-active {
+    opacity: 0;
+  }
+
+  .top-slide-enter {
+    transform: translateY(-32px);
+  }
+
+  .top-slide-leave-active {
+    transform: translateY(-32px);
+  }
+
+}
+

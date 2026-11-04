@@ -1,2 +1,35 @@
 <?php
- namespace App\Http\Controllers\Merchant; use App\Library\Response; use Illuminate\Http\Request; use App\Http\Controllers\Controller; use Illuminate\Support\Facades\Auth; class Log extends Controller { function get(Request $request) { $user_id = $request->input('user_id'); $action = $request->input('action', \App\Log::ACTION_LOGIN); $query = \App\Log::where('action', $action); $query->where('user_id', Auth::id()); $start_at = $request->input('start_at'); if (strlen($start_at)) $query->where('created_at', '>=', $start_at . ' 00:00:00'); $end_at = $request->input('end_at'); if (strlen($end_at)) $query->where('created_at', '<=', $end_at . ' 23:59:59'); $page = (int)$request->input('current_page', 1); $pageSize = (int)$request->input('per_page', 20); $list = $query->orderBy('created_at', 'DESC') ->paginate($pageSize, ['*'], 'page', $page); return Response::success($list); } } 
+
+namespace App\Http\Controllers\Merchant;
+
+use App\Library\Response;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+
+class Log extends Controller
+{
+    function get(Request $request)
+    {
+        $user_id = $request->input('user_id');
+        $action = $request->input('action', \App\Log::ACTION_LOGIN);
+        $query = \App\Log::where('action', $action);
+
+        $query->where('user_id', Auth::id());
+
+        $start_at = $request->input('start_at');
+        if (strlen($start_at))
+            $query->where('created_at', '>=', $start_at . ' 00:00:00');
+
+        $end_at = $request->input('end_at');
+        if (strlen($end_at))
+            $query->where('created_at', '<=', $end_at . ' 23:59:59');
+
+        $page = (int)$request->input('current_page', 1);
+        $pageSize = (int)$request->input('per_page', 20);
+        $list = $query->orderBy('created_at', 'DESC')
+            ->paginate($pageSize, ['*'], 'page', $page);
+
+        return Response::success($list);
+    }
+}

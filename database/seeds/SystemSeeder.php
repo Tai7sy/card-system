@@ -27,7 +27,7 @@ class SystemSeeder extends Seeder
 
             'keywords' => '在线发卡系统',
             'description' => '我是一个发卡系统, 这里填写描述',
-            'shop_bkg' => 'http://api.izhao.me/img',
+            'shop_bkg' => '',
             'shop_ann' => '欢迎来到XXX小店',
             'shop_ann_pop' => '',
             'shop_inventory' => 1,

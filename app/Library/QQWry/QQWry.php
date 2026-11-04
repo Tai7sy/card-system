@@ -1,2 +1,149 @@
 <?php
- namespace App\Library\QQWry; class QQWry { private $fp; private $firstIP; private $lastIP; private $totalIP; public function __construct($filename = false) { if ($filename === false) { $filename = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'qqwry.dat'; } $this->fp = 0; if (($this->fp = @fopen($filename, 'rb')) !== false) { $this->firstIP = $this->getLong(); $this->lastIP = $this->getLong(); $this->totalIP = ($this->lastIP - $this->firstIP) / 7; register_shutdown_function(array(&$this, '__destruct')); } } public function __destruct() { if ($this->fp) { fclose($this->fp); } $this->fp = 0; } private function getLong() { $result = unpack('Vlong', fread($this->fp, 4)); return $result['long']; } private function _getLong3() { $result = unpack('Vlong', fread($this->fp, 3) . chr(0)); return $result['long']; } private function _packIP($ip) { return pack('N', intval(ip2long($ip))); } private function _getString($data = "") { $char = fread($this->fp, 1); while (ord($char) > 0) { $data .= $char; $char = fread($this->fp, 1); } return $data; } private function _getArea() { $byte = fread($this->fp, 1); switch (ord($byte)) { case 0: $area = ""; break; case 1: case 2: fseek($this->fp, $this->_getLong3()); $area = $this->_getString(); break; default: $area = $this->_getString($byte); break; } return $area; } public function getLocation($ip) { if (!$this->fp) return '请下载qqwry.dat放在app/Library/QQWry目录下'; $location['ip'] = gethostbyname($ip); $ip = $this->_packIP($location['ip']); $l = 0; $u = $this->totalIP; $findip = $this->lastIP; while ($l <= $u) { $i = floor(($l + $u) / 2); fseek($this->fp, $this->firstIP + $i * 7); $beginip = strrev(fread($this->fp, 4)); if ($ip < $beginip) { $u = $i - 1; } else { fseek($this->fp, $this->_getLong3()); $endip = strrev(fread($this->fp, 4)); if ($ip > $endip) { $l = $i + 1; } else { $findip = $this->firstIP + $i * 7; break; } } } fseek($this->fp, $findip); $location['beginip'] = long2ip($this->getLong()); $offset = $this->_getLong3(); fseek($this->fp, $offset); $location['endip'] = long2ip($this->getLong()); $byte = fread($this->fp, 1); switch (ord($byte)) { case 1: $countryOffset = $this->_getLong3(); fseek($this->fp, $countryOffset); $byte = fread($this->fp, 1); switch (ord($byte)) { case 2: fseek($this->fp, $this->_getLong3()); $location['country'] = $this->_getString(); fseek($this->fp, $countryOffset + 4); $location['area'] = $this->_getArea(); break; default: $location['country'] = $this->_getString($byte); $location['area'] = $this->_getArea(); break; } break; case 2: fseek($this->fp, $this->_getLong3()); $location['country'] = $this->_getString(); fseek($this->fp, $offset + 8); $location['area'] = $this->_getArea(); break; default: $location['country'] = $this->_getString($byte); $location['area'] = $this->_getArea(); break; } if ($location['country'] == ' CZ88.NET') { $location['country'] = '未知'; } if ($location['area'] == ' CZ88.NET') { $location['area'] = ''; } return iconv('gbk', 'utf-8//IGNORE', $location['country'] . $location['area']); } }
+
+namespace App\Library\QQWry;
+
+class QQWry
+{
+    private $fp;
+    private $firstIP;
+    private $lastIP;
+    private $totalIP;
+
+    public function __construct($filename = false)
+    {
+        if ($filename === false) {
+            $filename = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'qqwry.dat';
+        }
+        $this->fp = 0;
+        if (($this->fp = @fopen($filename, 'rb')) !== false) {
+            $this->firstIP = $this->getLong();
+            $this->lastIP = $this->getLong();
+            $this->totalIP = ($this->lastIP - $this->firstIP) / 7;
+            register_shutdown_function(array(&$this, '__destruct'));
+        }
+    }
+
+    public function __destruct()
+    {
+        if ($this->fp) {
+            fclose($this->fp);
+        }
+        $this->fp = 0;
+    }
+
+    private function getLong()
+    {
+        $result = unpack('Vlong', fread($this->fp, 4));
+        return $result['long'];
+    }
+
+    private function _getLong3()
+    {
+        $result = unpack('Vlong', fread($this->fp, 3) . chr(0));
+        return $result['long'];
+    }
+
+    private function _packIP($ip)
+    {
+        return pack('N', intval(ip2long($ip)));
+    }
+
+    private function _getString($data = "")
+    {
+        $char = fread($this->fp, 1);
+        while (ord($char) > 0) {
+            $data .= $char;
+            $char = fread($this->fp, 1);
+        }
+        return $data;
+    }
+
+    private function _getArea()
+    {
+        $byte = fread($this->fp, 1);
+        switch (ord($byte)) {
+            case 0:
+                $area = "";
+                break;
+            case 1:
+            case 2:
+                fseek($this->fp, $this->_getLong3());
+                $area = $this->_getString();
+                break;
+            default:
+                $area = $this->_getString($byte);
+                break;
+        }
+        return $area;
+    }
+
+    public function getLocation($ip)
+    {
+        // free 版本不带IP库, (大小考虑)
+        if (!$this->fp) return '请下载qqwry.dat放在app/Library/QQWry目录下';
+        $location['ip'] = gethostbyname($ip);
+        $ip = $this->_packIP($location['ip']);
+        $l = 0;
+        $u = $this->totalIP;
+        $findip = $this->lastIP;
+        while ($l <= $u) {
+            $i = floor(($l + $u) / 2);
+            fseek($this->fp, $this->firstIP + $i * 7);
+            $beginip = strrev(fread($this->fp, 4));
+            if ($ip < $beginip) {
+                $u = $i - 1;
+            } else {
+                fseek($this->fp, $this->_getLong3());
+                $endip = strrev(fread($this->fp, 4));
+                if ($ip > $endip) {
+                    $l = $i + 1;
+                } else {
+                    $findip = $this->firstIP + $i * 7;
+                    break;
+                }
+            }
+        }
+        fseek($this->fp, $findip);
+        $location['beginip'] = long2ip($this->getLong());
+        $offset = $this->_getLong3();
+        fseek($this->fp, $offset);
+        $location['endip'] = long2ip($this->getLong());
+        $byte = fread($this->fp, 1);
+        switch (ord($byte)) {
+            case 1:
+                $countryOffset = $this->_getLong3();
+                fseek($this->fp, $countryOffset);
+                $byte = fread($this->fp, 1);
+                switch (ord($byte)) {
+                    case 2:
+                        fseek($this->fp, $this->_getLong3());
+                        $location['country'] = $this->_getString();
+                        fseek($this->fp, $countryOffset + 4);
+                        $location['area'] = $this->_getArea();
+                        break;
+                    default:
+                        $location['country'] = $this->_getString($byte);
+                        $location['area'] = $this->_getArea();
+                        break;
+                }
+                break;
+            case 2:
+                fseek($this->fp, $this->_getLong3());
+                $location['country'] = $this->_getString();
+                fseek($this->fp, $offset + 8);
+                $location['area'] = $this->_getArea();
+                break;
+            default:
+                $location['country'] = $this->_getString($byte);
+                $location['area'] = $this->_getArea();
+                break;
+        }
+        if ($location['country'] == ' CZ88.NET') {
+            $location['country'] = '未知';
+        }
+        if ($location['area'] == ' CZ88.NET') {
+            $location['area'] = '';
+        }
+        return iconv('gbk', 'utf-8//IGNORE', $location['country'] . $location['area']);
+    }
+}

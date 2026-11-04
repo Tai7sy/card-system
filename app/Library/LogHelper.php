@@ -1,2 +1,26 @@
 <?php
- namespace App\Library; use Illuminate\Support\Facades\Log; class LogHelper { private static $log_file; public static function setLogFile($file) { $old_file = self::$log_file; self::$log_file = $file; config(['logging.channels.card' => [ 'driver' => 'daily', 'path' => storage_path('logs/' . $file . '_' . PHP_SAPI . '.log'), 'days' => 0, 'level' => config('app.log_level', 'error'), ]]); Log::forgetChannel('card'); Log::setDefaultDriver('card'); return $old_file; } } 
+
+
+namespace App\Library;
+
+use Illuminate\Support\Facades\Log;
+
+class LogHelper
+{
+    private static $log_file;
+
+    public static function setLogFile($file)
+    {
+        $old_file = self::$log_file;
+        self::$log_file = $file;
+        config(['logging.channels.card' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/' . $file . '_' . PHP_SAPI . '.log'),
+            'days' => 0,
+            'level' => config('app.log_level', 'error'),
+        ]]);
+        Log::forgetChannel('card');
+        Log::setDefaultDriver('card');
+        return $old_file;
+    }
+}

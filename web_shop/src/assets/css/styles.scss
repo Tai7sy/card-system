@@ -1,0 +1,223 @@
+@import "helper";
+
+body {
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+}
+
+a {
+  color: #03a9f4;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/*
+::-webkit-scrollbar {
+  display: none;
+}
+*/
+input:-webkit-autofill {
+  background-color: #fff;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.over-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html, body {
+  height: 100vh;
+  margin: 0;
+}
+
+#bkg {
+  content: ' ';
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  // don't optimize this !!!
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  position: relative;
+
+  .content {
+    text-align: center;
+  }
+}
+
+.my-card {
+  transition: all 0.5s ease;
+  box-shadow: 0 1px 6px 0 rgba(0, 0, 0, .1);
+
+  &:hover {
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .15) !important;
+  }
+}
+
+.mu-bottom-nav {
+  z-index: 1;
+  box-shadow: 0 -3px 9px -4px rgba(0, 0, 0, 0.25);
+}
+
+.s-opacity-75 {
+  .header-title {
+    color: #fff !important;
+  }
+
+  .header-btn {
+    color: #ffffff90;
+
+    &:hover {
+      color: #fff;
+    }
+
+    &.active {
+      color: #fff;
+    }
+  }
+
+  .gray-background {
+    background: none !important;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, .4)), to(rgba(0, 0, 0, .4))) !important;
+    background-image: -moz-linear-gradient(rgba(0, 0, 0, .4) 0, rgba(0, 0, 0, .4) 100%) !important;
+    background-image: -ms-linear-gradient(rgba(0, 0, 0, .4) 0, rgba(0, 0, 0, .4) 100%) !important;
+    background-image: -o-linear-gradient(rgba(0, 0, 0, .4) 0, rgba(0, 0, 0, .4) 100%) !important;
+    background-image: linear-gradient(rgba(0, 0, 0, .4) 0, rgba(0, 0, 0, .4) 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#66000000, endColorstr=#66000000) !important;
+
+    .s-item:hover {
+      color: #333 !important;
+      background-color: transparent !important;
+      background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(240, 240, 240, .45)), to(rgba(240, 240, 240, .45))) !important;
+      background-image: -moz-linear-gradient(rgba(240, 240, 240, .45) 0, rgba(240, 240, 240, .45) 100%) !important;
+      background-image: -ms-linear-gradient(rgba(240, 240, 240, .45) 0, rgba(240, 240, 240, .45) 100%) !important;
+      background-image: -o-linear-gradient(rgba(240, 240, 240, .45) 0, rgba(240, 240, 240, .45) 100%) !important;
+      background-image: linear-gradient(rgba(240, 240, 240, .45) 0, rgba(240, 240, 240, .45) 100%) !important;
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#72f0f0f0, endColorstr=#72f0f0f0) !important
+    }
+  }
+
+  .white-background {
+    background: none !important;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, .75)), to(rgba(255, 255, 255, .75))) !important;
+    background-image: -moz-linear-gradient(rgba(255, 255, 255, .75) 0, rgba(255, 255, 255, .75) 100%) !important;
+    background-image: -ms-linear-gradient(rgba(255, 255, 255, .75) 0, rgba(255, 255, 255, .75) 100%) !important;
+    background-image: -o-linear-gradient(rgba(255, 255, 255, .75) 0, rgba(255, 255, 255, .75) 100%) !important;
+    background-image: linear-gradient(rgba(255, 255, 255, .75) 0, rgba(255, 255, 255, .75) 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#bfffffff, endColorstr=#bfffffff) !important
+  }
+
+  footer {
+    .text > * {
+      will-change: opacity;
+      /* This value is the OPPOSITE color of our background */
+      mix-blend-mode: overlay;
+      color: #FFF !important;
+    }
+
+    .text > .link:hover {
+      mix-blend-mode: difference;
+    }
+  }
+
+  .record-title {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  .mu-tabs {
+    .mu-tab {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    .mu-tab-active {
+      color: #fff !important;
+    }
+
+    .mu-tab-active > div > .mu-ripple-wrapper {
+      background-color: rgba(255, 255, 255, 0.07) !important;
+    }
+  }
+
+  .mu-table {
+    background-color: transparent !important;
+
+    .mu-tr {
+      transition: all 0.3s ease;
+    }
+
+    .mu-tr.hover {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  .mu-bottom-nav {
+    box-shadow: none;
+  }
+}
+
+.quill-html {
+  img {
+    max-width: 100%;
+  }
+}
+
+.equal-with-mu {
+  display: inline-block !important;
+  height: 72px !important;
+  vertical-align: top;
+  line-height: 96px !important;
+}
+
+// IE10 and IE11   (Method 1)
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  .equal-with-mu {
+    vertical-align: bottom;
+  }
+}
+
+//3.0
+.geetest_holder{
+  &.geetest_wind{
+    width: auto !important;
+    min-width: unset !important;
+  }
+
+  .geetest_btn {
+    
+    margin-bottom: 24px;
+    min-width: auto !important;
+  }
+}
+
+//2.0
+.gt_holder {
+  width: 290px;
+  margin: 0 auto;
+  padding-top: 20px;
+  z-index: 4;
+
+  .gt_holder_top {
+    display: none
+  }
+
+  .gt_box_holder {
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    margin-bottom: 10px
+  }
+
+  .gt_bottom {
+    display: none
+  }
+}

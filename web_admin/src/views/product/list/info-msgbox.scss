@@ -1,0 +1,22 @@
+
+.product-info-msgbox{
+  .el-tag-label {
+    margin-left: 4px;
+    line-height: 22px;
+    height: 22px;
+    padding: 0 3px
+  }
+
+  .small-input {
+    width: 100px;
+    border: 1px solid #dcdfe6;
+    outline: 0;
+    border-radius: 2px;
+    padding: 2px 4px;
+    transition: border-color .2s cubic-bezier(.645, .045, .355, 1);
+  }
+
+  .small-input:hover {
+    border-color: #409EFF;
+  }
+}
