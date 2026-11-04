@@ -21,7 +21,7 @@ class ConfigServiceProvider extends ServiceProvider
 
         config()->set([
             'app.project' => 'card_free',
-            'app.version' => '3.20',
+            'app.version' => '3.21',
         ]);
 
         // Build and metadata commands do not require a configured business database.

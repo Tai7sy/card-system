@@ -114,6 +114,7 @@ class System extends Controller
     function order(Request $request)
     {
         $names = [
+            'order_pay_timeout_minutes',
             'order_query_password_open',
             'order_query_day',
             'order_clean_unpay_open',
