@@ -829,7 +829,7 @@ class Pay extends Controller
             'success' => true,
             'msg' => $order->getSendMessage(),
         ], [
-            'card_txt' => join('&#013;&#010;', $order->getCardsArray()),
+            'card_txt' => join("\r\n", $order->getCardsArray()),
             'order' => $order,
             'product' => $order->product
         ]);

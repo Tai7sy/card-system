@@ -23,7 +23,7 @@ class PayTableSeeder extends Seeder
   "api_id": "你的 API_ID",
   "api_key": "你的 API_KEY"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -36,7 +36,7 @@ class PayTableSeeder extends Seeder
   "api_id": "你的 API_ID",
   "api_key": "你的 API_KEY"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -49,7 +49,7 @@ class PayTableSeeder extends Seeder
   "api_id": "你的 API_ID",
   "api_key": "你的 API_KEY"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -62,7 +62,7 @@ class PayTableSeeder extends Seeder
   "api_id": "你的 API_ID",
   "api_key": "你的 API_KEY"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
 
@@ -75,7 +75,7 @@ class PayTableSeeder extends Seeder
   "partner": "partner",
   "key": "key"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -87,7 +87,7 @@ class PayTableSeeder extends Seeder
   "partner": "partner",
   "key": "key"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
 
@@ -101,7 +101,7 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -114,7 +114,7 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -127,7 +127,7 @@ class PayTableSeeder extends Seeder
   "alipay_public_key": "alipay_public_key",
   "merchant_private_key": "merchant_private_key"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
 
@@ -142,7 +142,7 @@ class PayTableSeeder extends Seeder
   "MCHID": "商户ID",
   "KEY": "KEY"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -156,7 +156,7 @@ class PayTableSeeder extends Seeder
   "MCHID": "商户ID",
   "KEY": "KEY"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -170,7 +170,7 @@ class PayTableSeeder extends Seeder
   "MCHID": "商户ID",
   "KEY": "KEY"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -182,7 +182,7 @@ class PayTableSeeder extends Seeder
   "mch_id": "mch_id",
   "mch_key": "mch_key"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -195,7 +195,7 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -208,7 +208,7 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -221,7 +221,7 @@ class PayTableSeeder extends Seeder
   "client_secret": "client_secret",
   "kdt_id": "kdt_id"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->save();
 
         $pay = new \App\Pay;
@@ -233,7 +233,7 @@ class PayTableSeeder extends Seeder
   "id": "id",
   "key": "key"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->fee_system = 0;
         $pay->save();
 
@@ -246,7 +246,7 @@ class PayTableSeeder extends Seeder
   "id": "id",
   "key": "key"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->fee_system = 0;
         $pay->save();
 
@@ -259,7 +259,7 @@ class PayTableSeeder extends Seeder
   "id": "id",
   "key": "key"
 }';
-        $pay->enabled = true;
+        $pay->enabled = false;
         $pay->fee_system = 0;
         $pay->save();
 
