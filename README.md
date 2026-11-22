@@ -105,7 +105,7 @@ composer test:aws        # 离线测试
 composer build
 ```
 
-输出：`build/releases/card-system-3.21.tar.gz`。
+输出：`build/releases/card_release.tar.gz`。
 
 ## 常见问题
 

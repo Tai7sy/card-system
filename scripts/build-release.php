@@ -96,7 +96,7 @@ try {
         throw new RuntimeException('Invalid app.version in ConfigServiceProvider.php.');
     }
     $version = $match[1];
-    $archiveName = 'card-system-' . $version . '.tar.gz';
+    $archiveName = 'card_release.tar.gz';
     $versionFile['version'] = $version;
     $versionFile['data']['version'] = $version;
     $versionFile['url'] = preg_replace('~(/releases/download/)[^/]+/[^/?#]+~',
