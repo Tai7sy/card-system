@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/minify-php.php';
 
-// Build from a committed tree so local configuration and untracked files never
-// become part of a release. No application boot or database connection is needed.
+// Build current source files, including uncommitted changes, in a disposable tree.
+// Git-ignored files stay excluded. No application boot or database connection is needed.
 $root = dirname(__DIR__);
 $temporaryRoot = null;
 $pendingArchive = null;
+$pendingVersion = null;
 
 function command(array $arguments, string $directory, bool $capture = false): string
 {
@@ -55,22 +56,29 @@ function cleanTemporaryTree(string $directory, string $ownedRoot): void
     if (!rmdir($directory)) throw new RuntimeException('Cannot remove temporary directory: ' . $directory);
 }
 
-try {
-    if (command(['git', 'status', '--porcelain', '--untracked-files=no'], $root, true) !== '') {
-        throw new RuntimeException('Commit tracked changes before building a release. Local untracked files are excluded.');
+function copyWorkingTree(string $source, string $destination, array $excluded = []): void
+{
+    $files = command(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z'], $source, true);
+    foreach (array_unique(explode("\0", $files)) as $relative) {
+        if ($relative === '' || in_array($relative, $excluded, true)) continue;
+        $path = $source . '/' . $relative;
+        if (is_link($path)) throw new RuntimeException('Release source must not be a symbolic link: ' . $relative);
+        if (!file_exists($path)) continue; // Respect deletions in the working tree.
+        if (!is_file($path)) throw new RuntimeException('Unexpected source directory: ' . $relative);
+        $target = $destination . '/' . $relative;
+        if (!is_dir(dirname($target)) && !mkdir(dirname($target), 0755, true)) {
+            throw new RuntimeException('Cannot create source directory: ' . dirname($target));
+        }
+        if (!copy($path, $target)) throw new RuntimeException('Cannot copy release source: ' . $relative);
     }
+}
+
+try {
     $revision = command(['git', 'rev-parse', 'HEAD'], $root, true);
     $submodule = 'app/Library/Gateway';
-    $entry = command(['git', 'ls-tree', 'HEAD', '--', $submodule], $root, true);
-    if (!preg_match('/^160000 commit ([a-f0-9]{40})\s/', $entry, $match)) {
-        throw new RuntimeException('The Gateway submodule is missing from the committed tree.');
-    }
-    $gatewayRevision = $match[1];
     $gatewayPath = $root . '/' . $submodule;
-    if (!file_exists($gatewayPath . '/.git') ||
-        command(['git', 'rev-parse', 'HEAD'], $gatewayPath, true) !== $gatewayRevision ||
-        command(['git', 'status', '--porcelain'], $gatewayPath, true) !== '') {
-        throw new RuntimeException('Initialize the pinned Gateway submodule and keep its working tree clean.');
+    if (!file_exists($gatewayPath . '/.git') || !is_file($gatewayPath . '/Pay/Pay.php')) {
+        throw new RuntimeException('Initialize the Gateway submodule before building.');
     }
 
     $temporaryRoot = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'card-system-build-' . bin2hex(random_bytes(8));
@@ -78,16 +86,23 @@ try {
     file_put_contents($temporaryRoot . '/.card-system-build-owner', $revision);
     $packageRoot = $temporaryRoot . '/card-system';
     mkdir($packageRoot, 0755);
-    echo "Preparing committed source $revision\n";
-    command(['git', 'archive', '--format=tar', '--output=' . $temporaryRoot . '/source.tar', $revision], $root);
-    command(['tar', '-xf', $temporaryRoot . '/source.tar', '-C', $packageRoot], $root);
-    if (!is_dir($packageRoot . '/' . $submodule)) mkdir($packageRoot . '/' . $submodule, 0755, true);
-    command(['git', '-c', 'core.autocrlf=false', '-c', 'core.eol=lf', 'archive', '--format=tar', '--output=' . $temporaryRoot . '/gateway.tar', $gatewayRevision], $gatewayPath);
-    command(['tar', '-xf', $temporaryRoot . '/gateway.tar', '-C', $packageRoot . '/' . $submodule], $root);
+    echo "Preparing current working tree (base commit $revision)...\n";
+    copyWorkingTree($root, $packageRoot, [$submodule]);
+    copyWorkingTree($gatewayPath, $packageRoot . '/' . $submodule);
 
     $versionFile = json_decode(file_get_contents($packageRoot . '/.version'), true, 512, JSON_THROW_ON_ERROR);
-    $version = $versionFile['version'] ?? '';
-    if (!preg_match('/\A[0-9]+(?:\.[0-9]+)*\z/', $version)) throw new RuntimeException('Invalid release version.');
+    $provider = file_get_contents($packageRoot . '/app/Providers/ConfigServiceProvider.php');
+    if (!preg_match('/[\'\"]app\.version[\'\"]\s*=>\s*[\'\"]([0-9]+(?:\.[0-9]+)*)[\'\"]/', $provider, $match)) {
+        throw new RuntimeException('Invalid app.version in ConfigServiceProvider.php.');
+    }
+    $version = $match[1];
+    $archiveName = 'card-system-' . $version . '.tar.gz';
+    $versionFile['version'] = $version;
+    $versionFile['data']['version'] = $version;
+    $versionFile['url'] = preg_replace('~(/releases/download/)[^/]+/[^/?#]+~',
+        '${1}' . $version . '/' . $archiveName, $versionFile['url'], 1, $urlReplacements);
+    if ($urlReplacements !== 1) throw new RuntimeException('Invalid release download URL in .version.');
+    echo "Release version: $version\n";
 
     $composerBinary = getenv('COMPOSER_BINARY');
     $composer = $composerBinary && is_file($composerBinary)
@@ -130,7 +145,6 @@ try {
         $minification['files'], $minification['before'] / 1048576, $minification['after'] / 1048576,
         $minification['vendor_before'] / 1048576, $minification['vendor_after'] / 1048576);
 
-    $archiveName = 'card-system-' . $version . '.tar.gz';
     $archivePath = $temporaryRoot . '/' . $archiveName;
     echo "Packing $archiveName...\n";
     command([
@@ -138,6 +152,8 @@ try {
         '--exclude=node_modules', '--exclude=.git', '--exclude=.env', '--exclude=.env.local',
         '--exclude=.env.*.local', '--exclude=card-system/build', '--exclude=card-system/tests',
         '--exclude=card-system/.github',
+        // The release index describes this archive and cannot contain its own digest.
+        '--exclude=card-system/.version',
         '--exclude=card-system/storage/framework/testing', 'card-system',
     ], $temporaryRoot);
     $entries = command(['tar', '-tzf', $archivePath], $root, true);
@@ -155,14 +171,25 @@ try {
     $destination = $releaseDirectory . '/' . $archiveName;
     $pendingArchive = $destination . '.tmp-' . bin2hex(random_bytes(4));
     if (!copy($archivePath, $pendingArchive)) throw new RuntimeException('Cannot stage release archive.');
+    $md5 = md5_file($pendingArchive);
+    if ($md5 === false) throw new RuntimeException('Cannot calculate release MD5.');
+    $versionFile['md5'] = $md5;
+    $versionJson = json_encode($versionFile, JSON_THROW_ON_ERROR) . "\n";
+    $pendingVersion = $root . '/.version.tmp-' . bin2hex(random_bytes(4));
+    if (file_put_contents($pendingVersion, $versionJson) !== strlen($versionJson)) {
+        throw new RuntimeException('Cannot stage release metadata.');
+    }
     if (!rename($pendingArchive, $destination)) throw new RuntimeException('Cannot publish completed release archive.');
     $pendingArchive = null;
-    echo "Release: $destination\nSHA256: " . hash_file('sha256', $destination) . "\n";
+    if (!rename($pendingVersion, $root . '/.version')) throw new RuntimeException('Cannot update repository .version.');
+    $pendingVersion = null;
+    echo "Release: $destination\nMD5: $md5\nUpdated: $root/.version\n";
 } catch (Throwable $error) {
     file_put_contents('php://stderr', 'Build failed: ' . $error->getMessage() . "\n");
     $failed = true;
 } finally {
     if ($pendingArchive !== null && is_file($pendingArchive)) unlink($pendingArchive);
+    if ($pendingVersion !== null && is_file($pendingVersion)) unlink($pendingVersion);
     if ($temporaryRoot !== null && is_dir($temporaryRoot)) {
         try {
             cleanTemporaryTree($temporaryRoot, $temporaryRoot);
